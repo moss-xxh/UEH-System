@@ -2,364 +2,403 @@
 (function() {
     'use strict';
 
-    // 创建推送通知HTML
-    function createPushNotificationsHTML() {
+    // 创建通知弹窗HTML
+    function createNotificationHTML() {
         return `
-            <!-- 推送通知弹窗 -->
-            <div id="chargeNotification" class="push-notification" style="display: none;">
-                <div class="push-notification-header">
-                    <div class="push-notification-title">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="#00ff88" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span data-i18n="chargeReminder">充电提醒</span><span>——</span><span class="notification-region">NSW</span>
+            <div id="chargeNotification" class="notification-popup" style="display: none;">
+                <div class="notification-card">
+                    <div class="notification-header">
+                        <div class="notification-title">
+                            <span class="notification-icon"></span><span class="title-text"></span>
+                        </div>
+                        <button class="notification-close-btn" onclick="closeNotification()">×</button>
                     </div>
-                    <button class="push-notification-close" onclick="closePushNotification('chargeNotification')">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13 1L1 13M1 1l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="push-notification-content">
-                    <p><span class="notification-region">NSW</span><span data-i18n="regionPrice">地区充电价格</span><span class="highlight-number notification-price">$-19</span><span data-i18n="lowPriceCharge">，现在是充电好时机</span></p>
+                    <div class="notification-content">
+                        <span class="content-text"></span>
+                    </div>
                 </div>
             </div>
-
-            <div id="dischargeNotification" class="push-notification" style="display: none;">
-                <div class="push-notification-header">
-                    <div class="push-notification-title">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M3 3h18v18H3V3z" fill="none" stroke="#ffc107" stroke-width="2"/>
-                            <path d="M9 9h6v6H9V9z" fill="#ffc107"/>
-                        </svg>
-                        <span data-i18n="dischargeReminder">放电提醒</span><span>——</span><span class="notification-region">NSW</span>
+            
+            <div id="dischargeNotification" class="notification-popup" style="display: none;">
+                <div class="notification-card">
+                    <div class="notification-header">
+                        <div class="notification-title">
+                            <span class="notification-icon"></span><span class="title-text"></span>
+                        </div>
+                        <button class="notification-close-btn" onclick="closeNotification()">×</button>
                     </div>
-                    <button class="push-notification-close" onclick="closePushNotification('dischargeNotification')">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13 1L1 13M1 1l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="push-notification-content">
-                    <p><span class="notification-region">NSW</span><span data-i18n="regionPrice">地区放电价格</span><span class="highlight-number notification-price">$436</span><span data-i18n="highPriceDischarge">，现在是放电好时机</span></p>
+                    <div class="notification-content">
+                        <span class="content-text"></span>
+                    </div>
                 </div>
             </div>
-
-            <div id="optimalNotification" class="push-notification" style="display: none;">
-                <div class="push-notification-header">
-                    <div class="push-notification-title">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#1e7fff" stroke="#1e7fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span data-i18n="optimalReminder">最佳时机提醒</span><span>——</span><span class="notification-region">NSW</span>
+            
+            <div id="optimalTimeNotification" class="notification-popup" style="display: none;">
+                <div class="notification-card">
+                    <div class="notification-header">
+                        <div class="notification-title">
+                            <span class="notification-icon"></span><span class="title-text"></span>
+                        </div>
+                        <button class="notification-close-btn" onclick="closeNotification()">×</button>
                     </div>
-                    <button class="push-notification-close" onclick="closePushNotification('optimalNotification')">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13 1L1 13M1 1l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="push-notification-content">
-                    <p><span data-i18n="currentAction">当前</span><span class="notification-action-type">充电</span><span data-i18n="priceIs">价格为</span><span class="highlight-number notification-price">$68</span><span data-i18n="optimalTime">，是今日最佳</span><span class="notification-action-type">充电</span><span data-i18n="opportunity">时机</span></p>
+                    <div class="notification-content">
+                        <span class="content-text"></span>
+                    </div>
                 </div>
             </div>
-
-            <div id="priceAlertNotification" class="push-notification" style="display: none;">
-                <div class="push-notification-header">
-                    <div class="push-notification-title">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#ff6b6b" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <line x1="12" y1="9" x2="12" y2="13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="notification-price-type">高价</span><span class="notification-action-type">充电</span><span data-i18n="priceReminder">提醒</span><span>——</span><span class="notification-region">NSW</span>
+            
+            <div id="lowPriceNotification" class="notification-popup" style="display: none;">
+                <div class="notification-card">
+                    <div class="notification-header">
+                        <div class="notification-title">
+                            <span class="notification-icon"></span><span class="title-text"></span>
+                        </div>
+                        <button class="notification-close-btn" onclick="closeNotification()">×</button>
                     </div>
-                    <button class="push-notification-close" onclick="closePushNotification('priceAlertNotification')">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13 1L1 13M1 1l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="push-notification-content">
-                    <p><span class="notification-region">NSW</span><span data-i18n="regionPrice">地区充电价格</span><span class="highlight-number notification-price">$319</span><span data-i18n="timeRemaining">，还有</span><span class="highlight-value notification-time">27</span><span data-i18n="minutesToPrice">分钟到达</span><span class="notification-price-type">高价</span><span class="notification-action-type">充电</span><span data-i18n="timeOpportunity">时机，请做好准备</span></p>
+                    <div class="notification-content">
+                        <span class="content-text"></span>
+                    </div>
                 </div>
             </div>
         `;
     }
 
     // 创建测试卡片HTML
-    function createTestCardHTML() {
-        return `
-            <!-- 模拟推送按钮 -->
-            <div id="testCardContainer" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999;">
-                <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-radius: 16px; padding: 0; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.2);">
-                    <div id="testCardDragHandle" style="cursor: move; padding: 12px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0, 0, 0, 0.2);">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="opacity: 0.9;">
-                            <rect x="5" y="2" width="2" height="2" rx="1" fill="#fff"/>
-                            <rect x="9" y="2" width="2" height="2" rx="1" fill="#fff"/>
-                            <rect x="5" y="7" width="2" height="2" rx="1" fill="#fff"/>
-                            <rect x="9" y="7" width="2" height="2" rx="1" fill="#fff"/>
-                            <rect x="5" y="12" width="2" height="2" rx="1" fill="#fff"/>
-                            <rect x="9" y="12" width="2" height="2" rx="1" fill="#fff"/>
-                        </svg>
-                        <span data-i18n="testOnly" style="font-size: 14px; font-weight: 600; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);">测试专用</span>
-                    </div>
-                    <div style="padding: 16px;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; gap: 8px;">
-                                <button onclick="simulateChargeNotification()" style="background: linear-gradient(135deg, #00ff88, #00dd77); color: #000; padding: 10px 16px; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; box-shadow: 0 4px 16px rgba(0, 255, 136, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                    <span data-i18n="simulateCharge">模拟充电提醒</span>
-                                </button>
-                                <button onclick="simulateDischargeNotification()" style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #000; padding: 10px 16px; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                    <span data-i18n="simulateDischarge">模拟放电提醒</span>
-                                </button>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button onclick="simulateOptimalNotification()" style="background: linear-gradient(135deg, #1e7fff, #0066ff); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; box-shadow: 0 4px 16px rgba(30, 127, 255, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                    <span data-i18n="simulateOptimal">模拟最佳提醒</span>
-                                </button>
-                                <button onclick="simulatePriceAlertNotification()" style="background: linear-gradient(135deg, #ff6b6b, #ff5252); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                    <span data-i18n="simulatePriceAlert">模拟价格提醒</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
+    
 
     // 创建样式
     function createStyles() {
         const style = document.createElement('style');
         style.textContent = `
-            /* 推送通知样式 */
-            .push-notification {
+            /* 通知弹窗样式 */
+            .notification-popup {
                 position: fixed;
-                top: 80px;
+                top: 20px;
                 right: 20px;
-                width: 400px;
-                background: #fff;
-                border-radius: 12px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.1);
-                padding: 20px;
                 z-index: 10001;
-                animation: slideInRight 0.3s ease-out;
-                border: 1px solid rgba(0, 0, 0, 0.06);
             }
 
-            @keyframes slideInRight {
-                from {
-                    transform: translateX(120%);
+
+            .notification-card {
+                background: rgba(0, 0, 0, 0.75);
+                backdrop-filter: blur(24px) saturate(180%);
+                -webkit-backdrop-filter: blur(24px) saturate(180%);
+                border-radius: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                padding: 16px 18px;
+                width: 380px;
+                box-shadow: 
+                    0 12px 40px rgba(0, 0, 0, 0.4),
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    0 0 0 1px rgba(255, 255, 255, 0.05);
+                animation: slideInScale 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .notification-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            }
+
+            @keyframes slideInScale {
+                0% {
+                    transform: translateX(120%) scale(0.8);
                     opacity: 0;
                 }
-                to {
-                    transform: translateX(0);
+                60% {
+                    transform: translateX(-5%) scale(1.02);
+                    opacity: 0.9;
+                }
+                100% {
+                    transform: translateX(0) scale(1);
                     opacity: 1;
                 }
             }
 
-            .push-notification-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 15px;
-                padding-bottom: 15px;
-                border-bottom: 1px solid #f0f0f0;
+            .notification-header {
+                position: relative;
+                margin-bottom: 8px;
+                margin-top: -15px;
             }
 
-            .push-notification-title {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                font-size: 16px;
+            .notification-title {
+                width: calc(100% - 30px);
+                display: block;
+                text-align: left;
+                font-size: 15px;
                 font-weight: 600;
-                color: #333;
+                color: #ffffff;
+                letter-spacing: -0.03em;
+                margin: 0;
+                padding: 0;
+                margin-top: -5px;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
-            .push-notification-close {
-                background: none;
-                border: none;
+            .notification-icon {
+                font-size: 17px;
+                margin-right: 8px;
+                filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+            }
+
+            .notification-close-btn {
+                position: absolute;
+                top: 5px;
+                right: 2px;
+                background: rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.7);
+                width: 26px;
+                height: 26px;
+                border-radius: 8px;
                 cursor: pointer;
-                padding: 4px;
-                color: #999;
-                transition: color 0.2s;
-                border-radius: 4px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                font-size: 15px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             }
 
-            .push-notification-close:hover {
-                color: #666;
-                background: #f5f5f5;
+            .notification-close-btn:hover {
+                background: rgba(255, 255, 255, 0.15);
+                color: #fff;
+                transform: scale(1.05);
+                border-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             }
 
-            .push-notification-content {
+            .notification-content {
                 font-size: 14px;
-                line-height: 1.6;
-                color: #666;
+                color: rgba(255, 255, 255, 0.92);
+                line-height: 1.5;
+                text-align: left;
+                margin: 0;
+                padding: 0;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
             }
 
-            .push-notification-content .highlight-number {
-                font-size: 24px;
+            .price-value {
                 font-weight: 700;
-                margin: 0 8px;
-                vertical-align: middle;
+                font-size: 13px;
+                color: #000;
+                background: linear-gradient(135deg, #00ff88 0%, #00e676 100%);
+                padding: 3px 8px;
+                border-radius: 6px;
+                margin: 0 3px;
+                display: inline-block;
+                box-shadow: 
+                    0 2px 6px rgba(0, 255, 136, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(0, 255, 136, 0.4);
             }
 
-            .push-notification-content .highlight-value {
-                font-size: 20px;
+            .threshold-value {
                 font-weight: 600;
-                color: #ff6b6b;
-                margin: 0 6px;
+                font-size: 13px;
+                color: #fff;
+                background: linear-gradient(135deg, #007bff 0%, #0056d3 100%);
+                padding: 3px 8px;
+                border-radius: 6px;
+                margin: 0 3px;
+                display: inline-block;
+                box-shadow: 
+                    0 2px 6px rgba(0, 123, 255, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(0, 123, 255, 0.4);
             }
 
-            #chargeNotification .highlight-number {
-                color: #00ff88;
-            }
-
-            #dischargeNotification .highlight-number {
-                color: #ffc107;
-            }
-
-            #optimalNotification .highlight-number {
-                color: #1e7fff;
-            }
-
-            #priceAlertNotification .highlight-number {
-                color: #ff6b6b;
+            .time-value {
+                font-weight: 600;
+                font-size: 13px;
+                color: #fff;
+                background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+                padding: 3px 8px;
+                border-radius: 6px;
+                margin: 0 3px;
+                display: inline-block;
+                box-shadow: 
+                    0 2px 6px rgba(255, 107, 53, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(255, 107, 53, 0.4);
             }
 
             @media (max-width: 768px) {
-                .push-notification {
+                .notification-card {
                     width: calc(100% - 40px);
-                    right: 20px;
-                    left: 20px;
+                    max-width: 380px;
+                    margin: 0 20px;
+                }
+                
+                .notification-popup {
+                    top: 20px;
+                    right: 10px;
+                    left: 10px;
+                    width: auto;
                 }
             }
         `;
         return style;
     }
 
-    // 全局函数：关闭推送通知
-    window.closePushNotification = function(notificationId) {
-        const notification = document.getElementById(notificationId);
-        if (notification) {
-            notification.style.display = 'none';
-        }
-    };
-
-    // 全局函数：显示推送通知
-    window.showPushNotification = function(notificationId, duration = 5000) {
-        const notification = document.getElementById(notificationId);
-        if (notification) {
-            notification.style.display = 'block';
-            
-            if (duration > 0) {
-                setTimeout(() => {
-                    closePushNotification(notificationId);
-                }, duration);
+    // 通知内容配置
+    const notificationConfigs = {
+        charge: {
+            icon: '🔋',
+            zh: {
+                title: '充电提醒——NSW',
+                content: '当前电价<span class="price-value">$20</span>，低于阈值<span class="threshold-value">$250</span>，请充电'
+            },
+            en: {
+                title: 'Charge Reminder——NSW',
+                content: 'Current electricity price <span class="price-value">$20</span>, below threshold <span class="threshold-value">$250</span>, please charge'
+            }
+        },
+        discharge: {
+            icon: '⚡',
+            zh: {
+                title: '放电提醒——NSW',
+                content: '当前电价<span class="price-value">$300</span>，高于阈值<span class="threshold-value">$250</span>，请放电'
+            },
+            en: {
+                title: 'Discharge Reminder——NSW',
+                content: 'Current electricity price <span class="price-value">$300</span>, above threshold <span class="threshold-value">$250</span>, please discharge'
+            }
+        },
+        optimal: {
+            icon: '⚡',
+            zh: {
+                title: '最佳放电时机提醒——NSW',
+                content: 'NSW地区充电价格<span class="price-value">$300</span>，还有<span class="time-value">27分钟</span>到达最佳放电时机，请做好准备'
+            },
+            en: {
+                title: 'Optimal Discharge Time Reminder——NSW',
+                content: 'NSW electricity price <span class="price-value">$300</span>, <span class="time-value">27 minutes</span> until optimal discharge time, please prepare'
+            }
+        },
+        lowPrice: {
+            icon: '🔋',
+            zh: {
+                title: '低价充电提醒——NSW',
+                content: 'NSW地区充电价格<span class="price-value">$20</span>，还有<span class="time-value">27分钟</span>到达低价充电时机，请做好准备'
+            },
+            en: {
+                title: 'Low Price Charge Reminder——NSW',
+                content: 'NSW electricity price <span class="price-value">$20</span>, <span class="time-value">27 minutes</span> until low price charging time, please prepare'
             }
         }
     };
 
-    // 模拟充电提醒
+    // 更新弹窗内容的函数
+    function updateNotificationContent(notificationId, type) {
+        const notification = document.getElementById(notificationId);
+        if (!notification) return;
+        
+        const titleText = notification.querySelector('.title-text');
+        const contentText = notification.querySelector('.content-text');
+        const iconElement = notification.querySelector('.notification-icon');
+        
+        if (titleText && contentText && iconElement) {
+            const currentLang = (window.i18n && window.i18n.currentLanguage) || 'zh';
+            const config = notificationConfigs[type];
+            
+            if (config) {
+                iconElement.textContent = config.icon;
+                titleText.textContent = config[currentLang].title;
+                contentText.innerHTML = config[currentLang].content;
+            }
+        }
+    }
+
+    // 通用关闭弹窗函数
+    window.closeNotification = function() {
+        const notifications = document.querySelectorAll('.notification-popup');
+        notifications.forEach(notification => {
+            if (notification.style.display === 'block') {
+                notification.style.display = 'none';
+            }
+        });
+    };
+
+    // 充电提醒弹窗函数
+    window.showChargeNotification = function() {
+        closeNotification(); // 先关闭其他弹窗
+        updateNotificationContent('chargeNotification', 'charge');
+        document.getElementById('chargeNotification').style.display = 'block';
+    };
+
+    // 放电提醒弹窗函数
+    window.showDischargeNotification = function() {
+        closeNotification();
+        updateNotificationContent('dischargeNotification', 'discharge');
+        document.getElementById('dischargeNotification').style.display = 'block';
+    };
+
+    // 最佳时机提醒弹窗函数
+    window.showOptimalNotification = function() {
+        console.log('showOptimalNotification called');
+        closeNotification();
+        updateNotificationContent('optimalTimeNotification', 'optimal');
+        const element = document.getElementById('optimalTimeNotification');
+        console.log('optimalTimeNotification element found:', element);
+        if (element) {
+            element.style.display = 'block';
+            console.log('optimalTimeNotification shown');
+        } else {
+            console.error('optimalTimeNotification element not found!');
+        }
+    };
+
+    // 低价充电提醒弹窗函数
+    window.showLowPriceNotification = function() {
+        closeNotification();
+        updateNotificationContent('lowPriceNotification', 'lowPrice');
+        document.getElementById('lowPriceNotification').style.display = 'block';
+    };
+
+    // ESC键关闭弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const popup = document.getElementById('chargeNotification');
+            if (popup && popup.style.display === 'block') {
+                closeChargeNotification();
+            }
+        }
+    });
+
+    // 模拟通知函数
+    // 模拟通知函数
     window.simulateChargeNotification = function() {
-        const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-        const region = regions[Math.floor(Math.random() * regions.length)];
-        const price = Math.floor(Math.random() * 100) - 50;
-        
-        const notification = document.getElementById('chargeNotification');
-        if (notification) {
-            const regionElements = notification.querySelectorAll('.notification-region');
-            regionElements.forEach(elem => elem.textContent = region);
-            
-            const priceElement = notification.querySelector('.notification-price');
-            if (priceElement) {
-                priceElement.textContent = `$${price}`;
-            }
-            
-            showPushNotification('chargeNotification', 8000);
-        }
+        console.log('显示充电提醒弹窗');
+        showChargeNotification();
     };
 
-    // 模拟放电提醒
     window.simulateDischargeNotification = function() {
-        const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-        const region = regions[Math.floor(Math.random() * regions.length)];
-        const price = Math.floor(Math.random() * 300) + 200;
-        
-        const notification = document.getElementById('dischargeNotification');
-        if (notification) {
-            const regionElements = notification.querySelectorAll('.notification-region');
-            regionElements.forEach(elem => elem.textContent = region);
-            
-            const priceElement = notification.querySelector('.notification-price');
-            if (priceElement) {
-                priceElement.textContent = `$${price}`;
-            }
-            
-            showPushNotification('dischargeNotification', 8000);
-        }
+        console.log('显示放电提醒弹窗');
+        showDischargeNotification();
     };
 
-    // 模拟最佳时机提醒
     window.simulateOptimalNotification = function() {
-        const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-        const region = regions[Math.floor(Math.random() * regions.length)];
-        const price = Math.floor(Math.random() * 150) + 50;
-        const actionTypes = ['充电', '放电'];
-        const actionType = actionTypes[Math.floor(Math.random() * actionTypes.length)];
-        
-        const notification = document.getElementById('optimalNotification');
-        if (notification) {
-            const regionElements = notification.querySelectorAll('.notification-region');
-            regionElements.forEach(elem => elem.textContent = region);
-            
-            const priceElement = notification.querySelector('.notification-price');
-            if (priceElement) {
-                priceElement.textContent = `$${price}`;
-            }
-            
-            const actionElements = notification.querySelectorAll('.notification-action-type');
-            actionElements.forEach(elem => elem.textContent = actionType);
-            
-            showPushNotification('optimalNotification', 8000);
-        }
+        console.log('显示最佳时机提醒弹窗');
+        console.log('optimalNotification element:', document.getElementById('optimalNotification'));
+        showOptimalNotification();
     };
 
-    // 模拟价格提醒
-    window.simulatePriceAlertNotification = function() {
-        const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-        const region = regions[Math.floor(Math.random() * regions.length)];
-        const price = Math.floor(Math.random() * 200) + 200;
-        const time = Math.floor(Math.random() * 30) + 5;
-        const priceTypes = ['高价', '低价'];
-        const actionTypes = ['充电', '放电'];
-        const priceType = priceTypes[Math.floor(Math.random() * priceTypes.length)];
-        const actionType = actionTypes[Math.floor(Math.random() * actionTypes.length)];
-        
-        const notification = document.getElementById('priceAlertNotification');
-        if (notification) {
-            const regionElements = notification.querySelectorAll('.notification-region');
-            regionElements.forEach(elem => elem.textContent = region);
-            
-            const priceElement = notification.querySelector('.notification-price');
-            if (priceElement) {
-                priceElement.textContent = `$${price}`;
-            }
-            
-            const timeElement = notification.querySelector('.notification-time');
-            if (timeElement) {
-                timeElement.textContent = time;
-            }
-            
-            const priceTypeElements = notification.querySelectorAll('.notification-price-type');
-            priceTypeElements.forEach(elem => elem.textContent = priceType);
-            
-            const actionTypeElements = notification.querySelectorAll('.notification-action-type');
-            actionTypeElements.forEach(elem => elem.textContent = actionType);
-            
-            showPushNotification('priceAlertNotification', 8000);
-        }
+    window.simulateLowPriceNotification = function() {
+        console.log('显示低价充电提醒弹窗');
+        showLowPriceNotification();
     };
 
     // 初始化拖拽功能
@@ -475,44 +514,196 @@
             container.style.top = 'auto';
             container.style.transform = 'none';
             localStorage.removeItem('testCardPosition');
+            updateTestCardPosition();
             console.log('Test card position reset to bottom-left corner');
         }
     };
 
+    // 更新测试卡片位置显示
+    function updateTestCardPosition() {
+        const container = document.getElementById('testCardContainer');
+        const positionSpan = document.getElementById('testCardPosition');
+        if (container && positionSpan) {
+            const rect = container.getBoundingClientRect();
+            positionSpan.textContent = `(${Math.round(rect.left)}, ${Math.round(rect.top)})`;
+        }
+    }
+
+    // 测试工具相关函数
+    window.toggleTestTools = function() {
+        console.log('toggleTestTools called!'); // Debug log
+        const panel = document.getElementById('testToolsPanel');
+        const toggle = document.getElementById('testToolsToggle');
+        console.log('Panel:', panel, 'Toggle:', toggle); // Debug log
+        if (panel && toggle) {
+            if (panel.style.display === 'none' || !panel.style.display) {
+                panel.style.display = 'block';
+                toggle.style.transform = 'rotate(45deg)';
+                console.log('Panel opened'); // Debug log
+                
+                // 强制更新面板内的翻译
+                setTimeout(() => {
+                    console.log('Checking i18n availability:', window.i18n);
+                    
+                    // 尝试直接调用updatePageTexts
+                    if (window.i18n && window.i18n.updatePageTexts) {
+                        console.log('Calling updatePageTexts directly');
+                        window.i18n.updatePageTexts();
+                    }
+                    
+                    // 同时尝试手动更新
+                    if (window.i18n) {
+                        const currentLang = window.i18n.currentLanguage || 'zh';
+                        console.log('Current language:', currentLang);
+                        
+                        // 使用正确的翻译
+                        const translations = {
+                            zh: {
+                                pushNotificationTest: '推送通知测试',
+                                simulateCharge: '充电提醒',
+                                simulateDischarge: '放电提醒',
+                                simulateOptimal: '最佳放电时机提醒',
+                                simulateLowPrice: '低价充电提醒'
+                            },
+                            en: {
+                                pushNotificationTest: 'Push Notification Test',
+                                simulateCharge: 'Charge Reminder',
+                                simulateDischarge: 'Discharge Reminder',
+                                simulateOptimal: 'Optimal Discharge Time Reminder',
+                                simulateLowPrice: 'Low Price Charge Reminder'
+                            }
+                        };
+                        
+                        const langTexts = translations[currentLang] || translations.zh;
+                        
+                        panel.querySelectorAll('[data-i18n]').forEach(el => {
+                            const key = el.getAttribute('data-i18n');
+                            const text = langTexts[key];
+                            if (text) {
+                                el.textContent = text;
+                                console.log(`Manually updated: ${key} -> ${text}`);
+                            }
+                        });
+                    }
+                }, 100);
+            } else {
+                panel.style.display = 'none';
+                toggle.style.transform = 'rotate(0deg)';
+                console.log('Panel closed'); // Debug log
+            }
+        } else {
+            console.error('Panel or toggle not found!'); // Debug log
+        }
+    };
+
+    window.closeTestTools = function() {
+        const panel = document.getElementById('testToolsPanel');
+        const toggle = document.getElementById('testToolsToggle');
+        if (panel && toggle) {
+            panel.style.display = 'none';
+            toggle.style.transform = 'rotate(0deg)';
+        }
+    };
+
+    window.showTestCard = function() {
+        const container = document.getElementById('testCardContainer');
+        if (container) {
+            container.style.display = 'block';
+            updateTestCardPosition();
+            console.log('Test card shown');
+        }
+    };
+
+    window.hideTestCard = function() {
+        const container = document.getElementById('testCardContainer');
+        if (container) {
+            container.style.display = 'none';
+            console.log('Test card hidden');
+        }
+    };
+
+    window.randomTestCard = function() {
+        const container = document.getElementById('testCardContainer');
+        if (container) {
+            const maxX = window.innerWidth - 300;
+            const maxY = window.innerHeight - 150;
+            const randomX = Math.max(0, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(0, Math.floor(Math.random() * maxY));
+            
+            container.style.bottom = 'auto';
+            container.style.left = '0';
+            container.style.top = '0';
+            container.style.transform = `translate3d(${randomX}px, ${randomY}px, 0)`;
+            
+            localStorage.setItem('testCardPosition', JSON.stringify({
+                x: randomX,
+                y: randomY
+            }));
+            
+            updateTestCardPosition();
+            console.log(`Test card moved to random position: (${randomX}, ${randomY})`);
+        }
+    };
+
+    // 自动测试相关已删除
+
+    // 监听语言切换事件
+    function listenToLanguageChange() {
+        // 监听语言切换事件
+        if (window.i18n && window.i18n.addObserver) {
+            window.i18n.addObserver((newLang) => {
+                // 更新所有弹窗内容
+                updateNotificationContent('chargeNotification', 'charge');
+                updateNotificationContent('dischargeNotification', 'discharge');
+                updateNotificationContent('optimalTimeNotification', 'optimal');
+                updateNotificationContent('lowPriceNotification', 'lowPrice');
+            });
+        }
+        
+        // 定期检查语言变化
+        let lastLang = (window.i18n && window.i18n.currentLanguage) || 'zh';
+        setInterval(() => {
+            const currentLang = (window.i18n && window.i18n.currentLanguage) || 'zh';
+            if (currentLang !== lastLang) {
+                lastLang = currentLang;
+                // 更新所有弹窗内容
+                updateNotificationContent('chargeNotification', 'charge');
+                updateNotificationContent('dischargeNotification', 'discharge');
+                updateNotificationContent('optimalTimeNotification', 'optimal');
+                updateNotificationContent('lowPriceNotification', 'lowPrice');
+            }
+        }, 500);
+    }
+
     // 初始化组件
     function init() {
-        // 创建容器
-        const container = document.createElement('div');
-        container.id = 'globalNotificationsContainer';
-        container.innerHTML = createPushNotificationsHTML() + createTestCardHTML();
-        
         // 添加样式
         document.head.appendChild(createStyles());
         
-        // 添加到body
+        // 创建所有通知弹窗
+        const container = document.createElement('div');
+        container.innerHTML = createNotificationHTML();
         document.body.appendChild(container);
         
-        // 初始化拖拽
-        initTestCardDrag();
+        // 监听语言切换
+        listenToLanguageChange();
         
-        // 检查卡片是否可见
+        // Debug: 确认组件已加载
+        console.log('Global notifications component loaded with all notifications');
+        console.log('toggleTestTools function available:', typeof window.toggleTestTools);
+        
+        // 检查所有弹窗元素是否创建成功
+        console.log('chargeNotification:', document.getElementById('chargeNotification'));
+        console.log('dischargeNotification:', document.getElementById('dischargeNotification'));
+        console.log('optimalTimeNotification:', document.getElementById('optimalTimeNotification'));
+        console.log('lowPriceNotification:', document.getElementById('lowPriceNotification'));
+        
+        // 测试函数是否可用
         setTimeout(() => {
-            const testCard = document.getElementById('testCardContainer');
-            if (testCard) {
-                const rect = testCard.getBoundingClientRect();
-                if (rect.right < 0 || rect.bottom < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight) {
-                    console.warn('Test card is outside viewport, resetting position...');
-                    resetTestCardPosition();
-                }
-            }
+            console.log('Testing notification functions:');
+            console.log('simulateOptimalNotification available:', typeof window.simulateOptimalNotification);
+            console.log('showOptimalNotification available:', typeof window.showOptimalNotification);
         }, 1000);
-        
-        // 更新翻译
-        if (window.i18n && window.i18n.updateTranslations) {
-            setTimeout(() => {
-                window.i18n.updateTranslations();
-            }, 100);
-        }
     }
 
     // 等待DOM加载完成
@@ -521,4 +712,18 @@
     } else {
         init();
     }
+    
+    // 提供全局测试函数
+    window.testOptimalNotification = function() {
+        console.log('=== Testing Optimal Notification ===');
+        const elem = document.getElementById('optimalTimeNotification');
+        console.log('Element found:', elem);
+        if (elem) {
+            console.log('Current display:', elem.style.display);
+            elem.style.display = 'block';
+            console.log('New display:', elem.style.display);
+            updateNotificationContent('optimalTimeNotification', 'optimal');
+            console.log('Content updated');
+        }
+    };
 })();

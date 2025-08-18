@@ -197,6 +197,7 @@ class I18n {
                 chargeConditionSingle: "充电条件",
                 dischargeConditionSingle: "放电条件",
                 timeCondition: "时间条件",
+                timeConditionSettings: "时间条件设置",
                 priceCondition: "价格条件",
                 chargeStopSOC: "充电停止SOC",
                 dischargeStopSOC: "放电停止SOC",
@@ -211,6 +212,8 @@ class I18n {
                 autoModeType: "自动模式类型",
                 autoChargeConditions: "自动充电条件",
                 autoDischargeConditions: "自动放电条件",
+                autoChargeCondition: "自动充电条件",
+                autoDischargeCondition: "自动放电条件",
                 condition1Time: "条件1：时间",
                 condition2Price: "条件2：价格",
                 endConditionSoc: "结束条件：SOC",
@@ -226,6 +229,9 @@ class I18n {
                 availableHomes: "可放电家庭",
                 availablePower: "可放电量",
                 estimatedProfit: "获利",
+                estimatedRevenue: "预计收益（不考虑成本）",
+                estimatedRevenueMain: "预计收益",
+                estimatedRevenueSub: "（不考虑成本）",
                 todayDischargeHomes: "今日放电家庭",
                 discharged: "已放电量",
                 actualDischarge: "实际放电量",
@@ -283,7 +289,8 @@ class I18n {
                 networkStatus: "网络状态",
                 normal: "正常",
                 totalDischarge: "累计放电",
-                totalRevenue: "累计收益",
+                totalGridDischarge: "累计放电上网量",
+                totalRevenue: "累计获利",
                 totalHomes: "家庭",
                 totalInstall: "装机量",
                 totalActualDischarge: "累计实际放电",
@@ -292,6 +299,8 @@ class I18n {
                 currentCumulativePrice: "当前累计价格",
                 forecastCumulativePrice: "预测累计价格(5min)",
                 thresholdStatus: "阈值状态",
+                threshold: "阈值",
+                currentTime: "当前时间",
                 belowThreshold: "未超阈",
                 exceededThreshold: "已超阈",
                 executionEfficiency: "执行效率",
@@ -316,16 +325,20 @@ class I18n {
                 chargeStopSOC: "充电停止SOC",
                 dischargeStopSOC: "放电停止SOC",
                 pleaseStopCurrentMode: "请先停止当前模式",
+                autoChargingCannotEdit: "自动充电进行中，无法编辑设置",
+                autoDischargingCannotEdit: "自动放电进行中，无法编辑设置",
                 stationStatus: "电站状态",
                 
                 // Region overview card
                 regionConditionsOverview: "地区条件总览",
                 automationConditions: "自动化条件",
                 autoConditions: "自动条件",
+                autoConditionsDesc: "配置系统自动执行充放电操作的触发条件",
                 conditionsView: "条件视图",
                 chargeCondition: "充电条件",
                 dischargeCondition: "放电条件",
                 timeCondition: "时间条件",
+                timeConditionSettings: "时间条件设置",
                 priceCondition: "价格条件",
                 idle: "待机",
                 region: "地区",
@@ -374,6 +387,13 @@ class I18n {
                 resetComplete: "重置完成",
                 searchCleared: "已清空搜索条件",
                 noData: "暂无数据",
+                common: {
+                    back: "返回",
+                    cancel: "取消",
+                    previous: "上一页",
+                    next: "下一页",
+                    times: "次"
+                },
                 userName1: "张明",
                 userName2: "李华",
                 userName3: "王伟",
@@ -515,6 +535,32 @@ class I18n {
                 compareYesterday: "比昨日",
                 dischargedAmount: "已放电量",
                 earnedProfit: "已获利",
+                dischargeFamilies: "放电家庭",
+                dischargeAmount: "放电量",
+                dischargeProfit: "获利",
+                chargeFamilies: "充电家庭",
+                chargeAmount: "充电量",
+                chargeCost: "成本",
+                netProfit: "净获利",
+                cumulativeMetrics: "累计指标",
+                confirmAutoMode: "确认启用自动模式",
+                autoModeDescription: "启用自动模式后，系统将根据以下条件自动执行充放电操作：",
+                editConditionHint: "如需修改条件，请点击\"编辑设置\"按钮",
+                editSettings: "编辑设置",
+                confirmEnable: "确认启用",
+                confirmDisableAutoMode: "确认关闭自动模式",
+                disableAutoModeDescription: "关闭自动模式后，系统将停止自动充放电操作，您需要手动控制充放电。",
+                autoModeWarning: "注意",
+                disableAutoModeWarning: "关闭自动模式后，您可能会错过最佳的充放电时机，影响收益。",
+                currentAutoModeStatus: "当前自动模式状态：",
+                autoModeActive: "运行中",
+                confirmDisable: "确认关闭",
+                conditionEnabled: "已启用",
+                conditionDisabled: "未启用",
+                timeSegment: "时间段",
+                priceThreshold: "价格阈值",
+                chargeToSOC: "充电至 SOC",
+                dischargeToSOC: "放电至 SOC",
                 currentCumulativePrice: "当前累计价格",
                 forecastCumulativePrice5min: "预测累计价格(5min)",
                 thresholdStatus: "阈值状态",
@@ -918,7 +964,7 @@ class I18n {
                     enabled: "启用",
                     disabled: "禁用",
                     totalFamilies: "家庭总数",
-                    totalRevenue: "累计收益",
+                    totalRevenue: "累计获利",
                     familyDistribution: "家庭分布统计",
                     deviceStatus: "设备状态",
                     deviceStatusDistribution: "设备状态分布",
@@ -953,6 +999,7 @@ class I18n {
                         deviceStatus: "所有设备状态",
                         userName: "请输入用户名称...",
                         deviceCode: "请输入设备编码...",
+                        meterNumber: "请输入电表编号...",
                         minValue: "最小值",
                         maxValue: "最大值",
                         allLocations: "所有地区",
@@ -970,6 +1017,7 @@ class I18n {
                         avgProfit: "日均获利 ($)",
                         deviceCode: "设备编码",
                         deviceStatus: "设备状态",
+                        meterNumber: "电表",
                         soc: "SOC",
                         todayDischarge: "今日放电 (kWh)",
                         usageDays: "使用天数 (天)",
@@ -979,12 +1027,11 @@ class I18n {
                     },
                     activityStatus: {
                         active: "活跃",
-                        inactive: "非活跃",
-                        notParticipating: "未参与"
+                        inactive: "非活跃"
                     },
                     deviceStates: {
-                        charging: "充电",
-                        discharging: "放电",
+                        charging: "充电中",
+                        discharging: "放电中",
                         standby: "待机",
                         offline: "离线"
                     },
@@ -1030,12 +1077,14 @@ class I18n {
                         tabs: {
                             basicInfo: "基本信息",
                             revenueInfo: "收益信息",
-                            operatingData: "运行数据"
+                            operatingData: "运行数据",
+                            dispatchRecords: "调度记录"
                         },
                         basicInfo: "基本信息",
                         userName: "用户名称",
                         location: "地址",
                         address: "地址",
+                        meterNumber: "电表",
                         deviceCode: "设备编码",
                         batteryCapacity: "电池容量",
                         soc: "SOC",
@@ -1044,7 +1093,7 @@ class I18n {
                         owner: "所属用户",
                         todayProfit: "今日获利",
                         avgProfit: "日均获利",
-                        totalRevenue: "累计收益",
+                        totalRevenue: "累计获利",
                         todayDischarge: "今日放电量",
                         avgDischarge: "日均放电量",
                         totalDischarge: "累计放电量",
@@ -1060,7 +1109,31 @@ class I18n {
                         stopCharging: "停止充电",
                         charging: "充电",
                         discharging: "放电",
-                        stopDischarging: "停止放电"
+                        stopDischarging: "停止放电",
+                        actions: {
+                            cancel: "取消",
+                            save: "保存",
+                            delete: "删除",
+                            confirm: "确定"
+                        },
+                        messages: {
+                            saveSuccess: "保存成功",
+                            deleteConfirm: "确定要删除这条记录吗？",
+                            deleteSuccess: "删除成功"
+                        },
+                        dispatchRecords: {
+                            time: "时间",
+                            type: "类型",
+                            energy: "电量",
+                            amount: "金额",
+                            charge: "充电",
+                            discharge: "放电",
+                            totalCount: "总调度次数",
+                            totalCharge: "充电量",
+                            totalDischarge: "放电量",
+                            totalRevenue: "总收益",
+                            totalCost: "总成本"
+                        }
                     },
                     userName1: "张明",
                     userName2: "李华",
@@ -1107,11 +1180,13 @@ class I18n {
                     },
                     stats: {
                         userCount: "用户数量",
-                        totalRevenue: "累计收益",
+                        totalRevenue: "累计获利",
                         avgProfit: "人均获利",
-                        maxStationProfit: "最大获利（电站）",
-                        minStationProfit: "最小获利（电站）",
-                        comparedYesterday: "比昨日"
+                        maxStationProfit: "最大获利（家庭）",
+                        minStationProfit: "最小获利（家庭）",
+                        comparedYesterday: "比昨日",
+                        comparedLastMonth: "比上月",
+                        comparedLastYear: "比去年"
                     },
                     charts: {
                         userManagement: "用户管理",
@@ -1129,7 +1204,10 @@ class I18n {
                         user: "用户",
                         status: "性质",
                         dischargeAmount: "实际放电量 (kwh)",
+                        sellPrice: "卖电价 ($/kWh)",
+                        costPrice: "成本价 ($/kWh)",
                         profit: "获利 ($)",
+                        profitPerKwh: "每kWh获利 ($)",
                         dailyAvg: "日均",
                         monthlyAvg: "月均",
                         yearlyAvg: "年均",
@@ -1337,10 +1415,31 @@ class I18n {
                     highPriceChargeReminder: "高价充电提醒",
                     priceAlert: "提醒",
                     currentPrice: "当前价格",
+                    
+                    // 新增推送通知翻译
+                    chargeReminderTitle: "充电提醒——NSW",
+                    dischargeReminderTitle: "放电提醒——NSW",
+                    optimalChargeTitle: "最佳充电时机提醒——NSW",
+                    lowPriceChargeTitle: "低价充电提醒——NSW",
                     belowThreshold: "，低于阈值",
                     aboveThreshold: "，高于阈值",
                     pleaseCharge: "，请充电",
                     pleaseDischarge: "，请放电",
+                    regionChargePrice: "地区充电价格",
+                    timeRemaining: "，还有",
+                    minutesToOptimal: "分钟到达最佳放电时机，请做好准备",
+                    minutesToLowPrice: "分钟到达低价充电时机，请做好准备",
+                    
+                    // 充电提醒弹窗翻译
+                    chargeNotificationTitle: "充电提醒——NSW",
+                    currentElectricityPrice: "当前电价",
+                    belowThresholdText: "，低于阈值",
+                    pleaseChargeText: "，请充电",
+                    simulateCharge: "充电提醒",
+                    simulateDischarge: "放电提醒",
+                    simulateOptimal: "最佳放电时机提醒",
+                    simulateLowPrice: "低价充电提醒",
+                    pushNotificationTest: "推送通知测试",
                     regionPrice: "地区充电价格",
                     timeRemaining: "，还有",
                     minutesToOptimal: "分钟到达最佳放电时机，请做好准备",
@@ -1532,7 +1631,7 @@ class I18n {
                     page: "页"
                 },
                 
-                // Family page translations
+                // Merged Family page translations
                 family: {
                     title: "家庭",
                     subtitle: "管理和监控所有家庭的能源使用情况",
@@ -1543,16 +1642,17 @@ class I18n {
                         userName: "请输入用户名称...",
                         allActivity: "所有活跃度",
                         deviceCode: "请输入设备编码...",
-                        deviceStatus: "所有设备状态"
+                        deviceStatus: "所有设备状态",
+                        allRegions: "所有地区",
+                        meterNumber: "请输入电表编号..."
                     },
                     activityStatus: {
                         active: "活跃",
-                        inactive: "非活跃",
-                        notParticipating: "未参与"
+                        inactive: "非活跃"
                     },
                     deviceStates: {
-                        charging: "充电",
-                        discharging: "放电",
+                        charging: "充电中",
+                        discharging: "放电中",
                         standby: "待机",
                         offline: "离线"
                     },
@@ -1560,10 +1660,22 @@ class I18n {
                         search: "查询",
                         reset: "重置",
                         export: "导出",
-                        viewDetails: "查看详情"
+                        exportDetail: "导出明细",
+                        refresh: "刷新",
+                        viewDetails: "查看详情",
+                        runningData: "运行数据"
+                    },
+                    exportDetail: {
+                        title: "导出明细",
+                        selectDate: "选择日期",
+                        hint: "只能选择单个日期的数据进行导出",
+                        confirmExport: "确认导出",
+                        selectDateError: "请选择日期",
+                        exportSuccess: "明细数据导出成功"
                     },
                     table: {
                         user: "用户",
+                        meterNumber: "表号",
                         activity: "活跃度",
                         todayProfit: "今日获利 ($)",
                         totalProfit: "累计获利 ($)",
@@ -1571,6 +1683,8 @@ class I18n {
                         deviceCode: "设备编码",
                         deviceStatus: "设备状态",
                         soc: "SOC",
+                        socValue: "电池价值",
+                        batteryCost: "每kWh成本",
                         location: "地址",
                         usageDays: "使用天数 (天)",
                         action: "操作"
@@ -1580,22 +1694,29 @@ class I18n {
                         tabs: {
                             basicInfo: "基本信息",
                             revenueInfo: "收益信息",
-                            operatingData: "运行数据"
+                            operatingData: "运行数据",
+                            dispatchRecords: "调度记录"
                         },
+                        basicInfo: "基本信息",
+                        userName: "用户名称",
+                        location: "地址",
+                        address: "地址",
+                        meterNumber: "电表",
                         deviceCode: "设备编码",
                         batteryCapacity: "电池容量",
                         soc: "SOC",
                         status: "状态",
                         operatingDays: "运行天数",
                         owner: "所属用户",
-                        address: "地址",
                         day: "天",
                         todayProfit: "今日获利",
                         avgProfit: "日均获利",
-                        totalRevenue: "累计收益",
+                        totalRevenue: "累计获利",
                         todayDischarge: "今日放电量",
                         avgDischarge: "日均放电量",
                         totalDischarge: "累计放电量",
+                        revenue: "收益",
+                        discharge: "放电",
                         profitTrend: "收益趋势",
                         month: "月",
                         year: "年",
@@ -1605,7 +1726,31 @@ class I18n {
                         charging: "充电",
                         stopCharging: "停止充电",
                         discharging: "放电",
-                        stopDischarging: "停止放电"
+                        stopDischarging: "停止放电",
+                        actions: {
+                            cancel: "取消",
+                            save: "保存",
+                            delete: "删除",
+                            confirm: "确定"
+                        },
+                        messages: {
+                            saveSuccess: "保存成功",
+                            deleteConfirm: "确定要删除这条记录吗？",
+                            deleteSuccess: "删除成功"
+                        },
+                        dispatchRecords: {
+                            time: "时间",
+                            type: "类型",
+                            energy: "电量",
+                            amount: "金额",
+                            charge: "充电",
+                            discharge: "放电",
+                            totalCount: "总调度次数",
+                            totalCharge: "充电量",
+                            totalDischarge: "放电量",
+                            totalRevenue: "总收益",
+                            totalCost: "总成本"
+                        }
                     },
                     userName1: "张明",
                     userName2: "李华",
@@ -1617,6 +1762,38 @@ class I18n {
                     userName8: "吴敏",
                     userName9: "郑伟",
                     userName10: "林丽"
+                },
+                
+                // Running Data page translations (Chinese)
+                runningData: {
+                    title: "运行数据",
+                    tableTitle: "运行数据记录",
+                    startDate: "开始日期",
+                    endDate: "结束日期",
+                    dateRangeNote: "* 最多可选择3个月范围",
+                    query: "查询",
+                    reset: "重置",
+                    export: "导出",
+                    selectDateRange: "请选择日期范围",
+                    dateRangeError: "日期范围不能超过3个月",
+                    exportSuccess: "导出成功",
+                    exportDetailSuccess: "明细导出成功",
+                    table: {
+                        meterNumber: "电表",
+                        time: "时间",
+                        gridUsage: "电网用电量 (kWh)",
+                        feedIn: "馈网量 (kWh)",
+                        price: "价格 ($/kWh)",
+                        family: "家庭"
+                    },
+                    exportModal: {
+                        title: "导出运行数据",
+                        startDate: "开始日期",
+                        endDate: "结束日期",
+                        warning: "* 最多可导出3个月的数据，每5分钟一条记录"
+                    },
+                    cancel: "取消",
+                    confirmExport: "确认导出"
                 }
             },
             
@@ -1631,6 +1808,38 @@ class I18n {
                     operationLog: "Operation Log",
                     messageCenter: "Message Center",
                     settings: "Settings"
+                },
+                
+                // Running Data page translations
+                runningData: {
+                    title: "Running Data",
+                    tableTitle: "Running Data Records",
+                    startDate: "Start Date",
+                    endDate: "End Date",
+                    dateRangeNote: "* Maximum 3 months range",
+                    query: "Query",
+                    reset: "Reset",
+                    export: "Export",
+                    selectDateRange: "Please select date range",
+                    dateRangeError: "Date range cannot exceed 3 months",
+                    exportSuccess: "Export successful",
+                    exportDetailSuccess: "Details exported successfully",
+                    table: {
+                        meterNumber: "NMI",
+                        time: "Time",
+                        gridUsage: "Grid Usage (kWh)",
+                        feedIn: "To Grid (kWh)",
+                        price: "Price ($/kWh)",
+                        family: "Family"
+                    },
+                    exportModal: {
+                        title: "Export Running Data",
+                        startDate: "Start Date",
+                        endDate: "End Date",
+                        warning: "* Can export up to 3 months of data, one record every 5 minutes"
+                    },
+                    cancel: "Cancel",
+                    confirmExport: "Confirm Export"
                 },
                 analysis: {
                     realtime: "Real-time Analysis",
@@ -1746,6 +1955,7 @@ class I18n {
                 chargeConditionSingle: "Charge Condition",
                 dischargeConditionSingle: "Discharge Condition",
                 timeCondition: "Time Condition",
+                timeConditionSettings: "Time Condition Settings",
                 priceCondition: "Price Condition",
                 chargeStopSOC: "Charge Stop SOC",
                 dischargeStopSOC: "Discharge Stop SOC",
@@ -1760,6 +1970,8 @@ class I18n {
                 autoModeType: "Auto Mode Type",
                 autoChargeConditions: "Auto Charge Conditions",
                 autoDischargeConditions: "Auto Discharge Conditions",
+                autoChargeCondition: "Auto Charge Condition",
+                autoDischargeCondition: "Auto Discharge Condition",
                 condition1Time: "Condition 1: Time",
                 condition2Price: "Condition 2: Price",
                 endConditionSoc: "End Condition: SOC",
@@ -1772,9 +1984,12 @@ class I18n {
                 cancel: "Cancel",
                 saveSettings: "Save Settings",
                 family: "Families",
-                availableHomes: "Families",
+                availableHomes: "Available Families",
                 availablePower: "Available Discharge",
                 estimatedProfit: "Profit",
+                estimatedRevenue: "Estimated Revenue (Excluding Costs)",
+                estimatedRevenueMain: "Estimated Revenue",
+                estimatedRevenueSub: "(Excluding Costs)",
                 todayDischargeHomes: "Discharge Homes Today",
                 discharged: "Discharged",
                 actualDischarge: "Actual Discharge",
@@ -1835,6 +2050,7 @@ class I18n {
                 networkStatus: "Network Status",
                 normal: "Normal",
                 totalDischarge: "Total Discharge",
+                totalGridDischarge: "Total Grid Feed-in",
                 totalRevenue: "Total Revenue",
                 totalHomes: "Families",
                 totalInstall: "Installed Capacity",
@@ -1844,6 +2060,8 @@ class I18n {
                 currentCumulativePrice: "Current Cumulative Price",
                 forecastCumulativePrice: "Forecast Cumulative Price (5min)",
                 thresholdStatus: "Threshold Status",
+                threshold: "Threshold",
+                currentTime: "Current Time",
                 belowThreshold: "Below Threshold",
                 exceededThreshold: "Exceeded",
                 executionEfficiency: "Execution Efficiency",
@@ -1868,16 +2086,20 @@ class I18n {
                 chargeStopSOC: "Charge Stop SOC",
                 dischargeStopSOC: "Discharge Stop SOC",
                 pleaseStopCurrentMode: "Please stop current mode first",
+                autoChargingCannotEdit: "Auto charging in progress, unable to edit settings",
+                autoDischargingCannotEdit: "Auto discharging in progress, unable to edit settings",
                 stationStatus: "Station Status",
                 
                 // Region overview card
                 regionConditionsOverview: "Region Conditions Overview",
                 automationConditions: "Automation Conditions",
                 autoConditions: "Auto Conditions",
+                autoConditionsDesc: "Configure trigger conditions for automatic charge/discharge operations",
                 conditionsView: "Conditions View",
                 chargeCondition: "Charge Condition",
                 dischargeCondition: "Discharge Condition",
                 timeCondition: "Time Condition",
+                timeConditionSettings: "Time Condition Settings",
                 priceCondition: "Price Condition",
                 idle: "Idle",
                 region: "Region",
@@ -1941,6 +2163,32 @@ class I18n {
                 compareYesterday: "vs Yesterday",
                 dischargedAmount: "Discharged Energy",
                 earnedProfit: "Earned Profit",
+                dischargeFamilies: "Discharge Families",
+                dischargeAmount: "Discharge",
+                dischargeProfit: "Profit",
+                chargeFamilies: "Charge Families",
+                chargeAmount: "Charge",
+                chargeCost: "Cost",
+                netProfit: "Net Profit",
+                cumulativeMetrics: "Cumulative Metrics",
+                confirmAutoMode: "Confirm Auto Mode",
+                autoModeDescription: "After enabling auto mode, the system will automatically perform charge/discharge operations based on the following conditions:",
+                editConditionHint: "To modify conditions, please click the 'Edit Settings' button",
+                editSettings: "Edit Settings",
+                confirmEnable: "Confirm Enable",
+                confirmDisableAutoMode: "Confirm Disable Auto Mode",
+                disableAutoModeDescription: "After disabling auto mode, the system will stop automatic charge/discharge operations. You will need to control charging and discharging manually.",
+                autoModeWarning: "Warning",
+                disableAutoModeWarning: "After disabling auto mode, you may miss optimal charge/discharge opportunities, affecting your revenue.",
+                currentAutoModeStatus: "Current auto mode status:",
+                autoModeActive: "Active",
+                confirmDisable: "Confirm Disable",
+                conditionEnabled: "Enabled",
+                conditionDisabled: "Disabled",
+                timeSegment: "Time Period",
+                priceThreshold: "Price Threshold",
+                chargeToSOC: "Charge to SOC",
+                dischargeToSOC: "Discharge to SOC",
                 currentCumulativePrice: "Current Cumulative Price",
                 forecastCumulativePrice5min: "Forecast Cumulative Price (5min)",
                 thresholdStatus: "Threshold Status",
@@ -2143,11 +2391,15 @@ class I18n {
                 
                 // Common translations
                 common: {
+                    back: "Back",
+                    cancel: "Cancel",
+                    previous: "Previous",
+                    next: "Next",
+                    times: " times",
                     设置: "Settings",
                     退出: "Logout",
                     确认退出: "Confirm Logout",
-                    确认退出消息: "Are you sure you want to logout?",
-                    cancel: "Cancel"
+                    确认退出消息: "Are you sure you want to logout?"
                 },
                 sortAsc: "Ascending",
                 sortDesc: "Descending",
@@ -2515,6 +2767,7 @@ class I18n {
                         deviceStatus: "All Device Status",
                         userName: "Enter user name...",
                         deviceCode: "Enter device code...",
+                        meterNumber: "Enter NMI...",
                         minValue: "Min Value",
                         maxValue: "Max Value",
                         allLocations: "All Locations",
@@ -2531,6 +2784,7 @@ class I18n {
                         avgProfit: "Avg Daily Profit ($)",
                         deviceCode: "Device Code",
                         deviceStatus: "Device Status",
+                        meterNumber: "NMI",
                         soc: "SOC",
                         todayDischarge: "Today's Discharge (kWh)",
                         usageDays: "Usage Days",
@@ -2540,8 +2794,7 @@ class I18n {
                     },
                     activityStatus: {
                         active: "Active",
-                        inactive: "Inactive",
-                        notParticipating: "Not Participating"
+                        inactive: "Inactive"
                     },
                     deviceStates: {
                         charging: "Charging",
@@ -2591,12 +2844,14 @@ class I18n {
                         tabs: {
                             basicInfo: "Basic Info",
                             revenueInfo: "Revenue Info",
-                            operatingData: "Operating Data"
+                            operatingData: "Operating Data",
+                            dispatchRecords: "Dispatch Records"
                         },
                         basicInfo: "Basic Information",
                         userName: "User Name",
                         location: "Location",
                         address: "Address",
+                        meterNumber: "NMI",
                         deviceCode: "Device Code",
                         batteryCapacity: "Battery Capacity",
                         soc: "SOC",
@@ -2621,7 +2876,31 @@ class I18n {
                         stopCharging: "Stop Charging",
                         charging: "Charging",
                         discharging: "Discharging",
-                        stopDischarging: "Stop Discharging"
+                        stopDischarging: "Stop Discharging",
+                        actions: {
+                            cancel: "Cancel",
+                            save: "Save",
+                            delete: "Delete",
+                            confirm: "Confirm"
+                        },
+                        messages: {
+                            saveSuccess: "Saved successfully",
+                            deleteConfirm: "Are you sure you want to delete this record?",
+                            deleteSuccess: "Deleted successfully"
+                        },
+                        dispatchRecords: {
+                            time: "Time",
+                            type: "Type",
+                            energy: "Energy",
+                            amount: "Amount",
+                            charge: "Charge",
+                            discharge: "Discharge",
+                            totalCount: "Total Dispatches",
+                            totalCharge: "Total Charge",
+                            totalDischarge: "Total Discharge",
+                            totalRevenue: "Total Revenue",
+                            totalCost: "Total Cost"
+                        }
                     },
                     userName1: "John Smith",
                     userName2: "Michael Lee",
@@ -2839,6 +3118,31 @@ class I18n {
                     highPriceChargeReminder: "High Price Charge Reminder",
                     priceAlert: "Alert",
                     currentPrice: "Current price ",
+                    
+                    // 新增推送通知英文翻译
+                    chargeReminderTitle: "Charge Reminder——NSW",
+                    dischargeReminderTitle: "Discharge Reminder——NSW",
+                    optimalChargeTitle: "Optimal Charge Time Reminder——NSW",
+                    lowPriceChargeTitle: "Low Price Charge Reminder——NSW",
+                    belowThreshold: ", below threshold ",
+                    aboveThreshold: ", above threshold ",
+                    pleaseCharge: ", please charge",
+                    pleaseDischarge: ", please discharge",
+                    regionChargePrice: " region charge price ",
+                    timeRemaining: ", remaining ",
+                    minutesToOptimal: " minutes until optimal discharge time, please prepare",
+                    minutesToLowPrice: " minutes until low price charge time, please prepare",
+                    
+                    // 充电提醒弹窗英文翻译
+                    chargeNotificationTitle: "Charge Reminder——NSW",
+                    currentElectricityPrice: "Current electricity price ",
+                    belowThresholdText: ", below threshold ",
+                    pleaseChargeText: ", please charge",
+                    simulateCharge: "Charge Reminder",
+                    simulateDischarge: "Discharge Reminder",
+                    simulateOptimal: "Optimal Discharge Time Reminder",
+                    simulateLowPrice: "Low Price Charge Reminder",
+                    pushNotificationTest: "Push Notification Test",
                     belowThreshold: " below threshold ",
                     aboveThreshold: " above threshold ",
                     pleaseCharge: ", please charge",
@@ -3007,9 +3311,11 @@ class I18n {
                         userCount: "User Count",
                         totalRevenue: "Total Revenue",
                         avgProfit: "Avg Profit per User",
-                        maxStationProfit: "Max Station Profit",
-                        minStationProfit: "Min Station Profit",
-                        comparedYesterday: "vs Yesterday"
+                        maxStationProfit: "Max Family Profit",
+                        minStationProfit: "Min Family Profit",
+                        comparedYesterday: "vs Yesterday",
+                        comparedLastMonth: "vs Last Month",
+                        comparedLastYear: "vs Last Year"
                     },
                     charts: {
                         userManagement: "User Management",
@@ -3027,7 +3333,10 @@ class I18n {
                         user: "User",
                         status: "Operating Status",
                         dischargeAmount: "Actual Discharge (kwh)",
+                        sellPrice: "Selling Price ($/kWh)",
+                        costPrice: "Cost Price ($/kWh)",
                         profit: "Profit ($)",
+                        profitPerKwh: "Profit per kWh ($)",
                         dailyAvg: "Daily Avg",
                         monthlyAvg: "Monthly Avg",
                         yearlyAvg: "Yearly Avg",
@@ -3087,8 +3396,7 @@ class I18n {
                     },
                     activityStatus: {
                         active: "Active",
-                        inactive: "Inactive",
-                        notParticipating: "Not Participating"
+                        inactive: "Inactive"
                     },
                     deviceStates: {
                         charging: "Charging",
@@ -3100,10 +3408,19 @@ class I18n {
                         search: "Search",
                         reset: "Reset",
                         export: "Export",
+                        exportDetail: "Export Details",
                         refresh: "Refresh",
                         expand: "Expand",
                         collapse: "Collapse",
                         viewDetails: "View Details"
+                    },
+                    exportDetail: {
+                        title: "Export Details",
+                        selectDate: "Select Date",
+                        hint: "You can only export data for a single date",
+                        confirmExport: "Confirm Export",
+                        selectDateError: "Please select a date",
+                        exportSuccess: "Details exported successfully"
                     },
                     table: {
                         user: "User",
@@ -3114,6 +3431,9 @@ class I18n {
                         deviceCode: "Device Code",
                         deviceStatus: "Device Status",
                         soc: "SOC",
+                        socValue: "Battery Value",
+                        batteryCost: "Cost per kWh",
+                        meterNumber: "Meter No.",
                         location: "Location",
                         usageDays: "Usage Days",
                         action: "Action"
@@ -3123,22 +3443,29 @@ class I18n {
                         tabs: {
                             basicInfo: "Basic Info",
                             revenueInfo: "Revenue Info",
-                            operatingData: "Operating Data"
+                            operatingData: "Operating Data",
+                            dispatchRecords: "Dispatch Records"
                         },
+                        basicInfo: "Basic Information",
+                        userName: "User Name",
+                        location: "Location",
+                        address: "Address",
+                        meterNumber: "NMI",
                         deviceCode: "Device Code",
                         batteryCapacity: "Battery Capacity",
                         soc: "SOC",
                         status: "Status",
                         operatingDays: "Operating Days",
                         owner: "Owner",
-                        address: "Address",
-                        day: "days",
+                        day: "Day",
                         todayProfit: "Today's Profit",
                         avgProfit: "Avg Daily Profit",
                         totalRevenue: "Total Revenue",
                         todayDischarge: "Today's Discharge",
                         avgDischarge: "Avg Daily Discharge",
                         totalDischarge: "Total Discharge",
+                        revenue: "Revenue",
+                        discharge: "Discharge",
                         profitTrend: "Profit Trend",
                         month: "Month",
                         year: "Year",
@@ -3148,7 +3475,31 @@ class I18n {
                         charging: "Charging",
                         stopCharging: "Stop Charging",
                         discharging: "Discharging",
-                        stopDischarging: "Stop Discharging"
+                        stopDischarging: "Stop Discharging",
+                        actions: {
+                            cancel: "Cancel",
+                            save: "Save",
+                            delete: "Delete",
+                            confirm: "Confirm"
+                        },
+                        messages: {
+                            saveSuccess: "Saved successfully",
+                            deleteConfirm: "Are you sure you want to delete this record?",
+                            deleteSuccess: "Deleted successfully"
+                        },
+                        dispatchRecords: {
+                            time: "Time",
+                            type: "Type",
+                            energy: "Energy",
+                            amount: "Amount",
+                            charge: "Charge",
+                            discharge: "Discharge",
+                            totalCount: "Total Dispatches",
+                            totalCharge: "Total Charge",
+                            totalDischarge: "Total Discharge",
+                            totalRevenue: "Total Revenue",
+                            totalCost: "Total Cost"
+                        }
                     },
                     userName1: "John Smith",
                     userName2: "Sarah Johnson",
@@ -4170,6 +4521,17 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // 设置全局变量，确保在页面加载时自动创建i18n实例
-if (typeof window !== 'undefined' && !window.i18n) {
-    window.i18n = new I18n();
+if (typeof window !== 'undefined') {
+    // 确保 I18n 类可用
+    window.I18n = I18n;
+    
+    // 创建默认实例
+    if (!window.i18n) {
+        console.log('Creating default i18n instance...');
+        window.i18n = new I18n({
+            defaultLanguage: 'zh',
+            containerId: 'languageSelector'
+        });
+        console.log('Default i18n instance created:', window.i18n);
+    }
 }

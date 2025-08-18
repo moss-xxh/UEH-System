@@ -14,10 +14,17 @@
     <link rel="stylesheet" href="components/user-dropdown.css">
     <script src="components/time-selector.js"></script>
     <script src="components/i18n.js"></script>
+    <script>
+        // 确保 i18n 初始化
+        console.log('After loading i18n.js - I18n class:', typeof I18n);
+        console.log('After loading i18n.js - window.i18n:', window.i18n);
+    </script>
     <script src="components/simple-message-icon.js"></script>
     <script src="components/user-dropdown-simple-new.js"></script>
     <script src="components/header-nav.js"></script>
     <script src="components/drawer-component.js"></script>
+    <script src="components/condition-settings-modal.js"></script>
+    <script src="components/global-notifications.js"></script>
     <script src="fix-charts-dom-ready.js" defer></script>
     <style>
         /* SOC Modal Slider Styles */
@@ -105,198 +112,6 @@
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        /* 可拖拽测试卡片样式 */
-        .draggable-test-card {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(30px) saturate(1.5);
-            -webkit-backdrop-filter: blur(30px) saturate(1.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            cursor: move;
-            z-index: 1000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
-        }
-
-        .draggable-test-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .test-card-header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .test-card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-            margin: 0;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .test-card-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .test-btn {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-
-        .test-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .test-btn:active {
-            transform: translateY(0);
-        }
-
-        .test-btn.home {
-            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
-            color: #fff;
-        }
-
-        .test-btn.charge {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .test-btn.discharge {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        }
-
-        .test-btn.optimal {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .test-btn.price {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-
-        /* 缩小状态样式 */
-        .draggable-test-card.minimized {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            padding: 0;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4), 
-                        0 0 0 1px rgba(0, 255, 136, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-
-        .draggable-test-card.minimized:hover {
-            transform: scale(1.15);
-            box-shadow: 0 12px 35px rgba(0, 255, 136, 0.6), 
-                        0 0 0 2px rgba(0, 255, 136, 0.5),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            border-color: rgba(255, 255, 255, 1);
-        }
-
-        .draggable-test-card.minimized .test-card-header,
-        .draggable-test-card.minimized .test-card-buttons {
-            display: none;
-        }
-
-        .draggable-test-card.minimized::before {
-            content: '⚡';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 28px;
-            color: #000;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
-            z-index: 1;
-            font-weight: bold;
-        }
-
-        /* 展开按钮 */
-        .expand-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 24px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .expand-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-            color: #fff;
-        }
-
-        .draggable-test-card.minimized .expand-btn {
-            display: none;
-        }
-
-        /* 缩小状态脉冲动画 */
-        @keyframes minimizedPulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4), 
-                            0 0 0 1px rgba(0, 255, 136, 0.3),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5), 
-                            0 0 0 2px rgba(0, 255, 136, 0.4),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            }
-        }
-
-        .draggable-test-card.minimized {
-            animation: minimizedPulse 3s ease-in-out infinite;
-        }
-
-        .draggable-test-card.minimized:hover {
-            animation: none;
-        }
 
         /* 可拖拽地区条件总览卡片样式 */
         .draggable-region-overview-card {
@@ -952,6 +767,8 @@
             --color-text: rgba(255, 255, 255, 0.9);
             --color-text-secondary: rgba(255, 255, 255, 0.6);
             --color-primary: #00ff88;
+            --color-region-primary: #00ff88;
+            --color-circle-primary: #52c41a;
             --color-accent: #1e7fff;
             --color-border: rgba(255, 255, 255, 0.08);
             --color-shadow: 0 2px 8px rgba(0,0,0,0.32);
@@ -1399,7 +1216,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00ff88, #00aa66);
+            background: linear-gradient(135deg, #007AFF, #0056CC);
             opacity: 0.9;
             transition: all 0.3s ease;
         }
@@ -1420,11 +1237,11 @@
         @keyframes dischargePulse {
             0%, 100% {
                 transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4);
+                box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.4);
             }
             50% {
                 transform: scale(1.05);
-                box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
+                box-shadow: 0 0 0 15px rgba(255, 149, 0, 0);
             }
         }
         
@@ -1459,7 +1276,7 @@
             height: 100%;
             border-radius: 50%;
             overflow: hidden;
-            background: linear-gradient(180deg, #666666 0%, #555555 50%, #444444 100%);
+            background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%);
         }
 
         .water-wave {
@@ -1973,6 +1790,37 @@
             background: #00ff88;
         }
 
+        /* Mode Tabs for Modal */
+        .mode-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .mode-tab:hover {
+            color: #fff;
+        }
+
+        .mode-tab.active {
+            color: #00ff88;
+        }
+
+        .mode-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00ff88;
+        }
+
         .auto-switch-toggle {
             margin-left: auto;
             display: flex;
@@ -2373,7 +2221,7 @@
         }
         
         .region-select-tab.active {
-            background: var(--color-primary) !important;
+            background: var(--color-region-primary) !important;
             color: #000 !important;
             box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
         }
@@ -2386,6 +2234,25 @@
             font-weight: 700 !important;
         }
         
+        /* Special styling for waitingExecution status */
+        .region-status-badge[data-status="waitingExecution"] {
+            background: rgba(30, 127, 255, 0.2) !important;
+            color: #1E7FFF !important;
+            border: 1px dashed #1E7FFF !important;
+            padding: 6px 12px !important;
+            border-radius: 12px !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            display: inline-block !important;
+        }
+        
+        /* Special styling for waitingExecution status when region is active */
+        .region-select-tab.active .region-status-badge[data-status="waitingExecution"] {
+            background: rgba(0, 0, 0, 0.2) !important;
+            color: #000 !important;
+            border: 1px dashed rgba(0, 0, 0, 0.4) !important;
+        }
+        
         /* Status badge base styles */
         .region-status-badge {
             transition: all 0.3s ease;
@@ -2394,6 +2261,11 @@
             padding: 6px 12px;
             border-radius: 20px;
             border-width: 1px;
+        }
+
+        /* Hide region status indicators in auto conditions modal */
+        #regionOverviewCard .region-status-indicator {
+            display: none !important;
         }
         
         /* Responsive Layout */
@@ -4307,9 +4179,9 @@
             <div class="region-selection-container" style="flex: 1; display: flex; align-items: stretch;">
                 <!-- 默认地区选择 -->
                 <div class="region-selection-tabs" style="display: flex; gap: 8px; justify-content: space-between; width: 100%;">
-                    <button class="region-select-tab active" data-region="NSW" onclick="selectMainRegion('NSW', this)" style="padding: 16px 20px; background: var(--color-primary); color: #000; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex: 1; min-height: 60px; flex-direction: column; gap: 4px;">
+                    <button class="region-select-tab active" data-region="NSW" onclick="selectMainRegion('NSW', this)" style="padding: 16px 20px; background: var(--color-region-primary); color: #000; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex: 1; min-height: 60px; flex-direction: column; gap: 4px;">
                         <span style="font-size: 14px; font-weight: 700;">NSW</span>
-                        <span class="region-status-badge" data-status="none"></span>
+                        <span class="region-status-badge" data-status="waitingExecution">等待执行中</span>
                     </button>
                     <button class="region-select-tab" data-region="QLD" onclick="selectMainRegion('QLD', this)" style="padding: 16px 20px; background: transparent; color: var(--color-text-secondary); border: 1px solid var(--color-border); border-radius: 50px; font-weight: 500; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex: 1; min-height: 60px; flex-direction: column; gap: 4px;">
                         <span style="font-size: 14px; font-weight: 700;">QLD</span>
@@ -4351,7 +4223,7 @@
                         <span id="regionStatusText" style="font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 4px; display: none;"></span>
                     </h3>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500;" data-i18n="autoMode">自动</span>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500;" data-i18n="autoMode">自动模式</span>
                         <div class="auto-toggle-switch" onclick="toggleAutoMode()" style="position: relative; width: 36px; height: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.2);">
                             <div id="autoToggleKnob" style="position: absolute; top: 1px; right: 1px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                         </div>
@@ -4402,7 +4274,7 @@
                         <h4 style="margin: 0; font-size: 15px; color: rgba(255,255,255,0.9); font-weight: 600;">
                             <span data-i18n="settings">设置</span>
                         </h4>
-                        <button onclick="openConditionSettingsModal()" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s;">
+                        <button id="settingsEditBtn" onclick="handleSettingsEdit()" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s;">
                             <span data-i18n="edit">编辑</span>
                         </button>
                     </div>
@@ -4427,7 +4299,7 @@
                         <div>
                             <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 10px; font-weight: 600;" data-i18n="autoChargeCondition">自动充电条件</div>
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <input type="checkbox" id="chargeTimeEnabledDisplay" checked disabled style="width: 14px; height: 14px; accent-color: #00ff88; cursor: default; opacity: 0.9;">
+                                <input type="checkbox" id="chargeTimeEnabledDisplay" disabled style="width: 14px; height: 14px; accent-color: #00ff88; cursor: default; opacity: 0.9;">
                                 <span style="font-size: 12px;">⏰</span>
                                 <span id="chargeTimeDisplay" style="font-size: 12px; color: rgba(255,255,255,0.85);">
                                     <span id="chargeStartTime">22:00</span> - <span id="chargeEndTime">06:00</span>
@@ -4435,7 +4307,7 @@
                                 <span id="chargeTimeDisabled" style="font-size: 11px; color: rgba(255,255,255,0.5); display: none;" data-i18n="notUsed">(未使用)</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" id="chargePriceEnabledDisplay" checked disabled style="width: 14px; height: 14px; accent-color: #00ff88; cursor: default; opacity: 0.9;">
+                                <input type="checkbox" id="chargePriceEnabledDisplay" disabled style="width: 14px; height: 14px; accent-color: #00ff88; cursor: default; opacity: 0.9;">
                                 <span style="font-size: 12px;">💰</span>
                                 <span id="chargePriceDisplay" style="font-size: 12px; color: rgba(255,255,255,0.85);">
                                     <span data-i18n="lessThan">低于</span> <span id="chargePriceValue" style="font-weight: 600;">50</span>$
@@ -4448,7 +4320,7 @@
                         <div>
                             <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 10px; font-weight: 600;" data-i18n="autoDischargeCondition">自动放电条件</div>
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <input type="checkbox" id="dischargeTimeEnabledDisplay" checked disabled style="width: 14px; height: 14px; accent-color: #FFC107; cursor: default; opacity: 0.9;">
+                                <input type="checkbox" id="dischargeTimeEnabledDisplay" disabled style="width: 14px; height: 14px; accent-color: #FFC107; cursor: default; opacity: 0.9;">
                                 <span style="font-size: 12px;">⏰</span>
                                 <span id="dischargeTimeDisplay" style="font-size: 12px; color: rgba(255,255,255,0.85);">
                                     <span id="dischargeStartTime">16:00</span> - <span id="dischargeEndTime">21:00</span>
@@ -4456,7 +4328,7 @@
                                 <span id="dischargeTimeDisabled" style="font-size: 11px; color: rgba(255,255,255,0.5); display: none;" data-i18n="notUsed">(未使用)</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <input type="checkbox" id="dischargePriceEnabledDisplay" checked disabled style="width: 14px; height: 14px; accent-color: #FFC107; cursor: default; opacity: 0.9;">
+                                <input type="checkbox" id="dischargePriceEnabledDisplay" disabled style="width: 14px; height: 14px; accent-color: #FFC107; cursor: default; opacity: 0.9;">
                                 <span style="font-size: 12px;">💰</span>
                                 <span id="dischargePriceDisplay" style="font-size: 12px; color: rgba(255,255,255,0.85);">
                                     <span data-i18n="greaterThan">高于</span> <span id="dischargePriceValue" style="font-weight: 600;">100</span>$
@@ -4465,24 +4337,28 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
                 
                 <!-- Bottom Stats Cards -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 80px; flex-shrink: 0;">
-                    <div style="padding: 10px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                        <div style="font-size: 18px; margin-bottom: 3px;">🏠</div>
-                        <div style="font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; font-weight: 500;" data-i18n="availableHomes">可放电家庭</div>
-                        <div style="font-size: 18px; font-weight: 700; color: #fff;" id="totalFamiliesCard">120</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; height: auto; min-height: 100px; flex-shrink: 0;">
+                    <div style="padding: 12px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; min-width: 0;">
+                        <div style="font-size: 22px; margin-bottom: 6px;">🏠</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 6px; font-weight: 600; line-height: 1.2; height: 30px; display: flex; align-items: center;" data-i18n="availableHomes">可放电家庭</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #fff;" id="totalFamiliesCard">120</div>
                     </div>
-                    <div style="padding: 10px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                        <div style="font-size: 18px; margin-bottom: 3px;">⚡</div>
-                        <div style="font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; font-weight: 500;" data-i18n="availablePower">可放电量</div>
-                        <div style="font-size: 18px; font-weight: 700; color: #fff;" id="totalPowerCard">65kWh</div>
+                    <div style="padding: 12px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; min-width: 0;">
+                        <div style="font-size: 22px; margin-bottom: 6px;">⚡</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 6px; font-weight: 600; line-height: 1.2; height: 30px; display: flex; align-items: center;" data-i18n="availablePower">可放电量</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #fff;" id="totalPowerCard">65kWh</div>
                     </div>
-                    <div style="padding: 10px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                        <div style="font-size: 18px; margin-bottom: 3px;">💰</div>
-                        <div style="font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 3px; font-weight: 500;" data-i18n="estimatedProfit">预计获利</div>
-                        <div style="font-size: 18px; font-weight: 700; color: #fff;">$3500</div>
+                    <div style="padding: 12px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; min-width: 0;">
+                        <div style="font-size: 22px; margin-bottom: 6px;">💰</div>
+                        <div style="height: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 6px;">
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 600; line-height: 1.2;" data-i18n="estimatedRevenueMain">预计收益</div>
+                            <div style="font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.2;" data-i18n="estimatedRevenueSub">（不考虑成本）</div>
+                        </div>
+                        <div style="font-size: 20px; font-weight: 700; color: #fff;">$3500</div>
                     </div>
                 </div>
             </div>
@@ -4625,9 +4501,8 @@
                         <div style="font-size: 10px; color: rgba(255,255,255,0.7); margin-bottom: 2px;" data-i18n="dischargedFamilies">已放电家庭</div>
                         <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px;">235</div>
                         <div style="display: flex; align-items: center; gap: 2px;">
-                            <span style="font-size: 8px; color: #00ff88;">↑</span>
-                            <span style="font-size: 8px; color: rgba(255,255,255,0.6);" data-i18n="compareYesterday">比昨日</span>
-                            <span style="font-size: 8px; color: #00ff88; font-weight: 600;">+21%</span>
+                            <span style="font-size: 11px; color: rgba(255,255,255,0.6);" data-i18n="compareYesterday">比昨日</span>
+                            <span style="font-size: 11px; color: #00ff88; font-weight: 600;">+41</span>
                         </div>
                     </div>
                     
@@ -4637,9 +4512,8 @@
                         <div style="font-size: 10px; color: rgba(255,255,255,0.7); margin-bottom: 2px;" data-i18n="dischargedAmount">已放电量</div>
                         <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px;">23547kWh</div>
                         <div style="display: flex; align-items: center; gap: 2px;">
-                            <span style="font-size: 8px; color: #00ff88;">↑</span>
-                            <span style="font-size: 8px; color: rgba(255,255,255,0.6);" data-i18n="compareYesterday">比昨日</span>
-                            <span style="font-size: 8px; color: #00ff88; font-weight: 600;">+21%</span>
+                            <span style="font-size: 11px; color: rgba(255,255,255,0.6);" data-i18n="compareYesterday">比昨日</span>
+                            <span style="font-size: 11px; color: #00ff88; font-weight: 600;">+4086kWh</span>
                         </div>
                     </div>
                     
@@ -4649,9 +4523,8 @@
                         <div style="font-size: 10px; color: rgba(255,255,255,0.7); margin-bottom: 2px;" data-i18n="earnedProfit">已获利</div>
                         <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px;">$23547</div>
                         <div style="display: flex; align-items: center; gap: 2px;">
-                            <span style="font-size: 8px; color: #00ff88;">↑</span>
-                            <span style="font-size: 8px; color: rgba(255,255,255,0.6);" data-i18n="compareYesterday">比昨日</span>
-                            <span style="font-size: 8px; color: #00ff88; font-weight: 600;">+21%</span>
+                            <span style="font-size: 11px; color: rgba(255,255,255,0.6);" data-i18n="compareYesterday">比昨日</span>
+                            <span style="font-size: 11px; color: #00ff88; font-weight: 600;">+$4086</span>
                         </div>
                     </div>
                 </div>
@@ -4676,10 +4549,10 @@
                         <div style="font-size: 18px; font-weight: 700; color: #fff;">235MW</div>
                     </div>
                     
-                    <!-- 累计放电 -->
+                    <!-- 累计放电上网量 -->
                     <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                         <div style="font-size: 20px; margin-bottom: 6px;">⚡</div>
-                        <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px;" data-i18n="totalDischarge">累计放电</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px;" data-i18n="totalGridDischarge">累计放电上网量</div>
                         <div style="font-size: 18px; font-weight: 700; color: #fff;">234kwh</div>
                     </div>
                     
@@ -4776,7 +4649,7 @@
             
             <div class="overview-footer">
                 <div class="overview-item">
-                    <div class="overview-label">累计放电</div>
+                    <div class="overview-label" data-i18n="totalGridDischarge">累计放电上网量</div>
                     <div class="overview-value" id="totalDischargeOverview">445.2 MWh</div>
                 </div>
                 <div class="overview-item">
@@ -4797,12 +4670,12 @@
                 <div class="stat-overview-card">
                     <div class="stat-overview-icon">🔋</div>
                     <div class="stat-overview-label" data-i18n="installedCapacity">装机量</div>
-                    <div class="stat-overview-value" id="installedCapacity">235MW</div>
+                    <div class="stat-overview-value" id="installedCapacity">235KW</div>
                 </div>
 
                 <div class="stat-overview-card">
                     <div class="stat-overview-icon">⚡</div>
-                    <div class="stat-overview-label">累计放电</div>
+                    <div class="stat-overview-label" data-i18n="totalGridDischarge">累计放电上网量</div>
                     <div class="stat-overview-value" id="totalDischarge">234kwh</div>
                 </div>
 
@@ -5232,8 +5105,340 @@
             }
             
             const isCurrentlyAuto = currentOperationMode === 'auto';
-            const newMode = isCurrentlyAuto ? 'manual' : 'auto';
-            switchOperationMode(newMode);
+            
+            if (!isCurrentlyAuto) {
+                // 切换到自动模式时，显示确认弹窗
+                showAutoModeConfirmDialog();
+            } else {
+                // 从自动模式切换到手动模式，也显示确认弹窗
+                showDisableAutoModeConfirmDialog();
+            }
+        }
+        
+        function showAutoModeConfirmDialog() {
+            // 获取当前地区的设置
+            const currentRegion = selectedMainRegion || 'NSW';
+            const regionData = selectedRegionData[currentRegion] || {};
+            
+            // 获取充电和放电条件
+            const chargeData = regionData.charge || { 
+                segments: [{ start: 22, end: 6 }],
+                priceThreshold: 50,
+                chargeSOC: 90,
+                timeEnabled: true,
+                priceEnabled: true
+            };
+            const dischargeData = regionData.discharge || { 
+                segments: [{ start: 6, end: 22 }],
+                priceThreshold: 100,
+                dischargeSOC: 20,
+                timeEnabled: true,
+                priceEnabled: true
+            };
+            
+            // 格式化时间段显示
+            const formatTimeSegments = (segments) => {
+                if (!segments || segments.length === 0) return '未设置';
+                return segments.map(seg => `${seg.start}:00 - ${seg.end}:00`).join(', ');
+            };
+            
+            // 生成充电条件HTML
+            const generateChargeConditionsHTML = () => {
+                let conditionsHTML = '';
+                const i18n = window.i18n;
+                
+                // 时间条件
+                if (chargeData.timeEnabled !== false) {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span style="color: #00ff88; font-size: 10px;">✓ ${i18n ? i18n.getText('conditionEnabled') : '已启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.6);">${i18n ? i18n.getText('timeSegment') : '时间段'}：</span>
+                            <span style="color: #fff;">${formatTimeSegments(chargeData.segments)}</span>
+                        </div>`;
+                } else {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px; opacity: 0.5;">
+                            <span style="color: rgba(255, 255, 255, 0.4); font-size: 10px;">✗ ${i18n ? i18n.getText('conditionDisabled') : '未启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.4); text-decoration: line-through;">${i18n ? i18n.getText('timeSegment') : '时间段'}：${formatTimeSegments(chargeData.segments)}</span>
+                        </div>`;
+                }
+                
+                // 价格条件
+                if (chargeData.priceEnabled !== false) {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span style="color: #00ff88; font-size: 10px;">✓ ${i18n ? i18n.getText('conditionEnabled') : '已启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.6);">${i18n ? i18n.getText('priceThreshold') : '价格阈值'}：</span>
+                            <span style="color: #fff;">< $${chargeData.priceThreshold || 50}/MWh</span>
+                        </div>`;
+                } else {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px; opacity: 0.5;">
+                            <span style="color: rgba(255, 255, 255, 0.4); font-size: 10px;">✗ ${i18n ? i18n.getText('conditionDisabled') : '未启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.4); text-decoration: line-through;">${i18n ? i18n.getText('priceThreshold') : '价格阈值'}：< $${chargeData.priceThreshold || 50}/MWh</span>
+                        </div>`;
+                }
+                
+                // SOC条件始终显示为启用
+                conditionsHTML += `
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #00ff88; font-size: 10px;">✓ ${i18n ? i18n.getText('conditionEnabled') : '已启用'}</span>
+                        <span style="color: rgba(255, 255, 255, 0.6);">${i18n ? i18n.getText('chargeToSOC') : '充电至 SOC'}：</span>
+                        <span style="color: #fff;">${chargeData.chargeSOC || 90}%</span>
+                    </div>`;
+                
+                return conditionsHTML;
+            };
+            
+            // 生成放电条件HTML
+            const generateDischargeConditionsHTML = () => {
+                let conditionsHTML = '';
+                const i18n = window.i18n;
+                
+                // 时间条件
+                if (dischargeData.timeEnabled !== false) {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span style="color: #ffc107; font-size: 10px;">✓ ${i18n ? i18n.getText('conditionEnabled') : '已启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.6);">${i18n ? i18n.getText('timeSegment') : '时间段'}：</span>
+                            <span style="color: #fff;">${formatTimeSegments(dischargeData.segments)}</span>
+                        </div>`;
+                } else {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px; opacity: 0.5;">
+                            <span style="color: rgba(255, 255, 255, 0.4); font-size: 10px;">✗ ${i18n ? i18n.getText('conditionDisabled') : '未启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.4); text-decoration: line-through;">${i18n ? i18n.getText('timeSegment') : '时间段'}：${formatTimeSegments(dischargeData.segments)}</span>
+                        </div>`;
+                }
+                
+                // 价格条件
+                if (dischargeData.priceEnabled !== false) {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span style="color: #ffc107; font-size: 10px;">✓ ${i18n ? i18n.getText('conditionEnabled') : '已启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.6);">${i18n ? i18n.getText('priceThreshold') : '价格阈值'}：</span>
+                            <span style="color: #fff;">> $${dischargeData.priceThreshold || 100}/MWh</span>
+                        </div>`;
+                } else {
+                    conditionsHTML += `
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px; opacity: 0.5;">
+                            <span style="color: rgba(255, 255, 255, 0.4); font-size: 10px;">✗ ${i18n ? i18n.getText('conditionDisabled') : '未启用'}</span>
+                            <span style="color: rgba(255, 255, 255, 0.4); text-decoration: line-through;">${i18n ? i18n.getText('priceThreshold') : '价格阈值'}：> $${dischargeData.priceThreshold || 100}/MWh</span>
+                        </div>`;
+                }
+                
+                // SOC条件始终显示为启用
+                conditionsHTML += `
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #ffc107; font-size: 10px;">✓ ${i18n ? i18n.getText('conditionEnabled') : '已启用'}</span>
+                        <span style="color: rgba(255, 255, 255, 0.6);">${i18n ? i18n.getText('dischargeToSOC') : '放电至 SOC'}：</span>
+                        <span style="color: #fff;">${dischargeData.dischargeSOC || 20}%</span>
+                    </div>`;
+                
+                return conditionsHTML;
+            };
+            
+            // 创建确认弹窗
+            const modal = document.createElement('div');
+            modal.id = 'autoModeConfirmModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 10005;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(15px) saturate(1.5);
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: linear-gradient(145deg, #1e1e2e 0%, #252535 100%);
+                border-radius: 20px;
+                padding: 0;
+                width: 640px;
+                max-width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.1);
+                animation: slideUp 0.3s ease;
+            `;
+            
+            modalContent.innerHTML = `
+                <div style="padding: 24px 28px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.02);">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">${window.i18n ? window.i18n.getText('confirmAutoMode') : '确认启用自动模式'}</h3>
+                </div>
+                
+                <div style="padding: 24px 28px; max-height: 400px; overflow-y: auto;">
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: rgba(255, 255, 255, 0.8); font-size: 14px; margin: 0 0 16px 0;">
+                            ${window.i18n ? window.i18n.getText('autoModeDescription') : '启用自动模式后，系统将根据以下条件自动执行充放电操作：'}
+                        </p>
+                    </div>
+                    
+                    <!-- 充电和放电条件 - 左右排列 -->
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <!-- 充电条件 -->
+                        <div style="flex: 1; background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.2); border-radius: 12px; padding: 16px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                <span style="font-size: 16px;">🔋</span>
+                                <span style="color: #00ff88; font-weight: 600; font-size: 14px;">${window.i18n ? window.i18n.getText('chargeCondition') : '充电条件'}</span>
+                            </div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
+                                ${generateChargeConditionsHTML()}
+                            </div>
+                        </div>
+                        
+                        <!-- 放电条件 -->
+                        <div style="flex: 1; background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.2); border-radius: 12px; padding: 16px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                <span style="font-size: 16px;">⚡</span>
+                                <span style="color: #ffc107; font-weight: 600; font-size: 14px;">${window.i18n ? window.i18n.getText('dischargeCondition') : '放电条件'}</span>
+                            </div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
+                                ${generateDischargeConditionsHTML()}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 编辑提示 -->
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 14px;">💡</span>
+                        <span style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">
+                            ${window.i18n ? window.i18n.getText('editConditionHint') : '如需修改条件，请点击"编辑设置"按钮'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                    <button onclick="openConditionSettingsModal(); closeAutoModeConfirmDialog();" style="background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        ${window.i18n ? window.i18n.getText('editSettings') : '编辑设置'}
+                    </button>
+                    <button onclick="closeAutoModeConfirmDialog()" style="background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        ${window.i18n ? window.i18n.getText('cancel') : '取消'}
+                    </button>
+                    <button onclick="confirmEnableAutoMode()" style="background: linear-gradient(135deg, #00ff88, #00dd77); color: #000; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; border: none;">
+                        ${window.i18n ? window.i18n.getText('confirmEnable') : '确认启用'}
+                    </button>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // 添加动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        function closeAutoModeConfirmDialog() {
+            const modal = document.getElementById('autoModeConfirmModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function confirmEnableAutoMode() {
+            closeAutoModeConfirmDialog();
+            switchOperationMode('auto');
+        }
+        
+        // 显示关闭自动模式确认弹窗
+        function showDisableAutoModeConfirmDialog() {
+            // 创建模态框
+            const modal = document.createElement('div');
+            modal.id = 'disableAutoModeConfirmModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(40, 40, 40, 0.98) 100%);
+                backdrop-filter: blur(20px);
+                border-radius: 16px;
+                width: 480px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                animation: slideUp 0.3s ease;
+                overflow: hidden;
+            `;
+            
+            modalContent.innerHTML = `
+                <div style="padding: 24px 28px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.02);">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">
+                        ${window.i18n ? window.i18n.getText('confirmDisableAutoMode') : '确认关闭自动模式'}
+                    </h3>
+                </div>
+                
+                <div style="padding: 24px 28px;">
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0 0 16px 0;">
+                            ${window.i18n ? window.i18n.getText('disableAutoModeDescription') : '关闭自动模式后，系统将停止自动充放电操作，您需要手动控制充放电。'}
+                        </p>
+                    </div>
+                    
+                    <!-- 警告提示 -->
+                    <div style="background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.3); border-radius: 8px; padding: 12px; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px;">
+                        <span style="font-size: 16px; margin-top: 2px;">⚠️</span>
+                        <div>
+                            <p style="font-size: 13px; color: rgba(255, 184, 0, 0.9); margin: 0 0 4px 0; font-weight: 600;">
+                                ${window.i18n ? window.i18n.getText('autoModeWarning') : '注意'}
+                            </p>
+                            <p style="font-size: 12px; color: rgba(255, 255, 255, 0.7); margin: 0;">
+                                ${window.i18n ? window.i18n.getText('disableAutoModeWarning') : '关闭自动模式后，您可能会错过最佳的充放电时机，影响收益。'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                    <button onclick="closeDisableAutoModeConfirmDialog()" style="background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        ${window.i18n ? window.i18n.getText('cancel') : '取消'}
+                    </button>
+                    <button onclick="confirmDisableAutoMode()" style="background: linear-gradient(135deg, #ff6b6b, #ff5252); color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; border: none;">
+                        ${window.i18n ? window.i18n.getText('confirmDisable') : '确认关闭'}
+                    </button>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+        
+        function closeDisableAutoModeConfirmDialog() {
+            const modal = document.getElementById('disableAutoModeConfirmModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function confirmDisableAutoMode() {
+            closeDisableAutoModeConfirmDialog();
+            switchOperationMode('manual');
         }
         
         // 显示自动开关禁用提示
@@ -5252,7 +5457,7 @@
             tooltip.id = 'autoSwitchTooltip';
             tooltip.style.cssText = `
                 position: absolute;
-                top: -35px;
+                top: -45px;
                 left: 50%;
                 transform: translateX(-50%);
                 background: rgba(0, 0, 0, 0.9);
@@ -5260,8 +5465,8 @@
                 padding: 6px 12px;
                 border-radius: 4px;
                 font-size: 12px;
+                z-index: 10000;
                 white-space: nowrap;
-                z-index: 1000;
                 opacity: 0;
                 transition: opacity 0.3s ease;
                 pointer-events: none;
@@ -5272,9 +5477,14 @@
             // 设置提示文本
             tooltip.textContent = window.i18n ? window.i18n.getText('pleaseStopCurrentMode') : '请先停止当前模式';
             
-            // 添加到开关容器
-            toggleSwitch.style.position = 'relative';
-            toggleSwitch.appendChild(tooltip);
+            // 添加到body而不是开关容器，使用固定定位
+            const rect = toggleSwitch.getBoundingClientRect();
+            tooltip.style.position = 'fixed';
+            tooltip.style.top = (rect.top - 45) + 'px';
+            tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+            tooltip.style.transform = 'translateX(-50%)';
+            
+            document.body.appendChild(tooltip);
             
             // 显示提示
             setTimeout(() => {
@@ -5368,6 +5578,14 @@
                 
                 // Start auto check interval
                 startAutoOperationCheck();
+                
+                // 设置自动模式下的等待执行状态
+                if (regionData[selectedMainRegion]) {
+                    regionData[selectedMainRegion].status = 'waitingExecution';
+                    updatePowerStationStatus(selectedMainRegion, 'waitingExecution');
+                    // 更新地区状态标记
+                    updateRegionStatusDisplay();
+                }
                 
                 // 在自动模式下，大圆不可点击
                 if (mainCircle) {
@@ -5955,7 +6173,7 @@
         
         // 全局地区数据对象
         let regionData = {
-            'NSW': { status: 'none' },
+            'NSW': { status: 'waitingExecution' },
             'QLD': { status: 'autoCharge' },
             'VIC': { status: 'manualCharge' },
             'SA': { status: 'autoDischarge' },
@@ -5982,7 +6200,8 @@
             try {
                 const headerNav = new HeaderNav({
                     currentPage: 'home',
-                    containerId: 'headerContainer'
+                    containerId: 'headerContainer',
+                    showLanguageSelector: true
                 });
                 console.log('HeaderNav initialized successfully');
                 return true;
@@ -6074,7 +6293,7 @@
                     if (!window.i18n && typeof I18n !== 'undefined') {
                         window.i18n = new I18n({
                             defaultLanguage: 'zh',
-                            containerId: 'languageSelector'
+                            containerId: 'headerLanguageSelector'
                         });
                         console.log('i18n system initialized for homepage');
                     }
@@ -6124,26 +6343,6 @@
                         // 强制翻译每个按钮
                         const forcedButtonUpdates = [
                             {
-                                selector: '[data-i18n="simulateCharge"]',
-                                chinese: '模拟充电提醒',
-                                english: 'Simulate Charge Alert'
-                            },
-                            {
-                                selector: '[data-i18n="simulateDischarge"]',
-                                chinese: '模拟放电提醒',
-                                english: 'Simulate Discharge Alert'
-                            },
-                            {
-                                selector: '[data-i18n="simulateOptimal"]',
-                                chinese: '模拟最佳提醒',
-                                english: 'Simulate Optimal Alert'
-                            },
-                            {
-                                selector: '[data-i18n="simulatePriceAlert"]',
-                                chinese: '模拟价格提醒',
-                                english: 'Simulate Price Alert'
-                            },
-                            {
                                 selector: '[data-i18n="settings"]',
                                 chinese: '设置',
                                 english: 'Settings'
@@ -6182,6 +6381,9 @@
                         window.i18n.addObserver((newLanguage, oldLanguage) => {
                             console.log('Language changed from', oldLanguage, 'to', newLanguage);
                             updateDynamicContent(newLanguage);
+                            
+                            // Update region status badges
+                            updateRegionStatusDisplay();
                             
                             // Refresh all charts with new language
                             if (marketChart) {
@@ -6275,6 +6477,24 @@
                 if (defaultRegion) {
                     selectMainRegion('NSW', defaultRegion);
                 }
+                
+                // 确保NSW状态正确显示
+                setTimeout(() => {
+                    const nswStatusBadge = document.querySelector('[data-region="NSW"] .region-status-badge');
+                    if (nswStatusBadge) {
+                        nswStatusBadge.setAttribute('data-status', 'waitingExecution');
+                        nswStatusBadge.textContent = window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中';
+                        nswStatusBadge.style.background = 'rgba(30, 127, 255, 0.2)';
+                        nswStatusBadge.style.color = '#1E7FFF';
+                        nswStatusBadge.style.border = '1px dashed #1E7FFF';
+                        nswStatusBadge.style.display = 'inline-block';
+                        nswStatusBadge.style.padding = '6px 12px';
+                        nswStatusBadge.style.borderRadius = '12px';
+                        nswStatusBadge.style.fontSize = '11px';
+                        nswStatusBadge.style.fontWeight = '600';
+                        console.log('Force updated NSW status badge:', nswStatusBadge);
+                    }
+                }, 100);
                 
                 // 定期更新地区状态（模拟实时数据）
                 setInterval(updateRegionStatusIndicators, 30000); // 每30秒更新一次
@@ -6719,7 +6939,7 @@
 
         // 地区操作状态存储
         const regionOperationStatus = {
-            'NSW': 'none',  // 待机状态
+            'NSW': 'none',  // 修改为none，由regionData控制状态
             'QLD': 'discharging',
             'VIC': 'charging',
             'SA': 'discharging',
@@ -6783,7 +7003,7 @@
                 }
             });
             button.classList.add('active');
-            button.style.background = 'var(--color-primary)';
+            button.style.background = 'var(--color-region-primary)';
             button.style.color = '#000';
             button.style.border = 'none';
             button.style.borderRadius = '50px';
@@ -6821,6 +7041,11 @@
             // 总是更新地区显示，以确保切换时样式正确
             updateRegionDisplay();
             
+            // 强制更新地区状态显示，确保状态文字正确显示
+            setTimeout(() => {
+                updateRegionStatusDisplay();
+            }, 50);
+            
             // 调整间距
             setTimeout(() => {
                 adjustSpacingForRegionSelector();
@@ -6843,7 +7068,7 @@
             
             // 更新自动开关状态 - 根据地区状态控制：只有自动操作或等待执行中时为开启状态
             if (autoToggle) {
-                if (status === 'autoCharge' || status === 'autoDischarge' || (status === 'none' && currentOperationMode === 'auto')) {
+                if (status === 'autoCharge' || status === 'autoDischarge' || status === 'waitingExecution' || (status === 'none' && currentOperationMode === 'auto')) {
                     // 自动模式：开关向右（开启状态）- 纯绿色背景，白色圆点
                     autoToggle.style.right = '1px';
                     autoToggle.style.left = 'auto';
@@ -6960,6 +7185,8 @@
                 statusText = window.i18n ? window.i18n.getText('autoDischarge') : '自动放电';
             } else if (status === 'manualDischarge') {
                 statusText = window.i18n ? window.i18n.getText('manualDischarge') : '手动放电';
+            } else if (status === 'waitingExecution') {
+                statusText = window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中';
             }
             
             if (showLabel) {
@@ -7523,6 +7750,12 @@
         }
 
         function updatePowerChartWithData(labels, power, revenue, period) {
+            // Check if powerChart exists before updating
+            if (!powerChart) {
+                console.warn('powerChart is not initialized, skipping update');
+                return;
+            }
+            
             // Get updated translated labels
             const dischargeLabel = window.i18n ? window.i18n.getText('discharge') : '放电';
             const revenueLabel = window.i18n ? window.i18n.getText('totalRevenue') : '收益';
@@ -8612,6 +8845,9 @@
                 console.log('Map animation interval cleared');
             }
             
+            // 保存停止前的状态，用于判断是否需要设置为等待执行中
+            const currentStatus = regionData[selectedMainRegion] ? regionData[selectedMainRegion].status : 'none';
+            
             // 重置当前操作状态
             currentOperation = null;
             
@@ -8626,6 +8862,25 @@
                 stopDisplay.style.display = 'none';
                 stopDisplay.style.opacity = '0';
             }
+            
+            // 更新地区状态
+            if (regionData[selectedMainRegion]) {
+                // 如果是自动模式操作，停止后变为等待执行中
+                if (currentStatus === 'autoCharge' || currentStatus === 'autoDischarge') {
+                    regionData[selectedMainRegion].status = 'waitingExecution';
+                    updatePowerStationStatus(selectedMainRegion, 'waitingExecution');
+                } else {
+                    // 手动模式操作，停止后变为none
+                    regionData[selectedMainRegion].status = 'none';
+                    updatePowerStationStatus(selectedMainRegion, 'none');
+                }
+            }
+            
+            // 更新地区状态指示器
+            updateRegionStatusIndicators();
+            
+            // 更新地区状态显示
+            updateRegionStatusDisplay();
             
             // 更新大圆显示状态
             updateCircleStatusDisplay();
@@ -9266,11 +9521,12 @@
         
         // 主圆圈悬停处理
         function handleMainCircleHover() {
-            const operationStatus = getRegionOperationStatus(selectedMainRegion);
-            console.log('handleMainCircleHover - mode:', currentOperationMode, 'operation:', operationStatus);
+            const regionStatus = regionData[selectedMainRegion] ? regionData[selectedMainRegion].status : 'none';
+            console.log('handleMainCircleHover - region:', selectedMainRegion, 'status:', regionStatus);
             
-            // 只在手动模式下且充电或放电状态时显示停止
-            if (currentOperationMode === 'manual' && (operationStatus === 'charging' || operationStatus === 'discharging')) {
+            // 在4种状态下显示停止：autoCharge, manualCharge, autoDischarge, manualDischarge
+            if (regionStatus === 'autoCharge' || regionStatus === 'manualCharge' || 
+                regionStatus === 'autoDischarge' || regionStatus === 'manualDischarge') {
                 const priceDisplay = document.getElementById('priceDisplay');
                 const statusDisplay = document.getElementById('statusDisplay');
                 const stopDisplay = document.getElementById('stopDisplay');
@@ -9359,15 +9615,11 @@
         
         // 主圆圈点击处理
         function handleMainCircleClick() {
-            // 在自动模式下，点击大圆不做任何操作
-            if (currentOperationMode === 'auto') {
-                return;
-            }
+            const regionStatus = regionData[selectedMainRegion] ? regionData[selectedMainRegion].status : 'none';
             
-            const operationStatus = getRegionOperationStatus(selectedMainRegion);
-            
-            // 只在手动模式下且充电或放电状态时响应点击
-            if (currentOperationMode === 'manual' && (operationStatus === 'charging' || operationStatus === 'discharging')) {
+            // 在4种状态下响应点击：autoCharge, manualCharge, autoDischarge, manualDischarge
+            if (regionStatus === 'autoCharge' || regionStatus === 'manualCharge' || 
+                regionStatus === 'autoDischarge' || regionStatus === 'manualDischarge') {
                 // 显示停止确认弹窗
                 showStopConfirmation();
             }
@@ -9869,22 +10121,22 @@
             const waterLevelContainer = document.getElementById('waterLevelContainer');
             
             if (regionStatus === 'autoCharge' || regionStatus === 'manualCharge') {
-                // 充电状态 - 绿色，30%水位
-                waterWaveContainer.style.background = '#4CD964';
+                // 充电状态 - 柔和的绿色渐变，与橙色明度匹配
+                waterWaveContainer.style.background = 'linear-gradient(135deg, var(--color-circle-primary) 0%, #389e0d 100%)';
                 if (waterLevelContainer) {
                     waterLevelContainer.style.height = '100%';
                 }
                 console.log('Set charging water wave color and 30% level');
             } else if (regionStatus === 'autoDischarge' || regionStatus === 'manualDischarge') {
-                // 放电状态 - 黄色，80%水位
-                waterWaveContainer.style.background = '#FFC107';
+                // 放电状态 - 优化的橙色渐变，更加温暖
+                waterWaveContainer.style.background = 'linear-gradient(135deg, #ff9500 0%, #ff7700 100%)';
                 if (waterLevelContainer) {
                     waterLevelContainer.style.height = '100%';
                 }
                 console.log('Set discharging water wave color and 80% level');
             } else {
-                // 无状态 - 青色/浅蓝色，50%水位
-                waterWaveContainer.style.background = '#5AC8FA';
+                // 无状态 - 优化的蓝色渐变，更加柔和
+                waterWaveContainer.style.background = 'linear-gradient(135deg, #007AFF 0%, #0056CC 100%)';
                 if (waterLevelContainer) {
                     waterLevelContainer.style.height = '100%';
                 }
@@ -9913,18 +10165,18 @@
             if (!mainPriceCircle) return;
             
             // 获取当前选中地区的状态
-            const regionStatus = getRegionOperationStatus(selectedMainRegion);
+            const regionStatus = regionData[selectedMainRegion] ? regionData[selectedMainRegion].status : 'none';
             
-            // 只有在手动模式下且正在进行充电或放电操作时才显示停止按钮
-            const shouldShowStop = currentOperationMode === 'manual' && 
-                                  (regionStatus === 'charging' || regionStatus === 'discharging');
+            // 在4种状态下都显示停止按钮：autoCharge, manualCharge, autoDischarge, manualDischarge
+            const shouldShowStop = regionStatus === 'autoCharge' || regionStatus === 'manualCharge' || 
+                                  regionStatus === 'autoDischarge' || regionStatus === 'manualDischarge';
             
             if (shouldShowStop) {
                 mainPriceCircle.classList.add('manual-operation');
-                console.log('Stop button enabled - manual operation in progress');
+                console.log('Stop button enabled - operation in progress:', regionStatus);
             } else {
                 mainPriceCircle.classList.remove('manual-operation');
-                console.log('Stop button disabled - no manual operation or in auto mode');
+                console.log('Stop button disabled - no operation:', regionStatus);
             }
         }
 
@@ -11057,9 +11309,28 @@
             
             // 重置regionData中的状态
             if (regionData[selectedMainRegion]) {
-                regionData[selectedMainRegion].status = 'none';
-                // 更新电站管理显示
-                updatePowerStationStatus(selectedMainRegion, 'none');
+                const currentStatus = regionData[selectedMainRegion].status;
+                // 如果是自动模式操作，停止后变为等待执行中
+                if (currentStatus === 'autoCharge' || currentStatus === 'autoDischarge') {
+                    regionData[selectedMainRegion].status = 'waitingExecution';
+                    updatePowerStationStatus(selectedMainRegion, 'waitingExecution');
+                    
+                    // 更新地区选择器状态
+                    setTimeout(() => {
+                        const selectedRegionTab = document.querySelector('.region-select-tab.active');
+                        if (selectedRegionTab) {
+                            const statusBadge = selectedRegionTab.querySelector('.region-status-badge');
+                            if (statusBadge) {
+                                statusBadge.setAttribute('data-status', 'waitingExecution');
+                                statusBadge.textContent = window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中';
+                            }
+                        }
+                    }, 100);
+                } else {
+                    // 手动模式操作，停止后变为none
+                    regionData[selectedMainRegion].status = 'none';
+                    updatePowerStationStatus(selectedMainRegion, 'none');
+                }
             }
             
             // 更新地区状态指示器
@@ -12619,7 +12890,53 @@
                             ])
                         },
                         symbol: 'circle',
-                        showSymbol: false
+                        showSymbol: false,
+                        markLine: {
+                            silent: true,
+                            symbol: 'none',
+                            data: [
+                                {
+                                    yAxis: base + 50,  // 阈值水平线
+                                    label: {
+                                        show: false  // 隐藏阈值文字
+                                    },
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.3)',
+                                        width: 2,
+                                        type: 'dashed'
+                                    }
+                                },
+                                {
+                                    xAxis: currentTime,  // 当前时间垂直线
+                                    label: {
+                                        show: false  // 隐藏当前时间文字
+                                    },
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.3)',
+                                        width: 2,
+                                        type: 'dashed'
+                                    }
+                                }
+                            ]
+                        },
+                        markPoint: {
+                            symbol: 'circle',
+                            symbolSize: 10,
+                            label: {
+                                show: false
+                            },
+                            itemStyle: {
+                                color: '#fff',
+                                borderColor: 'rgba(255, 255, 255, 0.5)',
+                                borderWidth: 2
+                            },
+                            data: [
+                                {
+                                    coord: [currentTime, base + 50],  // 交叉点坐标
+                                    value: 'Intersection'
+                                }
+                            ]
+                        }
                     },
                     {
                         name: window.i18n ? window.i18n.getText('predictedPrice') : 'Predicted Price',
@@ -14635,6 +14952,7 @@
             const regions = ['NSW', 'QLD', 'VIC', 'SA', 'TAS'];
             const currentLang = getCurrentLanguage() || 'zh';
             console.log('updateRegionStatusDisplay called with language:', currentLang);
+            console.log('Current regionData:', regionData);
             
             regions.forEach(region => {
                 const regionButton = document.querySelector(`[data-region="${region}"]`);
@@ -14658,20 +14976,35 @@
                         'autoCharge': window.i18n ? window.i18n.getText('autoCharge') : '自动充电中',
                         'manualCharge': window.i18n ? window.i18n.getText('manualCharge') : '手动充电中',
                         'autoDischarge': window.i18n ? window.i18n.getText('autoDischarge') : '自动放电中',
-                        'manualDischarge': window.i18n ? window.i18n.getText('manualDischarge') : '手动放电中'
+                        'manualDischarge': window.i18n ? window.i18n.getText('manualDischarge') : '手动放电中',
+                        'waitingExecution': window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中'
                     };
                     statusDisplay = statusTextMap[status] || status;
                 } else {
-                    // 对于NSW，如果是自动模式，显示"等待执行中"
-                    if (region === 'NSW' && currentOperationMode === 'auto') {
+                    // 对于所有地区，如果是自动模式，显示"等待执行中"
+                    if (currentOperationMode === 'auto') {
                         statusDisplay = window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中';
+                        console.log(`Setting statusDisplay for ${region} to: ${statusDisplay}`);
                     }
+                }
+                
+                // 特殊处理NSW：如果其状态为waitingExecution，确保显示文字
+                if (region === 'NSW' && status === 'waitingExecution') {
+                    statusDisplay = window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中';
+                    console.log(`NSW special handling - statusDisplay: ${statusDisplay}`);
                 }
                 
                 // 更新状态文本
                 statusBadge.textContent = statusDisplay;
-                statusBadge.setAttribute('data-status', status);
+                
+                // 根据显示状态设置data-status属性
+                if (statusDisplay && currentOperationMode === 'auto' && status === 'none') {
+                    statusBadge.setAttribute('data-status', 'waitingExecution');
+                } else {
+                    statusBadge.setAttribute('data-status', status);
+                }
                 console.log(`Updated ${region} status badge: "${statusDisplay}" (status: ${status})`);
+                console.log(`Status badge element for ${region}:`, statusBadge);
                 
                 // 根据状态设置颜色和边框样式
                 const statusColors = {
@@ -14679,15 +15012,21 @@
                     'autoCharge': { bg: 'rgba(76, 217, 100, 0.2)', color: '#4CD964', border: '#4CD964', borderStyle: 'dashed' },
                     'manualCharge': { bg: 'rgba(76, 217, 100, 0.2)', color: '#4CD964', border: '#4CD964', borderStyle: 'solid' },
                     'autoDischarge': { bg: 'rgba(255, 193, 7, 0.2)', color: '#FFC107', border: '#FFC107', borderStyle: 'dashed' },
-                    'manualDischarge': { bg: 'rgba(255, 193, 7, 0.2)', color: '#FFC107', border: '#FFC107', borderStyle: 'solid' }
+                    'manualDischarge': { bg: 'rgba(255, 193, 7, 0.2)', color: '#FFC107', border: '#FFC107', borderStyle: 'solid' },
+                    'waitingExecution': { bg: 'rgba(30, 127, 255, 0.2)', color: '#1E7FFF', border: '#1E7FFF', borderStyle: 'dashed' }
                 };
                 
-                let colorScheme = statusColors[status];
-                let shouldDisplay = status !== 'none';
+                // 获取实际的显示状态
+                let displayStatus = status;
+                if (statusDisplay && currentOperationMode === 'auto' && status === 'none') {
+                    displayStatus = 'waitingExecution';
+                }
                 
-                // 特殊处理NSW在自动模式下的"等待执行中"
-                if (region === 'NSW' && currentOperationMode === 'auto' && status === 'none') {
-                    colorScheme = { bg: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '#fff', borderStyle: 'dashed' };
+                let colorScheme = statusColors[displayStatus];
+                let shouldDisplay = displayStatus !== 'none';
+                
+                // 确保waitingExecution状态被正确显示
+                if (displayStatus === 'waitingExecution') {
                     shouldDisplay = true;
                 }
                 
@@ -14746,6 +15085,8 @@
                     statusText = window.i18n ? window.i18n.getText('manualCharge') : '手动充电中';
                 } else if (regionStatus === 'manualDischarge') {
                     statusText = window.i18n ? window.i18n.getText('manualDischarge') : '手动放电中';
+                } else if (regionStatus === 'waitingExecution') {
+                    statusText = window.i18n ? window.i18n.getText('waitingExecution') : '等待执行中';
                 } else {
                     // 无状态时根据当前模式显示
                     if (currentOperationMode === 'auto') {
@@ -14804,6 +15145,12 @@
             // 初始化时调整间距
             setTimeout(adjustSpacingForRegionSelector, 300);
             
+            // 强制更新NSW状态显示
+            setTimeout(() => {
+                console.log('Force updating NSW status after DOM load');
+                updateRegionStatusDisplay();
+            }, 500);
+            
             // 初始化ResizeObserver监听地区选择器高度变化
             setTimeout(() => {
                 initRegionSelectorObserver();
@@ -14813,7 +15160,7 @@
             setTimeout(() => {
                 const activeRegion = document.querySelector('.region-select-tab.active');
                 if (activeRegion) {
-                    activeRegion.style.background = 'var(--color-primary)';
+                    activeRegion.style.background = 'var(--color-region-primary)';
                     activeRegion.style.color = '#000';
                     const activeSpan = activeRegion.querySelector('span:first-child');
                     if (activeSpan && !activeSpan.innerHTML.includes('<div')) {
@@ -14837,7 +15184,7 @@
             // 确保选中地区颜色正确
             const activeRegion = document.querySelector('.region-select-tab.active');
             if (activeRegion) {
-                activeRegion.style.background = 'var(--color-primary)';
+                activeRegion.style.background = 'var(--color-region-primary)';
                 activeRegion.style.color = '#000';
                 const activeSpan = activeRegion.querySelector('span:first-child');
                 if (activeSpan && !activeSpan.innerHTML.includes('<div')) {
@@ -14861,7 +15208,7 @@
             setTimeout(() => {
                 const activeRegion = document.querySelector('.region-select-tab.active');
                 if (activeRegion) {
-                    activeRegion.style.background = 'var(--color-primary)';
+                    activeRegion.style.background = 'var(--color-region-primary)';
                     activeRegion.style.color = '#000';
                     const activeSpan = activeRegion.querySelector('span:first-child');
                     if (activeSpan && !activeSpan.innerHTML.includes('<div')) {
@@ -14886,7 +15233,7 @@
             setTimeout(() => {
                 const activeRegion = document.querySelector('.region-select-tab.active');
                 if (activeRegion) {
-                    activeRegion.style.background = 'var(--color-primary)';
+                    activeRegion.style.background = 'var(--color-region-primary)';
                     activeRegion.style.color = '#000';
                     const activeSpan = activeRegion.querySelector('span:first-child');
                     if (activeSpan && !activeSpan.innerHTML.includes('<div')) {
@@ -14914,7 +15261,7 @@
             setTimeout(() => {
                 const activeRegion = document.querySelector('.region-select-tab.active');
                 if (activeRegion) {
-                    activeRegion.style.background = 'var(--color-primary)';
+                    activeRegion.style.background = 'var(--color-region-primary)';
                     activeRegion.style.color = '#000';
                     const activeSpan = activeRegion.querySelector('span:first-child');
                     if (activeSpan && !activeSpan.innerHTML.includes('<div')) {
@@ -14974,7 +15321,7 @@
             });
             
             button.classList.add('active');
-            button.style.background = 'var(--color-primary)';
+            button.style.background = 'var(--color-region-primary)';
             button.style.color = '#000';
             button.style.border = 'none';
             
@@ -15010,29 +15357,83 @@
         }
         
         function loadRegionData(region, type) {
-            const key = `${region}_${type}`;
+            // 确保有地区数据
+            if (!selectedRegionData[region]) {
+                selectedRegionData[region] = { charge: {}, discharge: {} };
+            }
             
-            if (selectedRegionData[key]) {
-                // 加载已保存的数据
-                if (type === 'charge') {
-                    chargeTimeSettings = selectedRegionData[key];
-                } else {
-                    dischargeTimeSettings = selectedRegionData[key];
+            const regionData = selectedRegionData[region];
+            
+            // 加载充电设置
+            if (regionData.charge) {
+                chargeTimeSettings = { 
+                    segments: regionData.charge.segments || [{ start: 22, end: 6, id: `charge-${Date.now()}` }]
+                };
+                // 设置checkbox状态
+                const chargeTimeCheckbox = document.getElementById('chargeTimeEnabled');
+                const chargePriceCheckbox = document.getElementById('chargePriceEnabled');
+                const chargePriceInput = document.getElementById('chargePrice');
+                
+                if (chargeTimeCheckbox) chargeTimeCheckbox.checked = regionData.charge.timeEnabled !== false;
+                if (chargePriceCheckbox) chargePriceCheckbox.checked = regionData.charge.priceEnabled !== false;
+                if (chargePriceInput && regionData.charge.priceThreshold) {
+                    chargePriceInput.value = regionData.charge.priceThreshold;
                 }
             } else {
-                // 使用默认数据
-                if (type === 'charge') {
-                    chargeTimeSettings = { segments: [{ start: 22, end: 6, id: `charge-${Date.now()}` }] };
-                } else {
-                    dischargeTimeSettings = { segments: [{ start: 6, end: 22, id: `discharge-${Date.now()}` }] };
+                chargeTimeSettings = { segments: [{ start: 22, end: 6, id: `charge-${Date.now()}` }] };
+            }
+            
+            // 加载放电设置
+            if (regionData.discharge) {
+                dischargeTimeSettings = { 
+                    segments: regionData.discharge.segments || [{ start: 6, end: 22, id: `discharge-${Date.now()}` }]
+                };
+                // 设置checkbox状态
+                const dischargeTimeCheckbox = document.getElementById('dischargeTimeEnabled');
+                const dischargePriceCheckbox = document.getElementById('dischargePriceEnabled');
+                const dischargePriceInput = document.getElementById('dischargePrice');
+                
+                if (dischargeTimeCheckbox) dischargeTimeCheckbox.checked = regionData.discharge.timeEnabled !== false;
+                if (dischargePriceCheckbox) dischargePriceCheckbox.checked = regionData.discharge.priceEnabled !== false;
+                if (dischargePriceInput && regionData.discharge.priceThreshold) {
+                    dischargePriceInput.value = regionData.discharge.priceThreshold;
                 }
-                selectedRegionData[key] = type === 'charge' ? chargeTimeSettings : dischargeTimeSettings;
+            } else {
+                dischargeTimeSettings = { segments: [{ start: 6, end: 22, id: `discharge-${Date.now()}` }] };
             }
         }
         
         function saveRegionData(region, type) {
-            const key = `${region}_${type}`;
-            selectedRegionData[key] = type === 'charge' ? chargeTimeSettings : dischargeTimeSettings;
+            // 确保 selectedRegionData[region] 存在
+            if (!selectedRegionData[region]) {
+                selectedRegionData[region] = { charge: {}, discharge: {} };
+            }
+            
+            // 获取checkbox状态
+            const chargeTimeEnabled = document.getElementById('chargeTimeEnabled')?.checked;
+            const chargePriceEnabled = document.getElementById('chargePriceEnabled')?.checked;
+            const dischargeTimeEnabled = document.getElementById('dischargeTimeEnabled')?.checked;
+            const dischargePriceEnabled = document.getElementById('dischargePriceEnabled')?.checked;
+            
+            // 获取价格值
+            const chargePriceValue = document.getElementById('chargePrice')?.value || 50;
+            const dischargePriceValue = document.getElementById('dischargePrice')?.value || 100;
+            
+            // 保存充电设置
+            selectedRegionData[region].charge = {
+                segments: chargeTimeSettings.segments,
+                timeEnabled: chargeTimeEnabled !== undefined ? chargeTimeEnabled : true,
+                priceEnabled: chargePriceEnabled !== undefined ? chargePriceEnabled : true,
+                priceThreshold: parseInt(chargePriceValue)
+            };
+            
+            // 保存放电设置
+            selectedRegionData[region].discharge = {
+                segments: dischargeTimeSettings.segments,
+                timeEnabled: dischargeTimeEnabled !== undefined ? dischargeTimeEnabled : true,
+                priceEnabled: dischargePriceEnabled !== undefined ? dischargePriceEnabled : true,
+                priceThreshold: parseInt(dischargePriceValue)
+            };
         }
         
         function updateModalCurrentSettings() {
@@ -15171,12 +15572,28 @@
             }
         }
         
+        // Switch Modal Mode Function (已移除tab，函数保留以兼容)
+        function switchModalMode(mode) {
+            // 由于已移除手动/自动tab，此函数现在不执行任何操作
+            // 自动条件始终显示
+            const autoConditions = document.getElementById('autoModeConditions');
+            if (autoConditions) {
+                autoConditions.style.display = 'block';
+            }
+            
+            // 仍然保存模式以兼容其他可能的调用
+            localStorage.setItem('modalMode', mode);
+        }
+
         function saveConditionSettings() {
             // 保存当前正在编辑的数据
             saveRegionData(currentSelectedRegion, currentConditionType);
             
             // 保存所有地区的设置数据到localStorage
             localStorage.setItem('regionTimeSettings', JSON.stringify(selectedRegionData));
+            
+            // 更新显示的勾选状态
+            updateConditionsDisplayFromSaved();
             
             // 关闭弹窗
             closeConditionSettingsModal();
@@ -15187,6 +15604,86 @@
             console.log('多地区时间条件设置已保存:', selectedRegionData);
         }
         
+        // 从保存的设置更新显示
+        function updateConditionsDisplayFromSaved() {
+            const currentRegion = selectedMainRegion || 'NSW';
+            const regionData = selectedRegionData[currentRegion];
+            
+            if (!regionData) {
+                // 如果没有保存的数据，使用默认值
+                document.getElementById('chargeTimeEnabledDisplay').checked = true;
+                document.getElementById('chargePriceEnabledDisplay').checked = true;
+                document.getElementById('dischargeTimeEnabledDisplay').checked = true;
+                document.getElementById('dischargePriceEnabledDisplay').checked = true;
+                return;
+            }
+            
+            // 从保存的数据中获取checkbox状态
+            const chargeTimeEnabled = regionData.charge?.timeEnabled !== false;
+            const chargePriceEnabled = regionData.charge?.priceEnabled !== false;
+            const dischargeTimeEnabled = regionData.discharge?.timeEnabled !== false;
+            const dischargePriceEnabled = regionData.discharge?.priceEnabled !== false;
+            
+            // 更新checkbox显示
+            const chargeTimeCheckbox = document.getElementById('chargeTimeEnabledDisplay');
+            const chargePriceCheckbox = document.getElementById('chargePriceEnabledDisplay');
+            const dischargeTimeCheckbox = document.getElementById('dischargeTimeEnabledDisplay');
+            const dischargePriceCheckbox = document.getElementById('dischargePriceEnabledDisplay');
+            
+            if (chargeTimeCheckbox) chargeTimeCheckbox.checked = chargeTimeEnabled;
+            if (chargePriceCheckbox) chargePriceCheckbox.checked = chargePriceEnabled;
+            if (dischargeTimeCheckbox) dischargeTimeCheckbox.checked = dischargeTimeEnabled;
+            if (dischargePriceCheckbox) dischargePriceCheckbox.checked = dischargePriceEnabled;
+            
+            // 更新显示的透明度和未使用标签
+            updateConditionDisplayStyle('charge', 'time', chargeTimeEnabled);
+            updateConditionDisplayStyle('charge', 'price', chargePriceEnabled);
+            updateConditionDisplayStyle('discharge', 'time', dischargeTimeEnabled);
+            updateConditionDisplayStyle('discharge', 'price', dischargePriceEnabled);
+            
+            // 更新时间和价格值
+            if (regionData.charge) {
+                const chargeSegments = regionData.charge.segments || regionData.charge.timeSegments;
+                if (chargeSegments && chargeSegments.length > 0) {
+                    document.getElementById('chargeStartTime').textContent = chargeSegments[0].start + ':00';
+                    document.getElementById('chargeEndTime').textContent = chargeSegments[0].end + ':00';
+                }
+                if (regionData.charge.priceThreshold !== undefined) {
+                    document.getElementById('chargePriceValue').textContent = regionData.charge.priceThreshold;
+                }
+            }
+            
+            if (regionData.discharge) {
+                const dischargeSegments = regionData.discharge.segments || regionData.discharge.timeSegments;
+                if (dischargeSegments && dischargeSegments.length > 0) {
+                    document.getElementById('dischargeStartTime').textContent = dischargeSegments[0].start + ':00';
+                    document.getElementById('dischargeEndTime').textContent = dischargeSegments[0].end + ':00';
+                }
+                if (regionData.discharge.priceThreshold !== undefined) {
+                    document.getElementById('dischargePriceValue').textContent = regionData.discharge.priceThreshold;
+                }
+            }
+        }
+        
+        // 更新条件显示样式
+        function updateConditionDisplayStyle(type, condition, enabled) {
+            const prefix = type === 'charge' ? 'charge' : 'discharge';
+            const suffix = condition === 'time' ? 'Time' : 'Price';
+            
+            const display = document.getElementById(`${prefix}${suffix}Display`);
+            const disabled = document.getElementById(`${prefix}${suffix}Disabled`);
+            
+            if (display && disabled) {
+                if (enabled) {
+                    display.style.opacity = '1';
+                    disabled.style.display = 'none';
+                } else {
+                    display.style.opacity = '0.4';
+                    disabled.style.display = 'inline';
+                }
+            }
+        }
+        
         // 页面加载时恢复设置
         function loadConditionSettings() {
             const savedRegionSettings = localStorage.getItem('regionTimeSettings');
@@ -15194,10 +15691,15 @@
                 try {
                     selectedRegionData = JSON.parse(savedRegionSettings);
                     console.log('已恢复地区时间设置:', selectedRegionData);
+                    // 更新显示
+                    updateConditionsDisplayFromSaved();
                 } catch (e) {
                     console.error('恢复地区设置时出错:', e);
                     selectedRegionData = {};
                 }
+            } else {
+                // 如果没有保存的设置，也更新显示为默认值
+                updateConditionsDisplayFromSaved();
             }
         }
         
@@ -15303,17 +15805,194 @@
             }, 100);
         }
         
+        // 处理设置编辑按钮点击
+        function handleSettingsEdit() {
+            // 检查当前选中地区的状态
+            const currentRegionStatus = regionData[selectedMainRegion] ? regionData[selectedMainRegion].status : 'none';
+            
+            // 如果是自动充电或自动放电状态，显示提示并禁止编辑
+            if (currentRegionStatus === 'autoCharge' || currentRegionStatus === 'autoDischarge') {
+                showSettingsEditDisabledTooltip();
+                return;
+            }
+            
+            // 其他情况下可以正常编辑
+            openConditionSettingsModal();
+        }
+        
+        // 显示设置编辑禁用提示
+        function showSettingsEditDisabledTooltip() {
+            const editBtn = document.getElementById('settingsEditBtn');
+            if (!editBtn) return;
+            
+            // 移除现有的提示
+            const existingTooltip = document.getElementById('settingsEditTooltip');
+            if (existingTooltip) {
+                existingTooltip.remove();
+            }
+            
+            // 创建提示元素
+            const tooltip = document.createElement('div');
+            tooltip.id = 'settingsEditTooltip';
+            tooltip.style.cssText = `
+                position: fixed;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 12px;
+                z-index: 10000;
+                white-space: nowrap;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            `;
+            
+            // 设置提示文本
+            const currentStatus = regionData[selectedMainRegion].status;
+            if (currentStatus === 'autoCharge') {
+                tooltip.textContent = window.i18n ? window.i18n.getText('autoChargingCannotEdit') : '自动充电进行中，无法编辑设置';
+            } else if (currentStatus === 'autoDischarge') {
+                tooltip.textContent = window.i18n ? window.i18n.getText('autoDischargingCannotEdit') : '自动放电进行中，无法编辑设置';
+            }
+            
+            // 计算位置
+            const rect = editBtn.getBoundingClientRect();
+            tooltip.style.top = (rect.top - 45) + 'px';
+            tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+            tooltip.style.transform = 'translateX(-50%)';
+            
+            document.body.appendChild(tooltip);
+            
+            // 显示提示
+            setTimeout(() => {
+                tooltip.style.opacity = '1';
+            }, 10);
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // 时间段管理系统
+        class TimeSegmentManager {
+            constructor() {
+                this.chargeSegments = [{ id: 'charge_1', start: '22:00', end: '06:00' }];
+                this.dischargeSegments = [{ id: 'discharge_1', start: '16:00', end: '21:00' }];
+            }
+            
+            // 检查时间段是否有效（不重叠）
+            isValidTimeSegment(newSegment, type, excludeId = null) {
+                const segments = type === 'charge' ? this.chargeSegments : this.dischargeSegments;
+                const filteredSegments = segments.filter(seg => seg.id !== excludeId);
+                
+                for (let segment of filteredSegments) {
+                    if (this.isTimeOverlap(newSegment, segment)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            // 检查两个时间段是否重叠
+            isTimeOverlap(seg1, seg2) {
+                const start1 = this.timeToMinutes(seg1.start);
+                const end1 = this.timeToMinutes(seg1.end);
+                const start2 = this.timeToMinutes(seg2.start);
+                const end2 = this.timeToMinutes(seg2.end);
+                
+                // 处理跨日情况
+                const end1Adjusted = end1 < start1 ? end1 + 1440 : end1;
+                const end2Adjusted = end2 < start2 ? end2 + 1440 : end2;
+                
+                // 检查重叠
+                return !(end1Adjusted <= start2 || end2Adjusted <= start1);
+            }
+            
+            // 时间转换为分钟
+            timeToMinutes(time) {
+                const [hours, minutes] = time.split(':').map(Number);
+                return hours * 60 + minutes;
+            }
+            
+            // 分钟转换为时间
+            minutesToTime(minutes) {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+            }
+            
+            // 添加时间段
+            addTimeSegment(type, start, end) {
+                const newSegment = {
+                    id: `${type}_${Date.now()}`,
+                    start: start,
+                    end: end
+                };
+                
+                if (this.isValidTimeSegment(newSegment, type)) {
+                    if (type === 'charge') {
+                        this.chargeSegments.push(newSegment);
+                    } else {
+                        this.dischargeSegments.push(newSegment);
+                    }
+                    return newSegment;
+                }
+                return null;
+            }
+            
+            // 更新时间段
+            updateTimeSegment(id, start, end) {
+                const chargeIndex = this.chargeSegments.findIndex(seg => seg.id === id);
+                const dischargeIndex = this.dischargeSegments.findIndex(seg => seg.id === id);
+                
+                if (chargeIndex !== -1) {
+                    const newSegment = { id, start, end };
+                    if (this.isValidTimeSegment(newSegment, 'charge', id)) {
+                        this.chargeSegments[chargeIndex] = newSegment;
+                        return true;
+                    }
+                } else if (dischargeIndex !== -1) {
+                    const newSegment = { id, start, end };
+                    if (this.isValidTimeSegment(newSegment, 'discharge', id)) {
+                        this.dischargeSegments[dischargeIndex] = newSegment;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // 删除时间段
+            removeTimeSegment(id) {
+                this.chargeSegments = this.chargeSegments.filter(seg => seg.id !== id);
+                this.dischargeSegments = this.dischargeSegments.filter(seg => seg.id !== id);
+            }
+            
+            // 获取时间段
+            getTimeSegments(type) {
+                return type === 'charge' ? this.chargeSegments : this.dischargeSegments;
+            }
+        }
+        
+        // 全局时间段管理器实例
+        window.timeSegmentManager = new TimeSegmentManager();
+        
         // 更新openConditionSettingsModal函数以初始化新的简化弹窗
         function openConditionSettingsModal() {
             console.log('=== OPENING CONDITION SETTINGS MODAL ===');
             
             try {
-                // 确保全局变量首先被初始化
-                if (!window.chargeTimeSegments) {
-                    window.chargeTimeSegments = [{ start: '22:00', end: '06:00' }];
-                }
-                if (!window.dischargeTimeSegments) {
-                    window.dischargeTimeSegments = [{ start: '16:00', end: '21:00' }];
+                // 确保时间段管理器已初始化
+                if (!window.timeSegmentManager) {
+                    window.timeSegmentManager = new TimeSegmentManager();
                 }
                 
                 // 重新加载模态框内容，避免初始化问题
@@ -15325,7 +16004,11 @@
                     return;
                 }
                 
-                modalContent.style.display = 'block';
+                modalContent.style.display = 'flex';
+                
+                // Restore saved mode or default to manual
+                const savedMode = localStorage.getItem('modalMode') || 'manual';
+                switchModalMode(savedMode);
                 
                 // 保存模态框打开状态到localStorage
                 localStorage.setItem('conditionSettingsModalOpen', 'true');
@@ -15611,12 +16294,277 @@
             }
         }
         
+        // 初始化时间段显示
+        function initTimeSegmentDisplay() {
+            createTimeSegmentVisualizer();
+            updateTimeSegmentDisplay();
+        }
+        
+        // 创建时间段可视化器
+        function createTimeSegmentVisualizer() {
+            const container = document.getElementById('timeSegmentContainer');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="time-visualizer">
+                    <div class="time-ruler">
+                        <div class="time-hours"></div>
+                        <div class="time-segments-display"></div>
+                    </div>
+                    <div class="time-controls">
+                        <div class="segment-type-tabs">
+                            <button class="segment-tab active" data-type="charge">充电时间</button>
+                            <button class="segment-tab" data-type="discharge">放电时间</button>
+                        </div>
+                        <div class="segment-list"></div>
+                        <button class="add-segment-btn">+ 添加时间段</button>
+                    </div>
+                </div>
+            `;
+            
+            // 创建时间刻度
+            const timeHours = container.querySelector('.time-hours');
+            for (let i = 0; i < 24; i++) {
+                const hour = document.createElement('div');
+                hour.className = 'time-hour';
+                hour.textContent = i.toString().padStart(2, '0') + ':00';
+                hour.style.left = `${(i / 24) * 100}%`;
+                timeHours.appendChild(hour);
+            }
+            
+            // 绑定事件
+            container.querySelectorAll('.segment-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    container.querySelectorAll('.segment-tab').forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateTimeSegmentDisplay();
+                });
+            });
+            
+            container.querySelector('.add-segment-btn').addEventListener('click', () => {
+                const activeType = container.querySelector('.segment-tab.active').dataset.type;
+                showAddSegmentModal(activeType);
+            });
+        }
+        
+        // 更新时间段显示
+        function updateTimeSegmentDisplay() {
+            const container = document.getElementById('timeSegmentContainer');
+            if (!container) return;
+            
+            const activeType = container.querySelector('.segment-tab.active').dataset.type;
+            const segments = window.timeSegmentManager.getTimeSegments(activeType);
+            const segmentsDisplay = container.querySelector('.time-segments-display');
+            const segmentList = container.querySelector('.segment-list');
+            
+            // 清空现有显示
+            segmentsDisplay.innerHTML = '';
+            segmentList.innerHTML = '';
+            
+            // 显示时间段
+            segments.forEach((segment, index) => {
+                // 在时间轴上显示
+                const segmentBar = createSegmentBar(segment, activeType);
+                segmentsDisplay.appendChild(segmentBar);
+                
+                // 在列表中显示
+                const segmentItem = createSegmentListItem(segment, activeType, index);
+                segmentList.appendChild(segmentItem);
+            });
+        }
+        
+        // 创建时间段条形图
+        function createSegmentBar(segment, type) {
+            const bar = document.createElement('div');
+            bar.className = 'time-segment-bar';
+            bar.dataset.segmentId = segment.id;
+            
+            const startMinutes = window.timeSegmentManager.timeToMinutes(segment.start);
+            const endMinutes = window.timeSegmentManager.timeToMinutes(segment.end);
+            
+            let left, width;
+            if (endMinutes > startMinutes) {
+                // 同一天
+                left = (startMinutes / 1440) * 100;
+                width = ((endMinutes - startMinutes) / 1440) * 100;
+            } else {
+                // 跨天
+                left = (startMinutes / 1440) * 100;
+                width = ((1440 - startMinutes + endMinutes) / 1440) * 100;
+            }
+            
+            bar.style.left = left + '%';
+            bar.style.width = width + '%';
+            bar.style.backgroundColor = type === 'charge' ? '#00ff88' : '#FFC107';
+            bar.style.opacity = '0.8';
+            
+            // 添加时间标签
+            const label = document.createElement('span');
+            label.className = 'segment-label';
+            label.textContent = `${segment.start} - ${segment.end}`;
+            bar.appendChild(label);
+            
+            return bar;
+        }
+        
+        // 创建时间段列表项
+        function createSegmentListItem(segment, type, index) {
+            const item = document.createElement('div');
+            item.className = 'segment-list-item';
+            item.innerHTML = `
+                <div class="segment-info">
+                    <span class="segment-time">${segment.start} - ${segment.end}</span>
+                    <span class="segment-type">${type === 'charge' ? '充电' : '放电'}</span>
+                </div>
+                <div class="segment-actions">
+                    <button class="edit-segment-btn" onclick="editTimeSegment('${segment.id}')">编辑</button>
+                    <button class="delete-segment-btn" onclick="deleteTimeSegment('${segment.id}')">删除</button>
+                </div>
+            `;
+            
+            return item;
+        }
+        
+        // 显示添加时间段弹窗
+        function showAddSegmentModal(type) {
+            const modal = document.createElement('div');
+            modal.className = 'add-segment-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <h3>添加${type === 'charge' ? '充电' : '放电'}时间段</h3>
+                        <div class="time-inputs">
+                            <div class="input-group">
+                                <label>开始时间</label>
+                                <input type="time" id="segmentStart" value="09:00">
+                            </div>
+                            <div class="input-group">
+                                <label>结束时间</label>
+                                <input type="time" id="segmentEnd" value="17:00">
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="cancel-btn" onclick="closeAddSegmentModal()">取消</button>
+                            <button class="confirm-btn" onclick="confirmAddSegment('${type}')">确认</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+        
+        // 确认添加时间段
+        function confirmAddSegment(type) {
+            const startTime = document.getElementById('segmentStart').value;
+            const endTime = document.getElementById('segmentEnd').value;
+            
+            if (!startTime || !endTime) {
+                alert('请选择开始和结束时间');
+                return;
+            }
+            
+            const newSegment = window.timeSegmentManager.addTimeSegment(type, startTime, endTime);
+            if (newSegment) {
+                updateTimeSegmentDisplay();
+                closeAddSegmentModal();
+            } else {
+                alert('时间段重叠，请重新选择时间');
+            }
+        }
+        
+        // 关闭添加时间段弹窗
+        function closeAddSegmentModal() {
+            const modal = document.querySelector('.add-segment-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // 编辑时间段
+        function editTimeSegment(segmentId) {
+            const allSegments = [...window.timeSegmentManager.chargeSegments, ...window.timeSegmentManager.dischargeSegments];
+            const segment = allSegments.find(seg => seg.id === segmentId);
+            if (!segment) return;
+            
+            const type = segmentId.startsWith('charge') ? 'charge' : 'discharge';
+            
+            const modal = document.createElement('div');
+            modal.className = 'edit-segment-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <h3>编辑${type === 'charge' ? '充电' : '放电'}时间段</h3>
+                        <div class="time-inputs">
+                            <div class="input-group">
+                                <label>开始时间</label>
+                                <input type="time" id="editSegmentStart" value="${segment.start}">
+                            </div>
+                            <div class="input-group">
+                                <label>结束时间</label>
+                                <input type="time" id="editSegmentEnd" value="${segment.end}">
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="cancel-btn" onclick="closeEditSegmentModal()">取消</button>
+                            <button class="confirm-btn" onclick="confirmEditSegment('${segmentId}')">确认</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+        
+        // 确认编辑时间段
+        function confirmEditSegment(segmentId) {
+            const startTime = document.getElementById('editSegmentStart').value;
+            const endTime = document.getElementById('editSegmentEnd').value;
+            
+            if (!startTime || !endTime) {
+                alert('请选择开始和结束时间');
+                return;
+            }
+            
+            const success = window.timeSegmentManager.updateTimeSegment(segmentId, startTime, endTime);
+            if (success) {
+                updateTimeSegmentDisplay();
+                closeEditSegmentModal();
+            } else {
+                alert('时间段重叠，请重新选择时间');
+            }
+        }
+        
+        // 关闭编辑时间段弹窗
+        function closeEditSegmentModal() {
+            const modal = document.querySelector('.edit-segment-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // 删除时间段
+        function deleteTimeSegment(segmentId) {
+            if (confirm('确认删除此时间段？')) {
+                window.timeSegmentManager.removeTimeSegment(segmentId);
+                updateTimeSegmentDisplay();
+            }
+        }
+        
         // 确保函数全局可用
         window.openConditionSettingsModal = openConditionSettingsModal;
         window.closeConditionSettingsModal = closeConditionSettingsModal;
         window.saveCurrentRegionSettings = saveCurrentRegionSettings;
         window.updateModalTranslations = updateModalTranslations;
         window.checkAndRestoreModal = checkAndRestoreModal;
+        window.editTimeSegment = editTimeSegment;
+        window.deleteTimeSegment = deleteTimeSegment;
+        window.closeAddSegmentModal = closeAddSegmentModal;
+        window.confirmAddSegment = confirmAddSegment;
+        window.closeEditSegmentModal = closeEditSegmentModal;
+        window.confirmEditSegment = confirmEditSegment;
         
         // 调试函数 - 可以在控制台手动调用
         window.forceModalTranslation = function() {
@@ -16705,6 +17653,277 @@
                 console.error('timeSelectionBox not found!');
             }
         }
+        
+        // ============== 时间条件矩形条系统 ==============
+        
+        let currentTimeBarMode = null; // 'charge' 或 'discharge'
+        let timeBarSelection = {
+            isSelecting: false,
+            startX: 0,
+            current: null
+        };
+        
+        // 设置时间条选择模式
+        function setTimeBarMode(mode) {
+            console.log('=== SET TIME BAR MODE ===');
+            console.log('Mode:', mode);
+            
+            currentTimeBarMode = mode;
+            
+            // 更新按钮状态
+            const chargeBtn = document.getElementById('chargeTimeBarBtn');
+            const dischargeBtn = document.getElementById('dischargeTimeBarBtn');
+            const selectionBox = document.getElementById('timeBarSelection');
+            
+            if (chargeBtn && dischargeBtn) {
+                if (mode === 'charge') {
+                    chargeBtn.style.boxShadow = '0 0 12px rgba(0,255,136,0.5)';
+                    dischargeBtn.style.boxShadow = 'none';
+                    selectionBox.style.borderColor = '#00ff88';
+                    selectionBox.style.backgroundColor = 'rgba(0,255,136,0.2)';
+                } else {
+                    dischargeBtn.style.boxShadow = '0 0 12px rgba(255,193,7,0.5)';
+                    chargeBtn.style.boxShadow = 'none';
+                    selectionBox.style.borderColor = '#FFC107';
+                    selectionBox.style.backgroundColor = 'rgba(255,193,7,0.2)';
+                }
+            }
+            
+            // 绑定时间条交互事件
+            initTimeBarInteraction();
+        }
+        
+        // 初始化时间条交互
+        function initTimeBarInteraction() {
+            const interactArea = document.getElementById('timeBarInteraction');
+            if (!interactArea) {
+                console.error('timeBarInteraction element not found!');
+                return;
+            }
+            
+            // 清除现有事件监听器
+            interactArea.removeEventListener('mousedown', handleTimeBarMouseDown);
+            interactArea.removeEventListener('mousemove', handleTimeBarMouseMove);
+            interactArea.removeEventListener('mouseup', handleTimeBarMouseUp);
+            
+            // 添加新的事件监听器
+            interactArea.addEventListener('mousedown', handleTimeBarMouseDown);
+            interactArea.addEventListener('mousemove', handleTimeBarMouseMove);
+            interactArea.addEventListener('mouseup', handleTimeBarMouseUp);
+        }
+        
+        // 处理时间条鼠标按下
+        function handleTimeBarMouseDown(e) {
+            if (!currentTimeBarMode) return;
+            
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            
+            timeBarSelection.isSelecting = true;
+            timeBarSelection.startX = x;
+            
+            const selectionBox = document.getElementById('timeBarSelection');
+            if (selectionBox) {
+                selectionBox.style.left = x + 'px';
+                selectionBox.style.width = '0px';
+                selectionBox.style.display = 'block';
+            }
+        }
+        
+        // 处理时间条鼠标移动
+        function handleTimeBarMouseMove(e) {
+            if (!timeBarSelection.isSelecting || !currentTimeBarMode) return;
+            
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            
+            const selectionBox = document.getElementById('timeBarSelection');
+            if (selectionBox) {
+                const left = Math.min(timeBarSelection.startX, x);
+                const width = Math.abs(x - timeBarSelection.startX);
+                
+                selectionBox.style.left = left + 'px';
+                selectionBox.style.width = width + 'px';
+                
+                // 计算时间范围
+                const containerWidth = rect.width;
+                const startPercent = left / containerWidth;
+                const endPercent = (left + width) / containerWidth;
+                
+                const startTime = percentToTime(startPercent);
+                const endTime = percentToTime(endPercent);
+                
+                timeBarSelection.current = {
+                    start: startTime,
+                    end: endTime,
+                    type: currentTimeBarMode
+                };
+            }
+        }
+        
+        // 处理时间条鼠标松开
+        function handleTimeBarMouseUp(e) {
+            if (!timeBarSelection.isSelecting || !currentTimeBarMode) return;
+            
+            timeBarSelection.isSelecting = false;
+            
+            // 如果有有效选择，添加时间段
+            if (timeBarSelection.current) {
+                addTimeBarSegment(timeBarSelection.current);
+            }
+            
+            // 清除选择框
+            const selectionBox = document.getElementById('timeBarSelection');
+            if (selectionBox) {
+                selectionBox.style.display = 'none';
+            }
+            
+            timeBarSelection.current = null;
+        }
+        
+        // 添加时间条段
+        function addTimeBarSegment(segment) {
+            console.log('Adding time bar segment:', segment);
+            
+            // 确保 timeConditionSegments 已初始化
+            if (!timeConditionSegments.charge || !timeConditionSegments.discharge) {
+                timeConditionSegments = {
+                    charge: [],
+                    discharge: []
+                };
+            }
+            
+            const newSegment = {
+                id: Date.now().toString() + Math.random(),
+                start: segment.start,
+                end: segment.end,
+                type: segment.type
+            };
+            
+            // 添加到相应的数组
+            if (segment.type === 'charge') {
+                timeConditionSegments.charge.push(newSegment);
+            } else {
+                timeConditionSegments.discharge.push(newSegment);
+            }
+            
+            // 更新显示
+            updateTimeConditionBars();
+            updateTimeSegmentsList();
+            
+            console.log('Updated segments:', timeConditionSegments);
+        }
+        
+        // 更新时间条件矩形条
+        function updateTimeConditionBars() {
+            const container = document.getElementById('timeConditionBars');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // 添加充电时间段
+            timeConditionSegments.charge.forEach((segment, index) => {
+                const bar = createTimeBar(segment, 'charge', index);
+                container.appendChild(bar);
+            });
+            
+            // 添加放电时间段
+            timeConditionSegments.discharge.forEach((segment, index) => {
+                const bar = createTimeBar(segment, 'discharge', index);
+                container.appendChild(bar);
+            });
+        }
+        
+        // 创建时间条
+        function createTimeBar(segment, type, index) {
+            const bar = document.createElement('div');
+            bar.className = `time-bar ${type}-bar`;
+            
+            const startPercent = timeToPercent(segment.start);
+            const endPercent = timeToPercent(segment.end);
+            const width = endPercent - startPercent;
+            
+            const color = type === 'charge' ? 
+                'linear-gradient(135deg, #00ff88, #00dd77)' : 
+                'linear-gradient(135deg, #FFC107, #FFB300)';
+            
+            const topPosition = type === 'charge' ? 6 : 24;
+            
+            bar.style.cssText = `
+                position: absolute;
+                top: ${topPosition}px;
+                height: 18px;
+                background: ${color};
+                border-radius: 4px;
+                left: ${startPercent}%;
+                width: ${width}%;
+                opacity: 0.9;
+                cursor: pointer;
+                transition: all 0.3s;
+            `;
+            
+            // 添加删除功能
+            bar.addEventListener('click', () => {
+                removeTimeBarSegment(segment.id, type);
+            });
+            
+            bar.addEventListener('mouseenter', () => {
+                bar.style.opacity = '1';
+                bar.style.transform = 'scale(1.02)';
+            });
+            
+            bar.addEventListener('mouseleave', () => {
+                bar.style.opacity = '0.9';
+                bar.style.transform = 'scale(1)';
+            });
+            
+            return bar;
+        }
+        
+        // 删除时间条段
+        function removeTimeBarSegment(segmentId, type) {
+            if (type === 'charge') {
+                timeConditionSegments.charge = timeConditionSegments.charge.filter(s => s.id !== segmentId);
+            } else {
+                timeConditionSegments.discharge = timeConditionSegments.discharge.filter(s => s.id !== segmentId);
+            }
+            
+            updateTimeConditionBars();
+            updateTimeSegmentsList();
+        }
+        
+        // 时间转换为百分比
+        function timeToPercent(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return ((hours * 60 + minutes) / (24 * 60)) * 100;
+        }
+        
+        // 百分比转换为时间
+        function percentToTime(percent) {
+            const totalMinutes = (percent * 24 * 60) / 100;
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = Math.floor(totalMinutes % 60);
+            
+            // 对齐到30分钟间隔
+            const alignedMinutes = Math.round(minutes / 30) * 30;
+            const adjustedHours = alignedMinutes === 60 ? hours + 1 : hours;
+            const finalMinutes = alignedMinutes === 60 ? 0 : alignedMinutes;
+            
+            return `${String(adjustedHours).padStart(2, '0')}:${String(finalMinutes).padStart(2, '0')}`;
+        }
+        
+        // 初始化时间条件矩形条
+        function initTimeConditionBars() {
+            console.log('=== Initializing time condition bars ===');
+            
+            // 更新时间条件矩形条显示
+            updateTimeConditionBars();
+            
+            // 默认选择充电模式
+            setTimeBarMode('charge');
+            
+            console.log('Time condition bars initialized');
+        }
 
         // 更新时间轴显示
         function updateTimelineDisplay() {
@@ -17455,11 +18674,18 @@
             if (typeof timeConditionSegments === 'undefined' || !timeConditionSegments.charge || !timeConditionSegments.discharge) {
                 console.log('Initializing timeConditionSegments...');
                 window.timeConditionSegments = {
-                    charge: [],
-                    discharge: []
+                    charge: [
+                        { id: 'default-charge', start: '22:00', end: '06:00', type: 'charge' }
+                    ],
+                    discharge: [
+                        { id: 'default-discharge', start: '16:00', end: '21:00', type: 'discharge' }
+                    ]
                 };
                 timeConditionSegments = window.timeConditionSegments;
             }
+            
+            // 初始化时间条件矩形条
+            initTimeConditionBars();
             
             // 初始化旧系统的全局变量
             if (!window.chargeTimeSegments) {
@@ -17585,10 +18811,25 @@
             
             console.log('Initialized time segments:', { chargeTimeSegments, dischargeTimeSegments });
         }, 500);
+        
+        // 设置卡片的取消和保存功能
+        function cancelSettings() {
+            console.log('取消设置更改');
+            // 这里可以重置设置到之前的状态
+            // 暂时只显示提示
+            alert('设置已取消');
+        }
+        
+        function saveSettings() {
+            console.log('保存设置');
+            // 这里可以保存当前设置状态
+            // 暂时只显示提示
+            alert('设置已保存');
+        }
     </script>
     
     <!-- Condition Settings Modal -->
-    <div id="modalContent" class="modal-content" style="display: none; position: fixed; top: 5%; left: calc(50% - 450px); background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0; overflow: hidden; width: 900px; max-width: 95%; max-height: 90vh; border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); overflow-y: auto; z-index: 2147483648; transition: none; user-select: none; cursor: move;">
+    <div id="modalContent" class="modal-content" style="display: none; position: fixed; top: 3%; left: calc(50% - 450px); background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0; width: 900px; max-width: 95%; max-height: 94vh; border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); z-index: 2147483648; transition: none; user-select: none; cursor: move; flex-direction: column;">
             <div class="modal-header" style="padding: 24px 32px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); position: sticky; top: 0; z-index: 1;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;" data-i18n="settings">设置</h3>
@@ -17597,7 +18838,7 @@
                 <button onclick="closeConditionSettingsModal()" style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">×</button>
             </div>
             
-            <div class="modal-body" style="padding: 24px 32px;">
+            <div class="modal-body" style="padding: 24px 32px; overflow-y: auto; flex: 1; min-height: 0;">
                 <!-- SOC设置 -->
                 <div style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; margin-bottom: 24px;">
                     <div style="color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
@@ -17657,6 +18898,11 @@
                     </div>
                 </div>
                 
+                <!-- 自动条件标题 -->
+                <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: #fff;" data-i18n="autoConditions">自动条件</h2>
+                
+                <!-- Auto Mode Conditions Container -->
+                <div id="autoModeConditions" style="display: block;">
                 <!-- 充电和放电条件设置 -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                     <!-- 充电条件 -->
@@ -17719,154 +18965,148 @@
                 </div>
                 
                 <!-- 时间条件设置 -->
-                <div style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); padding: 20px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                        <div style="color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                            ⏰ <span data-i18n="timeCondition">时间条件</span>
-                        </div>
-                        <div style="display: flex; gap: 12px;">
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <div style="width: 12px; height: 6px; background: linear-gradient(135deg, #00ff88, #00dd77); border-radius: 3px;"></div>
-                                <span style="color: rgba(255,255,255,0.8); font-size: 11px;" data-i18n="charge">充电</span>
+                <div style="background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; margin-bottom: 24px;">
+                    <div style="color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                        ⏰ <span data-i18n="timeConditionSettings">时间条件设置</span>
+                    </div>
+                    
+                    <!-- 24小时时间轴显示 -->
+                    <div style="margin-bottom: 24px;">
+                        <div id="timelineDisplay" style="position: relative; height: 30px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); overflow: visible;">
+                            <!-- 小时刻度线 -->
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 24px;">
+                                <!-- 主要刻度线 (每6小时) -->
+                                <div style="position: absolute; top: 0; bottom: 0; left: 0%; width: 1px; background: rgba(255,255,255,0.3);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; left: 25%; width: 1px; background: rgba(255,255,255,0.3);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: rgba(255,255,255,0.3);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; left: 75%; width: 1px; background: rgba(255,255,255,0.3);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; right: 0%; width: 1px; background: rgba(255,255,255,0.3);"></div>
+                                <!-- 次要刻度线 (每3小时) -->
+                                <div style="position: absolute; top: 0; bottom: 0; left: 12.5%; width: 1px; background: rgba(255,255,255,0.15);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; left: 37.5%; width: 1px; background: rgba(255,255,255,0.15);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; left: 62.5%; width: 1px; background: rgba(255,255,255,0.15);"></div>
+                                <div style="position: absolute; top: 0; bottom: 0; left: 87.5%; width: 1px; background: rgba(255,255,255,0.15);"></div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <div style="width: 12px; height: 6px; background: linear-gradient(135deg, #FFC107, #FFB300); border-radius: 3px;"></div>
-                                <span style="color: rgba(255,255,255,0.8); font-size: 11px;" data-i18n="discharge">放电</span>
+                            <!-- 时间标签 -->
+                            <div style="position: absolute; bottom: -18px; left: 0; right: 0; height: 16px; display: flex; justify-content: space-between; color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600;">
+                                <span style="transform: translateX(-50%);">00:00</span>
+                                <span style="transform: translateX(-50%);">03:00</span>
+                                <span style="transform: translateX(-50%);">06:00</span>
+                                <span style="transform: translateX(-50%);">09:00</span>
+                                <span style="transform: translateX(-50%);">12:00</span>
+                                <span style="transform: translateX(-50%);">15:00</span>
+                                <span style="transform: translateX(-50%);">18:00</span>
+                                <span style="transform: translateX(-50%);">21:00</span>
+                                <span style="transform: translateX(-50%);">24:00</span>
                             </div>
+                            <!-- 充电和放电时间段显示区域 - 同一行 -->
+                            <div id="chargeTimelineBlocks" style="position: absolute; top: 4px; left: 0; right: 0; height: 8px;"></div>
+                            <div id="dischargeTimelineBlocks" style="position: absolute; top: 12px; left: 0; right: 0; height: 8px;"></div>
                         </div>
                     </div>
                     
-                    <!-- 操作按钮 -->
-                    <div style="display: flex; gap: 12px; margin-bottom: 16px; justify-content: center;">
-                        <button id="chargeSelectBtn" onclick="setTimeSelectionMode('charge')" style="padding: 8px 16px; background: rgba(0,255,136,0.15); border: 1px solid rgba(0,255,136,0.3); color: #00ff88; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                            🔋 <span data-i18n="selectChargeTime">选择充电时间</span>
-                        </button>
-                        <button id="dischargeSelectBtn" onclick="setTimeSelectionMode('discharge')" style="padding: 8px 16px; background: rgba(255,193,7,0.15); border: 1px solid rgba(255,193,7,0.3); color: #FFC107; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                            ⚡ <span data-i18n="selectDischargeTime">选择放电时间</span>
-                        </button>
-                    </div>
-                    
-                    <!-- 时间轴容器 -->
-                    <div style="position: relative;">
-                        <!-- 时间刻度 -->
-                        <div style="position: relative; height: 20px; margin-bottom: 8px;">
-                            <!-- 主要刻度（每3小时） -->
-                            <div style="display: flex; justify-content: space-between; padding: 0 2px;">
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 0%; transform: translateX(-50%);">0</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 12.5%; transform: translateX(-50%);">3</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 25%; transform: translateX(-50%);">6</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 37.5%; transform: translateX(-50%);">9</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 50%; transform: translateX(-50%);">12</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 62.5%; transform: translateX(-50%);">15</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 75%; transform: translateX(-50%);">18</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 87.5%; transform: translateX(-50%);">21</span>
-                                <span style="color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 600; position: absolute; left: 100%; transform: translateX(-50%);">24</span>
-                            </div>
-                        </div>
-                        
-                        <!-- 时间轴主体 -->
-                        <div id="timelineContainer" style="position: relative; height: 48px; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; user-select: none;">
-                            <!-- 刻度线 -->
-                            <div style="position: absolute; top: 0; bottom: 0; width: 100%; pointer-events: none;">
-                                <!-- 主刻度线（每小时） -->
-                                <div style="position: absolute; left: 0%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 4.17%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 8.33%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 12.5%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 16.67%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 20.83%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 25%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 29.17%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 33.33%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 37.5%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 41.67%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 45.83%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 50%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 54.17%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 58.33%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 62.5%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 66.67%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 70.83%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 75%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 79.17%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 83.33%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 87.5%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 91.67%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 95.83%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                <div style="position: absolute; left: 100%; width: 1px; height: 100%; background: rgba(255,255,255,0.3);"></div>
-                                
-                                <!-- 副刻度线（每半小时） -->
-                                <div style="position: absolute; left: 2.08%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 6.25%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 10.42%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 14.58%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 18.75%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 22.92%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 27.08%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 31.25%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 35.42%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 39.58%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 43.75%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 47.92%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 52.08%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 56.25%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 60.42%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 64.58%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 68.75%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 72.92%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 77.08%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 81.25%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 85.42%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 89.58%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 93.75%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                                <div style="position: absolute; left: 97.92%; width: 1px; height: 50%; top: 25%; background: rgba(255,255,255,0.15);"></div>
-                            </div>
-                            
-                            <!-- 时间段显示区域 -->
-                            <div id="timelineSegmentDisplay" style="position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;"></div>
-                            
-                            <!-- 选择框 -->
-                            <div id="timeSelectionBox" style="position: absolute; top: 0; height: 100%; background: rgba(0,255,136,0.3); border: 2px solid #00ff88; display: none; pointer-events: none;"></div>
-                            
-                            <!-- 可交互区域 -->
-                            <div id="timelineInteractArea" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; cursor: default;"></div>
-                        </div>
-                        
-                        <!-- 操作说明 -->
-                        <div style="margin-top: 8px; text-align: center; color: rgba(255,255,255,0.6); font-size: 11px;">
-                            <span data-i18n="dragToAddTimeSlot">在时间轴上拖拽即可添加时间段</span>
-                        </div>
-                    </div>
-                    
-                    <!-- 时间段列表 -->
-                    <div style="margin-top: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                         <!-- 充电时间段 -->
-                        <div style="margin-bottom: 16px;">
-                            <div style="color: #00ff88; font-size: 13px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                🔋 <span data-i18n="chargeTimeSlot">充电时间段</span>
+                        <div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: #00ff88; margin: 0;" data-i18n="chargeTime" data-text-zh="充电时间" data-text-en="Charge Time">充电时间</h4>
+                                <button onclick="addTimePeriod('charge')" style="background: transparent; border: 1px dashed rgba(0, 255, 136, 0.4); color: #00ff88; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                    + <span data-i18n="add" data-text-zh="添加" data-text-en="Add">添加</span>
+                                </button>
                             </div>
-                            <div id="chargeTimeSegmentsList" style="display: flex; flex-direction: column; gap: 6px;">
-                                <!-- 充电时间段将在这里显示 -->
-                            </div>
+                            <div id="chargeTimePeriods" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
-                        
+
                         <!-- 放电时间段 -->
                         <div>
-                            <div style="color: #FFC107; font-size: 13px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                ⚡ <span data-i18n="dischargeTimeSlot">放电时间段</span>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: #ffc107; margin: 0;" data-i18n="dischargeTime" data-text-zh="放电时间" data-text-en="Discharge Time">放电时间</h4>
+                                <button onclick="addTimePeriod('discharge')" style="background: transparent; border: 1px dashed rgba(255, 193, 7, 0.4); color: #ffc107; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                    + <span data-i18n="add" data-text-zh="添加" data-text-en="Add">添加</span>
+                                </button>
                             </div>
-                            <div id="dischargeTimeSegmentsList" style="display: flex; flex-direction: column; gap: 6px;">
-                                <!-- 放电时间段将在这里显示 -->
-                            </div>
+                            <div id="dischargeTimePeriods" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                     </div>
                 </div>
+                    
+                    <!-- 时间条件样式 -->
+                    <style>
+                        .time-period-item {
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            padding: 8px 12px;
+                            background: rgba(255, 255, 255, 0.03);
+                            border-radius: 4px;
+                            border: 1px solid rgba(255, 255, 255, 0.08);
+                            transition: all 0.3s ease;
+                        }
+                        
+                        .time-period-item:hover {
+                            background: rgba(255, 255, 255, 0.05);
+                            border-color: rgba(255, 255, 255, 0.1);
+                        }
+                        
+                        .time-period-inputs {
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            flex: 1;
+                        }
+                        
+                        .time-input {
+                            width: 80px;
+                            padding: 4px 8px;
+                            background: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            border-radius: 4px;
+                            color: rgba(255, 255, 255, 0.9);
+                            font-size: 13px;
+                            text-align: center;
+                            transition: all 0.3s ease;
+                        }
+                        
+                        .time-input:focus {
+                            outline: none;
+                            border-color: #00ff88;
+                            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.1);
+                        }
+                        
+                        .time-period-separator {
+                            color: rgba(255, 255, 255, 0.6);
+                            font-size: 13px;
+                        }
+                        
+                        .period-action-btn {
+                            padding: 4px 6px;
+                            background: transparent;
+                            border: none;
+                            color: #ff6b6b;
+                            font-size: 12px;
+                            cursor: pointer;
+                            border-radius: 3px;
+                            transition: all 0.3s ease;
+                        }
+                        
+                        .period-action-btn:hover {
+                            background: rgba(255, 107, 107, 0.1);
+                            color: #ff8a8a;
+                        }
+                    </style>
+                </div>
+                </div><!-- End of autoModeConditions -->
+                
+                <!-- Modal Footer Buttons -->
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin: 32px 24px 24px 24px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                    <button onclick="closeConditionSettingsModal()" style="background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;" data-i18n="cancel">取消</button>
+                    <button onclick="saveConditionSettings()" style="background: linear-gradient(135deg, #00ff88, #00dd77); color: #000; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; border: none;" data-i18n="saveSettings">保存设置</button>
+                </div>
+                
+                </div>
             </div>
             
-            <div class="modal-footer" style="padding: 16px 32px; background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end; gap: 12px; position: sticky; bottom: 0;">
-                <button onclick="closeConditionSettingsModal()" style="background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;" data-i18n="cancel">取消</button>
-                <button onclick="saveCurrentRegionSettings()" style="background: linear-gradient(135deg, #00ff88, #00dd77); color: #000; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; border: none;" data-i18n="saveSettings">保存设置</button>
-            </div>
+            
         </div>
     </div>
     
@@ -17994,9 +19234,6 @@
         </div>
     </div>
     
-    <!-- 模拟推送按钮 -->
-    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px;">
-    </div>
 
     <!-- 立即尝试初始化HeaderNav -->
     <script>
@@ -18041,219 +19278,9 @@
             }
         }
         
-        // 模拟充电提醒
-        function simulateChargeNotification() {
-            const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-            const region = regions[Math.floor(Math.random() * regions.length)];
-            const price = Math.floor(Math.random() * 200) + 200; // 200-400
-            const threshold = Math.floor(Math.random() * 100) + 250; // 250-350
-            
-            const notification = document.getElementById('normalChargeNotification');
-            if (notification) {
-                const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'zh';
-                
-                // 更新标题
-                const titleElement = notification.querySelector('.push-notification-title span:last-child');
-                if (titleElement) {
-                    if (currentLang === 'en') {
-                        titleElement.textContent = `Charge Reminder - ${region}`;
-                    } else {
-                        titleElement.textContent = `充电提醒——${region}`;
-                    }
-                }
-                
-                // 更新内容
-                const contentElement = notification.querySelector('.push-notification-content p');
-                if (contentElement) {
-                    if (currentLang === 'en') {
-                        contentElement.innerHTML = `Current price <span class="highlight-number">$${price}</span> below threshold <span class="highlight-value">$${threshold}</span>, please charge`;
-                    } else {
-                        contentElement.innerHTML = `当前价格<span class="highlight-number">$${price}</span>，低于阈值<span class="highlight-value">$${threshold}</span>，请充电`;
-                    }
-                }
-                
-                // 更新所有地区元素
-                const regionElements = notification.querySelectorAll('.notification-region');
-                regionElements.forEach(elem => elem.textContent = region);
-                
-                // 更新价格
-                const priceElement = notification.querySelector('.notification-price');
-                if (priceElement) priceElement.textContent = `$${price}`;
-                
-                // 更新阈值
-                const thresholdElement = notification.querySelector('.notification-threshold');
-                if (thresholdElement) thresholdElement.textContent = `$${threshold}`;
-            }
-            
-            showPushNotification('normalChargeNotification');
-        }
         
-        // 模拟放电提醒
-        function simulateDischargeNotification() {
-            const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-            const region = regions[Math.floor(Math.random() * regions.length)];
-            const price = Math.floor(Math.random() * 200) + 300; // 300-500 (higher for discharge)
-            const threshold = Math.floor(Math.random() * 100) + 200; // 200-300
-            
-            const notification = document.getElementById('normalDischargeNotification');
-            if (notification) {
-                const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'zh';
-                
-                // 更新标题
-                const titleElement = notification.querySelector('.push-notification-title span:last-child');
-                if (titleElement) {
-                    if (currentLang === 'en') {
-                        titleElement.textContent = `Discharge Reminder - ${region}`;
-                    } else {
-                        titleElement.textContent = `放电提醒——${region}`;
-                    }
-                }
-                
-                // 更新内容
-                const contentElement = notification.querySelector('.push-notification-content p');
-                if (contentElement) {
-                    if (currentLang === 'en') {
-                        contentElement.innerHTML = `Current price <span class="highlight-number">$${price}</span> above threshold <span class="highlight-value">$${threshold}</span>, please discharge`;
-                    } else {
-                        contentElement.innerHTML = `当前价格<span class="highlight-number">$${price}</span>，高于阈值<span class="highlight-value">$${threshold}</span>，请放电`;
-                    }
-                }
-                
-                // 更新所有地区元素
-                const regionElements = notification.querySelectorAll('.notification-region');
-                regionElements.forEach(elem => elem.textContent = region);
-                
-                // 更新价格
-                const priceElement = notification.querySelector('.notification-price');
-                if (priceElement) priceElement.textContent = `$${price}`;
-                
-                // 更新阈值
-                const thresholdElement = notification.querySelector('.notification-threshold');
-                if (thresholdElement) thresholdElement.textContent = `$${threshold}`;
-            }
-            
-            showPushNotification('normalDischargeNotification');
-        }
         
-        // 模拟最佳提醒
-        function simulateOptimalNotification() {
-            const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-            const region = regions[Math.floor(Math.random() * regions.length)];
-            const price = Math.floor(Math.random() * 200) + 200; // 200-400
-            const time = Math.floor(Math.random() * 30) + 5; // 5-35分钟
-            const actions = ['充电', '放电'];
-            const action = actions[Math.floor(Math.random() * actions.length)];
-            
-            const notification = document.getElementById('optimalNotification');
-            if (notification) {
-                const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'zh';
-                
-                // 更新所有地区元素
-                const regionElements = notification.querySelectorAll('.notification-region');
-                regionElements.forEach(elem => elem.textContent = region);
-                
-                // 更新标题中的提醒类型
-                const titleElement = notification.querySelector('[data-i18n="optimalReminder"]');
-                if (titleElement) {
-                    if (currentLang === 'en') {
-                        const actionEn = action === '充电' ? 'Charge' : 'Discharge';
-                        titleElement.textContent = `Optimal ${actionEn} Reminder`;
-                    } else {
-                        titleElement.textContent = `最佳${action}提醒`;
-                    }
-                }
-                
-                // 更新内容
-                const contentElement = notification.querySelector('.push-notification-content p');
-                if (contentElement) {
-                    const highlightPrice = `<span class="highlight-number">$${price}</span>`;
-                    const highlightTime = `<span class="highlight-value">${time}</span>`;
-                    
-                    if (currentLang === 'en') {
-                        const actionEn = action === '充电' ? 'charge' : 'discharge';
-                        contentElement.innerHTML = `${region} region ${actionEn} price ${highlightPrice}, ${highlightTime} minutes until optimal ${actionEn} time, please prepare`;
-                    } else {
-                        contentElement.innerHTML = `${region}地区${action}价格${highlightPrice}，还有${highlightTime}分钟到达最佳${action}时机，请做好准备`;
-                    }
-                }
-                
-                // 更新价格
-                const priceElement = notification.querySelector('.notification-price');
-                if (priceElement) priceElement.textContent = `$${price}`;
-                
-                // 更新时间
-                const timeElement = notification.querySelector('.notification-time');
-                if (timeElement) timeElement.textContent = time;
-            }
-            
-            showPushNotification('optimalNotification');
-        }
         
-        // 模拟价格提醒
-        function simulatePriceAlertNotification() {
-            const regions = ['NSW', 'VIC', 'QLD', 'SA'];
-            const region = regions[Math.floor(Math.random() * regions.length)];
-            const price = Math.floor(Math.random() * 200) + 200; // 200-400
-            const time = Math.floor(Math.random() * 30) + 5; // 5-35分钟
-            const priceTypes = ['高价', '低价'];
-            const actionTypes = ['充电', '放电'];
-            const priceType = priceTypes[Math.floor(Math.random() * priceTypes.length)];
-            const actionType = actionTypes[Math.floor(Math.random() * actionTypes.length)];
-            
-            const notification = document.getElementById('priceAlertNotification');
-            if (notification) {
-                const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'zh';
-                
-                // 更新标题
-                const titleElement = notification.querySelector('.push-notification-title span:last-child');
-                if (titleElement) {
-                    if (currentLang === 'en') {
-                        const priceTypeEn = priceType === '高价' ? 'High Price' : 'Low Price';
-                        const actionTypeEn = actionType === '充电' ? 'Charge' : 'Discharge';
-                        titleElement.textContent = `${priceTypeEn} ${actionTypeEn} Reminder - ${region}`;
-                    } else {
-                        titleElement.textContent = `${priceType}${actionType}提醒——${region}`;
-                    }
-                }
-                
-                // 更新内容
-                const contentElement = notification.querySelector('.push-notification-content p');
-                if (contentElement) {
-                    const highlightPrice = `<span class="highlight-number">$${price}</span>`;
-                    const highlightTime = `<span class="highlight-value">${time}</span>`;
-                    
-                    if (currentLang === 'en') {
-                        const actionTypeEn = actionType === '充电' ? 'charge' : 'discharge';
-                        const priceTypeEn = priceType === '高价' ? 'high price' : 'low price';
-                        contentElement.innerHTML = `${region} region ${actionTypeEn} price ${highlightPrice}, ${highlightTime} minutes until ${priceTypeEn} ${actionTypeEn} time, please prepare`;
-                    } else {
-                        contentElement.innerHTML = `${region}地区${actionType}价格${highlightPrice}，还有${highlightTime}分钟到达${priceType}${actionType}时机，请做好准备`;
-                    }
-                }
-                
-                // 更新所有地区元素
-                const regionElements = notification.querySelectorAll('.notification-region');
-                regionElements.forEach(elem => elem.textContent = region);
-                
-                // 更新价格类型
-                const priceTypeElements = notification.querySelectorAll('.notification-price-type');
-                priceTypeElements.forEach(elem => elem.textContent = priceType);
-                
-                // 更新动作类型
-                const actionTypeElements = notification.querySelectorAll('.notification-action-type');
-                actionTypeElements.forEach(elem => elem.textContent = actionType);
-                
-                // 更新价格
-                const priceElement = notification.querySelector('.notification-price');
-                if (priceElement) priceElement.textContent = `$${price}`;
-                
-                // 更新时间
-                const timeElement = notification.querySelector('.notification-time');
-                if (timeElement) timeElement.textContent = time;
-            }
-            
-            showPushNotification('priceAlertNotification');
-        }
 
         // 更新弹窗内容
         function updateNotificationContent(notificationId, data) {
@@ -18427,7 +19454,7 @@
         }, 200);
         
         // 启动模拟推送（仅供测试，可注释掉）
-        simulatePushNotifications();
+        // simulatePushNotifications();
         
     </script>
 
@@ -18511,10 +19538,6 @@
 
         // 页面加载完成后初始化拖拽功能
         document.addEventListener('DOMContentLoaded', function() {
-            const testCard = document.getElementById('testCard');
-            if (testCard) {
-                makeDraggable(testCard);
-            }
             
             // 初始化地区条件总览卡片
             setTimeout(() => {
@@ -18538,7 +19561,7 @@
                     window.dischargeTimeSegments = window.dischargeTimeSegments || [{ start: '16:00', end: '21:00' }];
                     
                     // 恢复模态框显示
-                    modalContent.style.display = 'block';
+                    modalContent.style.display = 'flex';
                     
                     // 恢复位置
                     if (savedPosition) {
@@ -18563,6 +19586,10 @@
                         window.i18n.updatePageTexts();
                         updateModalTranslations();
                     }
+                    
+                    // Restore saved mode
+                    const savedMode = localStorage.getItem('modalMode') || 'manual';
+                    switchModalMode(savedMode);
                     
                     // 加载当前地区的条件设置
                     setTimeout(loadConditionSettings, 500);
@@ -18654,29 +19681,6 @@
             }
         }
 
-        // 卡片展开/缩小功能
-        function toggleCardExpansion() {
-            const testCard = document.getElementById('testCard');
-            const expandBtn = testCard.querySelector('.expand-btn');
-            
-            if (testCard.classList.contains('minimized')) {
-                // 展开卡片
-                testCard.classList.remove('minimized');
-                expandBtn.innerHTML = '−';
-                expandBtn.title = '缩小';
-                
-                // 恢复拖拽功能
-                makeDraggable(testCard);
-            } else {
-                // 缩小卡片
-                testCard.classList.add('minimized');
-                expandBtn.innerHTML = '+';
-                expandBtn.title = '展开';
-                
-                // 自动移动到屏幕边缘
-                moveToEdge(testCard);
-            }
-        }
 
         // 移动卡片到最近的屏幕边缘
         function moveToEdge(element) {
@@ -18727,41 +19731,8 @@
             }, 500);
         }
 
-        // 为缩小状态的卡片添加点击展开功能
-        document.addEventListener('click', function(e) {
-            const testCard = document.getElementById('testCard');
-            if (testCard && testCard.classList.contains('minimized') && testCard.contains(e.target)) {
-                // 如果点击的不是展开按钮且没有发生拖拽，则展开卡片
-                if (!e.target.classList.contains('expand-btn') && !window.isDragging) {
-                    toggleCardExpansion();
-                }
-                // 重置拖拽状态
-                window.isDragging = false;
-            }
-        });
     </script>
 
-    <!-- 可拖拽测试卡片 -->
-    <div id="testCard" class="draggable-test-card minimized">
-        <div class="expand-btn" onclick="toggleCardExpansion()" title="缩小">−</div>
-        <div class="test-card-header">
-            <h3 class="test-card-title" data-i18n="testTitle">测试专用</h3>
-        </div>
-        <div class="test-card-buttons">
-            <button class="test-btn charge" onclick="simulateChargeNotification()">
-                <span data-i18n="chargeAlert">充电提醒</span>
-            </button>
-            <button class="test-btn discharge" onclick="simulateDischargeNotification()">
-                <span data-i18n="dischargeAlert">放电提醒</span>
-            </button>
-            <button class="test-btn optimal" onclick="simulateOptimalNotification()">
-                <span data-i18n="optimalChargeTiming">最佳充电时机</span>
-            </button>
-            <button class="test-btn price" onclick="simulatePriceAlertNotification()">
-                <span data-i18n="lowPriceChargeAlert">低价充电提醒</span>
-            </button>
-        </div>
-    </div>
 
     <!-- 可拖拽自动化条件卡片 -->
     <div id="regionOverviewCard" class="draggable-region-overview-card" style="display: none;">
@@ -18775,5 +19746,70 @@
             </div>
         </div>
     </div>
+
+    <!-- 测试工具面板 -->
+    <div id="testToolsPanel" class="test-tools-panel" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: none;">
+        <div class="test-tools-content" style="background: rgba(15, 15, 25, 0.92); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border-radius: 16px; padding: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); min-width: 300px;">
+            <div class="test-tools-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <h3 style="margin: 0; color: #fff; font-size: 16px; font-weight: 600;" data-i18n="pushNotificationTest">推送通知测试</h3>
+                <button onclick="closeTestTools()" style="background: none; border: none; color: rgba(255, 255, 255, 0.6); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s;">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M12.5 3.5L8 8l4.5 4.5-1 1L7 9l-4.5 4.5-1-1L6 8 1.5 3.5l1-1L7 7l4.5-4.5z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="test-buttons-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button onclick="window.simulateChargeNotification()" style="background: linear-gradient(135deg, #00ff88, #00cc6a); color: #000; border: none; border-radius: 10px; padding: 12px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span data-i18n="simulateCharge">充电提醒</span>
+                </button>
+                <button onclick="window.simulateDischargeNotification()" style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #000; border: none; border-radius: 10px; padding: 12px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span data-i18n="simulateDischarge">放电提醒</span>
+                </button>
+                <button onclick="window.simulateOptimalNotification()" style="background: linear-gradient(135deg, #1e7fff, #0056cc); color: #fff; border: none; border-radius: 10px; padding: 12px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span data-i18n="simulateOptimal">最佳放电时机提醒</span>
+                </button>
+                <button onclick="window.simulateLowPriceNotification()" style="background: linear-gradient(135deg, #ff6b6b, #ff4757); color: #fff; border: none; border-radius: 10px; padding: 12px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span data-i18n="simulateLowPrice">低价充电提醒</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 测试工具触发按钮 -->
+    <button id="testToolsToggle" class="test-tools-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 10001; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 50%; width: 56px; height: 56px; cursor: pointer; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); transition: all 0.3s; display: flex; align-items: center; justify-content: center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+        </svg>
+    </button>
+    
+    <script>
+        // Wait for DOM and scripts to load, then bind the test tools button
+        document.addEventListener('DOMContentLoaded', function() {
+            function bindTestToolsButton() {
+                const button = document.getElementById('testToolsToggle');
+                if (button && window.toggleTestTools) {
+                    button.addEventListener('click', function() {
+                        console.log('Test tools button clicked!');
+                        window.toggleTestTools();
+                        // 强制更新测试工具面板的翻译
+                        setTimeout(() => {
+                            if (window.i18n && window.i18n.updatePageTexts) {
+                                window.i18n.updatePageTexts();
+                            }
+                        }, 100);
+                    });
+                    console.log('Test tools button successfully bound!');
+                } else {
+                    console.log('Retrying button binding in 100ms...');
+                    setTimeout(bindTestToolsButton, 100);
+                }
+            }
+            
+            // Start binding attempt
+            setTimeout(bindTestToolsButton, 100);
+        });
+    </script>
 </body>
 </html>
