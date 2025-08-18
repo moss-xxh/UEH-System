@@ -844,17 +844,38 @@
         .task-table td:last-child {
             position: sticky;
             right: 0;
-            background: var(--color-bg-card);
+            background: #000000; /* Solid black background */
             z-index: 2;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .task-table th:last-child {
-            background: rgba(255, 255, 255, 0.05);
+            background: #0a0a0a; /* Slightly lighter black for header */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .task-table tbody tr:hover td:last-child {
-            background: rgba(255, 255, 255, 0.03);
+            background: #111111; /* Darker on hover but still opaque */
+        }
+        
+        /* Operation table action column - same styling */
+        .data-table th:last-child,
+        .data-table td:last-child {
+            position: sticky;
+            right: 0;
+            background: #000000; /* Solid black background */
+            z-index: 2;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-table th:last-child {
+            background: #0a0a0a; /* Slightly lighter black for header */
+        }
+        
+        .data-table tbody tr:hover td:last-child {
+            background: #111111; /* Darker on hover but still opaque */
         }
 
         /* Data Table */
@@ -970,12 +991,16 @@
             padding: 6px 12px;
             border-radius: 8px;
             transition: all 0.2s ease;
-            border: 1px solid transparent;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.05);
+            display: inline-block;
         }
 
         .action-link:hover {
-            background: rgba(0, 255, 136, 0.1);
-            border-color: rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.15);
+            border-color: rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+            transform: translateY(-1px);
         }
         
         /* Status Badge */
@@ -1695,7 +1720,7 @@
             <div class="search-filter-section" style="display: flex; align-items: center; gap: 12px; margin-top: -14px; margin-bottom: 16px; padding: 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; backdrop-filter: blur(10px);">
                 <select id="regionFilter" class="filter-select" 
                         style="width: 180px; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: rgba(255, 255, 255, 0.9); font-size: 14px;">
-                    <option value="" data-i18n-key="allRegions">全部地区</option>
+                    <option value="" data-i18n="operationLog.filter.allRegions">全部地区</option>
                     <option value="NSW">NSW</option>
                     <option value="QLD">QLD</option>
                     <option value="VIC">VIC</option>
@@ -1705,21 +1730,21 @@
                 
                 <input type="text" class="search-input" id="opSearchInput" 
                        style="width: 180px; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: rgba(255, 255, 255, 0.9); font-size: 14px;"
-                       data-i18n-placeholder="operationLog.placeholder.operator" 
+                       data-i18n-placeholder="operationLog.filter.operatorPlaceholder" 
                        placeholder="请输入操作人员...">
                 
                 <select class="filter-select" id="opCommandFilter"
                         style="width: 180px; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: rgba(255, 255, 255, 0.9); font-size: 14px;">
-                    <option value="" data-i18n-key="operationLog.placeholder.command">全部命令</option>
-                    <option value="charge" data-i18n-key="operationLog.commands.charge">充电</option>
-                    <option value="discharge" data-i18n-key="operationLog.commands.discharge">放电</option>
-                    <option value="stop-charge" data-i18n-key="operationLog.commands.stopCharge">停止充电</option>
-                    <option value="stop-discharge" data-i18n-key="operationLog.commands.stopDischarge">停止放电</option>
+                    <option value="" data-i18n="operationLog.filter.allCommands">全部命令</option>
+                    <option value="charge" data-i18n="operationLog.filter.charge">充电</option>
+                    <option value="discharge" data-i18n="operationLog.filter.discharge">放电</option>
+                    <option value="stop-charge" data-i18n="operationLog.filter.stopCharge">停止充电</option>
+                    <option value="stop-discharge" data-i18n="operationLog.filter.stopDischarge">停止放电</option>
                 </select>
                 
                 <input type="text" class="search-input" id="opDateInput" 
                        style="width: 180px; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: rgba(255, 255, 255, 0.9); font-size: 14px; cursor: pointer;"
-                       data-i18n-placeholder="operationLog.placeholder.time" 
+                       data-i18n-placeholder="operationLog.filter.timePlaceholder" 
                        placeholder="请选择时间..." 
                        readonly>
                 
@@ -1727,12 +1752,12 @@
                     <button class="filter-btn primary" onclick="applyOpFilters()"
                             style="background: #00ff88; border-color: #00ff88; color: #000; font-weight: 500;">
                         <span></span>
-                        <span data-i18n-key="operationLog.buttons.search">查询</span>
+                        <span data-i18n="operationLog.buttons.search">查询</span>
                     </button>
                     <button class="filter-btn secondary" onclick="resetOpFilters()"
                             style="background: rgba(255, 255, 255, 0.05);">
                         <span></span>
-                        <span data-i18n-key="operationLog.buttons.reset">重置</span>
+                        <span data-i18n="operationLog.buttons.reset">重置</span>
                     </button>
                 </div>
             </div>
@@ -1836,11 +1861,11 @@
                 <div class="table-actions-header">
                     <button class="filter-btn export" onclick="exportOperationLogs()">
                         <span></span>
-                        <span data-i18n-key="operationLog.buttons.export">导出</span>
+                        <span data-i18n="operationLog.buttons.export">导出</span>
                     </button>
                     <button class="filter-btn refresh" onclick="refreshOperationLogs()">
                         <span></span>
-                        <span data-i18n-key="operationLog.buttons.refresh">刷新</span>
+                        <span data-i18n="operationLog.buttons.refresh">刷新</span>
                     </button>
                 </div>
                 
@@ -2617,7 +2642,9 @@
             { 
                 id: 'F-NSW-202403151945',
                 region: 'NSW',
-                time: '2024-03-15 19:45:00', 
+                time: '2024-03-15 19:45:00',
+                startTime: '2024-03-15 19:45:00',
+                endTime: '2024-03-15 22:30:00',
                 dischargeType: '自动', 
                 taskIssuer: '放电', 
                 taskCount: 450,
@@ -2948,7 +2975,7 @@
                     <td>$${task.profitPerKwh.toFixed(3)}</td>
                     <td>
                         <a href="#" class="action-link" onclick="viewTaskDetails('${task.id}'); return false;">
-                            ${window.i18n ? window.i18n.getText('operationLog.viewDetails') : '查看详情'}
+                            ${window.i18n ? window.i18n.getText('operationLog.buttons.viewDetails') : '查看详情'}
                         </a>
                     </td>
                 </tr>
@@ -2964,6 +2991,75 @@
             localStorage.setItem('taskDetailData', JSON.stringify(task));
             window.location.href = `task-detail.html?id=${taskId}`;
         }
+        
+        // Force translate function (can be called from console)
+        window.forceTranslate = function() {
+            console.log('Forcing translation update...');
+            
+            if (!window.i18n) {
+                console.error('i18n not initialized!');
+                return;
+            }
+            
+            // Update all elements with data-i18n attribute
+            const elements = document.querySelectorAll('[data-i18n]');
+            let updated = 0;
+            
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key) {
+                    const translation = window.i18n.getText(key);
+                    if (translation && translation !== key) {
+                        element.textContent = translation;
+                        updated++;
+                        console.log(`Updated: ${key} -> ${translation}`);
+                    } else {
+                        console.warn(`No translation found for: ${key}`);
+                    }
+                }
+            });
+            
+            // Update all placeholders
+            const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+            placeholders.forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (key) {
+                    const translation = window.i18n.getText(key);
+                    if (translation && translation !== key) {
+                        element.placeholder = translation;
+                        updated++;
+                        console.log(`Updated placeholder: ${key} -> ${translation}`);
+                    }
+                }
+            });
+            
+            console.log(`Translation complete! Updated ${updated} elements.`);
+            
+            // Special handling for tabs that might not update properly
+            const specialElements = [
+                { selector: '[data-i18n="operationLog.tabs.task"]', key: 'operationLog.tabs.task' },
+                { selector: '[data-i18n="operationLog.tabs.operation"]', key: 'operationLog.tabs.operation' }
+            ];
+            
+            specialElements.forEach(item => {
+                const element = document.querySelector(item.selector);
+                if (element) {
+                    const translation = window.i18n.getText(item.key);
+                    if (translation && translation !== item.key) {
+                        element.textContent = translation;
+                        console.log(`Special update: ${item.key} -> ${translation}`);
+                        updated++;
+                    }
+                }
+            });
+            
+            // Also refresh dynamic content
+            if (typeof updateTableDisplay === 'function') {
+                updateTableDisplay();
+            }
+            
+            return `Updated ${updated} translations`;
+        };
         
         // Export task logs
         function exportTaskLogs() {
@@ -2984,6 +3080,71 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize i18n
+            window.i18n = new I18n({
+                containerId: 'languageSelector',
+                defaultLanguage: localStorage.getItem('app_language') || 'zh'
+            });
+            
+            // Force update all translations after initialization
+            setTimeout(() => {
+                if (window.i18n && window.i18n.updatePageTexts) {
+                    console.log('Force updating page translations...');
+                    window.i18n.updatePageTexts();
+                    
+                    // Also update any dynamic content
+                    document.querySelectorAll('[data-i18n]').forEach(element => {
+                        const key = element.getAttribute('data-i18n');
+                        if (key && window.i18n.getText) {
+                            const translation = window.i18n.getText(key);
+                            if (translation && translation !== key) {
+                                element.textContent = translation;
+                            }
+                        }
+                    });
+                    
+                    // Update placeholders
+                    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                        const key = element.getAttribute('data-i18n-placeholder');
+                        if (key && window.i18n.getText) {
+                            const translation = window.i18n.getText(key);
+                            if (translation && translation !== key) {
+                                element.placeholder = translation;
+                            }
+                        }
+                    });
+                    
+                    console.log('Page translations updated successfully');
+                }
+            }, 100);
+            
+            // Force update again after a longer delay to catch any late-loading content
+            setTimeout(() => {
+                if (window.i18n && window.i18n.updatePageTexts) {
+                    window.i18n.updatePageTexts();
+                    
+                    // Specifically force update the tabs
+                    const taskTabSpan = document.querySelector('[data-i18n="operationLog.tabs.task"]');
+                    const operationTabSpan = document.querySelector('[data-i18n="operationLog.tabs.operation"]');
+                    
+                    if (taskTabSpan) {
+                        const taskText = window.i18n.getText('operationLog.tabs.task');
+                        if (taskText) {
+                            taskTabSpan.textContent = taskText;
+                            console.log('Force updated task tab to:', taskText);
+                        }
+                    }
+                    
+                    if (operationTabSpan) {
+                        const operationText = window.i18n.getText('operationLog.tabs.operation');
+                        if (operationText) {
+                            operationTabSpan.textContent = operationText;
+                            console.log('Force updated operation tab to:', operationText);
+                        }
+                    }
+                }
+            }, 500);
+            
             // Initialize HeaderNav component
             const headerNav = new HeaderNav({
                 currentPage: 'operationLog',
@@ -3017,6 +3178,26 @@
             // Add language change observer to refresh content
             if (window.i18n) {
                 window.i18n.addObserver((newLang, oldLang) => {
+                    console.log(`Language changed from ${oldLang} to ${newLang}`);
+                    
+                    // Force update tabs immediately
+                    setTimeout(() => {
+                        const taskTab = document.querySelector('[data-i18n="operationLog.tabs.task"]');
+                        const operationTab = document.querySelector('[data-i18n="operationLog.tabs.operation"]');
+                        
+                        if (taskTab) {
+                            const taskText = window.i18n.getText('operationLog.tabs.task');
+                            taskTab.textContent = taskText || (newLang === 'en' ? 'Task Records' : '任务记录');
+                            console.log('Updated task tab on language change:', taskText);
+                        }
+                        
+                        if (operationTab) {
+                            const operationText = window.i18n.getText('operationLog.tabs.operation');
+                            operationTab.textContent = operationText || (newLang === 'en' ? 'Operation Records' : '操作记录');
+                            console.log('Updated operation tab on language change:', operationText);
+                        }
+                    }, 50);
+                    
                     // Refresh table display with new language
                     updateTableDisplay();
                     updatePaginationDisplay();

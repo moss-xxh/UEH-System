@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+
+set timeout 300
+
+spawn npx bmad-method install
+
+# Wait for the path prompt
+expect "Enter the full path to your project directory where BMad should be installed:"
+
+# Send the installation path
+send "/Users/xuexinhai/Desktop/项目集/dist/充电站\r"
+
+# Wait for the module selection prompt
+expect "Select what to install/update"
+
+# Press Enter to continue with default selection (BMad Core)
+send "\r"
+
+# Wait for installation to complete
+expect {
+    "Installation complete" { exit 0 }
+    "Successfully installed" { exit 0 }
+    eof { exit 0 }
+    timeout { exit 1 }
+}
+
+interact

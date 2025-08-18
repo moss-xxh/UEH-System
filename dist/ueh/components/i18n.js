@@ -664,34 +664,48 @@ class I18n {
                 // Operation Log translations
                 operationLog: {
                     title: "操作记录",
+                    tabs: {
+                        task: "任务记录",
+                        operation: "操作记录",
+                        basic: "基本信息",
+                        stations: "电站详情",
+                        timeline: "执行时间线"
+                    },
                     table: {
                         time: "时间",
+                        region: "地区",
+                        dischargeType: "放电类型",
+                        taskIssuer: "下发任务",
+                        taskCount: "下发任务数",
+                        participants: "参与人数",
+                        participationRate: "参与率",
+                        dischargeAmount: "放电量(kWh)",
+                        netProfit: "净利润($)",
+                        profitPerKwh: "每度电净利润($/kWh)",
                         command: "命令",
                         operator: "操作人",
                         stations: "下发电站",
                         success: "成功",
                         failed: "失败",
-                        action: "操作",
-                        region: "地区"
+                        action: "操作"
                     },
-                    commands: {
+                    filter: {
+                        allRegions: "全部地区",
+                        operatorPlaceholder: "请输入操作人员...",
+                        allCommands: "全部命令",
                         charge: "充电",
                         discharge: "放电",
                         stopCharge: "停止充电",
-                        stopDischarge: "停止放电"
-                    },
-                    placeholder: {
-                        operator: "请输入操作人员...",
-                        command: "全部命令",
-                        time: "请选择时间..."
+                        stopDischarge: "停止放电",
+                        timePlaceholder: "请选择时间..."
                     },
                     buttons: {
                         search: "🔍 查询",
                         reset: "🔄 重置",
                         export: "📥 导出",
-                        refresh: "🔄 刷新"
+                        refresh: "🔄 刷新",
+                        viewDetails: "查看详情"
                     },
-                    viewDetails: "查看详情",
                     noData: "暂无数据",
                     total: "共",
                     perPage: "/页",
@@ -1794,6 +1808,48 @@ class I18n {
                     },
                     cancel: "取消",
                     confirmExport: "确认导出"
+                },
+                
+                // Task Detail Page
+                taskDetail: {
+                    tabs: {
+                        overview: "概览",
+                        details: "明细"
+                    },
+                    summary: {
+                        timeRange: "开始时间 —— 结束时间",
+                        region: "地区",
+                        dischargeType: "放电类型",
+                        taskCount: "下发任务数",
+                        participants: "参与人数",
+                        participationRate: "参与率",
+                        totalDischarge: "总放电量",
+                        netProfit: "总净利润",
+                        profitPerKwh: "每度电净利润"
+                    },
+                    chart: {
+                        trendTitle: "价格与放电量趋势变化"
+                    },
+                    filter: {
+                        username: "用户名:",
+                        usernamePlaceholder: "搜索用户名",
+                        status: "状态:",
+                        all: "全部",
+                        completed: "已完成",
+                        discharging: "放电中",
+                        notParticipated: "未参与"
+                    },
+                    table: {
+                        no: "序号",
+                        username: "用户名",
+                        discharge: "放电量 (kWh)",
+                        profit: "获利 ($)",
+                        profitPerKwh: "每度电获利 ($/kWh)",
+                        status: "状态"
+                    },
+                    button: {
+                        export: "导出"
+                    }
                 }
             },
             
@@ -1841,6 +1897,49 @@ class I18n {
                     cancel: "Cancel",
                     confirmExport: "Confirm Export"
                 },
+                
+                // Task Detail Page
+                taskDetail: {
+                    tabs: {
+                        overview: "Overview",
+                        details: "Details"
+                    },
+                    summary: {
+                        timeRange: "Start Time —— End Time",
+                        region: "Region",
+                        dischargeType: "Discharge Type",
+                        taskCount: "Tasks Issued",
+                        participants: "Participants",
+                        participationRate: "Participation Rate",
+                        totalDischarge: "Total Discharge",
+                        netProfit: "Total Net Profit",
+                        profitPerKwh: "Profit per kWh"
+                    },
+                    chart: {
+                        trendTitle: "Price & Discharge Trend"
+                    },
+                    filter: {
+                        username: "Username:",
+                        usernamePlaceholder: "Search username",
+                        status: "Status:",
+                        all: "All",
+                        completed: "Completed",
+                        discharging: "Discharging",
+                        notParticipated: "Not Participated"
+                    },
+                    table: {
+                        no: "No.",
+                        username: "Username",
+                        discharge: "Discharge (kWh)",
+                        profit: "Profit ($)",
+                        profitPerKwh: "Profit per kWh ($/kWh)",
+                        status: "Status"
+                    },
+                    button: {
+                        export: "Export"
+                    }
+                },
+                
                 analysis: {
                     realtime: "Real-time Analysis",
                     historical: "Historical Analysis",
@@ -2438,34 +2537,48 @@ class I18n {
                 // Operation Log translations
                 operationLog: {
                     title: "Operation Log",
+                    tabs: {
+                        task: "Task Records",
+                        operation: "Operation Records",
+                        basic: "Basic Info",
+                        stations: "Station Details",
+                        timeline: "Execution Timeline"
+                    },
                     table: {
                         time: "Time",
+                        region: "Region",
+                        dischargeType: "Discharge Type",
+                        taskIssuer: "Task Issuer",
+                        taskCount: "Tasks Issued",
+                        participants: "Participants",
+                        participationRate: "Participation Rate",
+                        dischargeAmount: "Discharge (kWh)",
+                        netProfit: "Net Profit ($)",
+                        profitPerKwh: "Profit per kWh ($/kWh)",
                         command: "Command",
                         operator: "Operator",
                         stations: "Stations",
                         success: "Success",
                         failed: "Failed",
-                        action: "Action",
-                        region: "Region"
+                        action: "Action"
                     },
-                    commands: {
+                    filter: {
+                        allRegions: "All Regions",
+                        operatorPlaceholder: "Enter operator name...",
+                        allCommands: "All Commands",
                         charge: "Charge",
                         discharge: "Discharge",
                         stopCharge: "Stop Charge",
-                        stopDischarge: "Stop Discharge"
-                    },
-                    placeholder: {
-                        operator: "Enter operator name...",
-                        command: "All Commands",
-                        time: "Select time..."
+                        stopDischarge: "Stop Discharge",
+                        timePlaceholder: "Select time..."
                     },
                     buttons: {
                         search: "🔍 Search",
                         reset: "🔄 Reset",
                         export: "📥 Export",
-                        refresh: "🔄 Refresh"
+                        refresh: "🔄 Refresh",
+                        viewDetails: "View Details"
                     },
-                    viewDetails: "View Details",
                     noData: "No data",
                     total: "Total",
                     perPage: "/page",
