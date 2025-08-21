@@ -297,6 +297,11 @@
         #tech .module-card:nth-child(2) .module-icon::after { content: '🐄'; }
         #tech .module-card:nth-child(3) .module-icon::after { content: '🎀'; }
 
+        /* 北能图标 */
+        #beineng .module-card:nth-child(1) .module-icon::after { content: '🏢'; }
+        #beineng .module-card:nth-child(2) .module-icon::after { content: '📱'; }
+        #beineng .module-card:nth-child(3) .module-icon::after { content: '📊'; }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .main-title {
@@ -393,6 +398,10 @@
                     <div class="tab-icon">⚙️</div>
                     <div class="tab-text">工控界面</div>
                 </div>
+                <div class="tab-item" data-tab="beineng">
+                    <div class="tab-icon">🔋</div>
+                    <div class="tab-text">北能</div>
+                </div>
             </div>
         </div>
 
@@ -479,6 +488,29 @@
                     <div class="module-icon"></div>
                     <div class="module-title">工控-APP</div>
                     <div class="module-desc">墨刀原型</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 北能 -->
+        <div class="tab-content" id="beineng">
+            <div class="modules-grid">
+                <div class="module-card" onclick="window.open('#', '_blank')">
+                    <div class="module-icon"></div>
+                    <div class="module-title">北能-管理端</div>
+                    <div class="module-desc">待开发</div>
+                </div>
+                
+                <div class="module-card" onclick="window.open('http://47.121.136.99:10054/北能/login.html', '_blank')">
+                    <div class="module-icon"></div>
+                    <div class="module-title">北能-移动端</div>
+                    <div class="module-desc">待开发</div>
+                </div>
+                
+                <div class="module-card" onclick="window.open('#', '_blank')">
+                    <div class="module-icon"></div>
+                    <div class="module-title">北能-数据分析</div>
+                    <div class="module-desc">待开发</div>
                 </div>
             </div>
         </div>
