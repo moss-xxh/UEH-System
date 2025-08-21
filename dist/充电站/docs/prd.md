@@ -1,492 +1,340 @@
-# 充电站管理系统 (EV Charging Station Management System) Brownfield Enhancement PRD
-
-## Intro Project Analysis and Context
-
-### Existing Project Overview
-
-#### Analysis Source
-- User-provided information
-- Initial project brief available at: docs/brief.md
-
-#### Current Project State
-The charging station management system is a planned multi-tenant SaaS platform designed to serve multiple charging station companies. Each company can manage multiple charging stations, with each station containing multiple charging piles. The system consists of a backend web administration interface and a user-facing mobile application.
-
-### Available Documentation Analysis
-
-#### Available Documentation
-- [x] Project Brief
-- [ ] Tech Stack Documentation
-- [ ] Source Tree/Architecture
-- [ ] Coding Standards
-- [ ] API Documentation
-- [ ] External API Documentation
-- [ ] UX/UI Guidelines
-- [ ] Technical Debt Documentation
-
-*Note: This is a greenfield project being planned, so traditional brownfield documentation is not yet available.*
-
-### Enhancement Scope Definition
-
-#### Enhancement Type
-- [x] New Feature Addition
-- [ ] Major Feature Modification
-- [x] Integration with New Systems
-- [x] Performance/Scalability Improvements
-- [x] UI/UX Overhaul
-- [ ] Technology Stack Upgrade
-- [ ] Bug Fix and Stability Improvements
-
-#### Enhancement Description
-Building a comprehensive SaaS platform for EV charging station management that enables multi-tenant operations, real-time monitoring, user mobile access, and centralized control of charging infrastructure across multiple locations.
-
-#### Impact Assessment
-- [ ] Minimal Impact (isolated additions)
-- [ ] Moderate Impact (some existing code changes)
-- [ ] Significant Impact (substantial existing code changes)
-- [x] Major Impact (architectural changes required) - This is a new system build
+# Charging Station SaaS System Product Requirements Document (PRD)
 
 ### Goals and Background Context
-
-#### Goals
-- Enable multi-tenant SaaS architecture supporting multiple charging companies
-- Provide centralized management for multiple charging stations per company
-- Deliver real-time monitoring and control of individual charging piles
-- Create user-friendly mobile app for EV drivers to locate and use charging stations
-- Implement billing and payment processing for charging sessions
-- Generate analytics and reporting for operational optimization
-- Support scalability from small operators (5-20 stations) to large networks (100+ stations)
-
-#### Background Context
-The rapid growth of electric vehicle adoption has created a fragmented charging infrastructure market where operators struggle with disparate management systems. This platform addresses the need for a unified, scalable solution that can serve multiple charging companies through a single SaaS platform, improving operational efficiency while enhancing the end-user experience for EV drivers.
-
-### Change Log
-
-| Change | Date | Version | Description | Author |
-|--------|------|---------|-------------|---------|
-| Initial Creation | 2025-01-18 | 1.0 | Initial PRD creation for charging station management system | PM |
-
-## Requirements
-
-### Functional
-
-- **FR1:** The system shall support multi-tenant architecture allowing complete data isolation between different charging companies
-- **FR2:** The system shall provide hierarchical organization structure: Company → Stations → Charging Piles
-- **FR3:** The backend web interface shall enable administrators to manage stations, view real-time status, and configure pricing
-- **FR4:** The mobile app shall allow users to locate available charging stations using GPS and real-time availability data
-- **FR5:** The system shall support multiple charging standards (GB/T, CCS, CHAdeMO) and power levels
-- **FR6:** The platform shall process charging sessions including start/stop commands, energy metering, and session logging
-- **FR7:** The system shall implement user authentication and authorization with role-based access control
-- **FR8:** The platform shall support multiple payment methods including credit cards, mobile payments, and subscription plans
-- **FR9:** The system shall generate real-time and historical reports on usage, revenue, and station performance
-- **FR10:** The platform shall send notifications for charging status, faults, and maintenance requirements
-- **FR11:** The system shall integrate with OCPP (Open Charge Point Protocol) for hardware communication
-- **FR12:** The platform shall support dynamic pricing based on time-of-use, demand, and user tiers
-
-### Non Functional
-
-- **NFR1:** The system shall support at least 1000 concurrent charging sessions with <2 second response time
-- **NFR2:** The platform shall maintain 99.9% uptime with redundancy and failover capabilities
-- **NFR3:** The mobile app shall load station maps within 3 seconds on 4G networks
-- **NFR4:** The system shall comply with PCI DSS standards for payment processing
-- **NFR5:** The platform shall scale horizontally to support from 10 to 10,000 charging stations
-- **NFR6:** All data transmission shall be encrypted using TLS 1.3 or higher
-- **NFR7:** The system shall retain transaction data for 7 years for regulatory compliance
-- **NFR8:** The platform shall support internationalization for at least Chinese and English languages
-- **NFR9:** The system shall handle network disconnections gracefully with offline mode capabilities
-- **NFR10:** API response times shall not exceed 500ms for 95% of requests
-
-### Compatibility Requirements
-
-- **CR1:** System APIs shall follow RESTful standards with OpenAPI documentation
-- **CR2:** Database shall support standard SQL with migration capabilities for future upgrades
-- **CR3:** UI/UX shall follow Material Design or similar established design system for consistency
-- **CR4:** Platform shall integrate with standard payment gateways (Stripe, Alipay, WeChat Pay)
-
-## User Interface Enhancement Goals
-
-### Integration with Existing UI
-The system will establish new UI patterns based on modern design principles:
-- **Web Admin**: Dashboard-centric design with data visualization components
-- **Mobile App**: Map-based interface with intuitive charging session management
-- Consistent design language across both platforms using shared component libraries
-
-### Modified/New Screens and Views
-
-**Web Admin Interface:**
-- Dashboard Overview (stations status, active sessions, revenue metrics)
-- Station Management (CRUD operations, configuration)
-- Charging Pile Control (real-time monitoring, remote commands)
-- User Management (customers, roles, permissions)
-- Billing & Payments (pricing rules, invoices, settlements)
-- Analytics & Reports (usage patterns, revenue analysis, maintenance)
-- System Settings (company profile, integrations, notifications)
-
-**Mobile App:**
-- Map View (station locations with availability)
-- Station Details (pile availability, pricing, amenities)
-- Charging Session (QR scan, start/stop, real-time status)
-- Payment & Wallet (payment methods, transaction history)
-- User Profile (account settings, charging history, favorites)
-- Notifications (charging updates, promotions)
-
-### UI Consistency Requirements
-- Implement unified design system with shared color palette, typography, and spacing
-- Ensure responsive design for web admin (desktop/tablet)
-- Follow iOS/Android platform guidelines for mobile app
-- Maintain consistent iconography and interaction patterns
-- Support dark/light theme options
-- Ensure accessibility compliance (WCAG 2.1 Level AA)
-
-## Technical Constraints and Integration Requirements
-
-### Existing Technology Stack
-
-**Languages**: 
-- Backend: Java/Spring Boot or Node.js/TypeScript
-- Frontend Web: React/TypeScript or Vue.js
-- Mobile: React Native or Flutter for cross-platform
-
-**Frameworks**:
-- Spring Cloud for microservices (if Java)
-- Express/NestJS (if Node.js)
-- Redux/MobX for state management
-- Material-UI or Ant Design for UI components
-
-**Database**:
-- PostgreSQL for primary data storage
-- Redis for caching and session management
-- TimescaleDB or InfluxDB for time-series charging data
-
-**Infrastructure**:
-- Docker containers with Kubernetes orchestration
-- AWS/Aliyun Cloud services
-- API Gateway for service mesh
-- Message Queue (RabbitMQ/Kafka) for event processing
-
-**External Dependencies**:
-- OCPP protocol libraries
-- Payment gateway SDKs
-- SMS/Push notification services
-- Map services (Google Maps/Amap)
-
-### Integration Approach
-
-**Database Integration Strategy**: 
-- Multi-tenant using schema-per-tenant approach
-- Connection pooling with tenant routing
-- Read replicas for analytics workloads
-
-**API Integration Strategy**:
-- GraphQL for mobile app to optimize data fetching
-- REST APIs for admin interface and third-party integrations
-- WebSocket for real-time charging status updates
-
-**Frontend Integration Strategy**:
-- Micro-frontend architecture for admin modules
-- Shared component library via npm packages
-- Progressive Web App capabilities for mobile web
-
-**Testing Integration Strategy**:
-- Unit tests with 80% coverage requirement
-- Integration tests for critical paths
-- E2E tests for user journeys
-- Load testing for concurrent session handling
-
-### Code Organization and Standards
-
-**File Structure Approach**:
-- Domain-driven design with bounded contexts
-- Separate packages for each microservice
-- Shared libraries for common utilities
-
-**Naming Conventions**:
-- camelCase for variables and functions
-- PascalCase for classes and components
-- kebab-case for file names
-- Descriptive names avoiding abbreviations
-
-**Coding Standards**:
-- ESLint/Prettier for JavaScript/TypeScript
-- SonarQube for code quality metrics
-- Mandatory code reviews via pull requests
-
-**Documentation Standards**:
-- OpenAPI specifications for all APIs
-- JSDoc/JavaDoc for public methods
-- README files for each service
-- Architecture Decision Records (ADRs)
-
-### Deployment and Operations
-
-**Build Process Integration**:
-- CI/CD pipeline using Jenkins/GitLab CI
-- Automated testing in build process
-- Docker image building and registry push
-- Semantic versioning for releases
-
-**Deployment Strategy**:
-- Blue-green deployment for zero downtime
-- Canary releases for gradual rollout
-- Feature flags for controlled activation
-- Rollback capabilities within 5 minutes
-
-**Monitoring and Logging**:
-- ELK stack (Elasticsearch, Logstash, Kibana) for logs
-- Prometheus + Grafana for metrics
-- Distributed tracing with Jaeger
-- Alert management via PagerDuty
-
-**Configuration Management**:
-- Environment variables for secrets
-- Consul/etcd for distributed configuration
-- Terraform for infrastructure as code
-- Separate configs for dev/staging/prod
-
-### Risk Assessment and Mitigation
-
-**Technical Risks**:
-- OCPP protocol compatibility issues across different charger manufacturers
-- Real-time data synchronization at scale
-- Payment processing failures during high load
-
-**Integration Risks**:
-- Third-party API dependencies (payment, maps, notifications)
-- Hardware communication reliability
-- Network connectivity issues at station locations
-
-**Deployment Risks**:
-- Data migration complexity for multi-tenant architecture
-- Service discovery and routing challenges
-- Database performance under concurrent load
-
-**Mitigation Strategies**:
-- Implement circuit breakers for external service calls
-- Design for offline-first with sync capabilities
-- Comprehensive monitoring and alerting
-- Gradual rollout with feature flags
-- Regular disaster recovery drills
-- Vendor-agnostic OCPP implementation
-
-## Epic and Story Structure
-
-### Epic Approach
-**Epic Structure Decision**: Single comprehensive epic for MVP platform development with clear phases. This approach ensures all components are developed in coordination while maintaining clear milestones for the multi-tenant SaaS platform launch.
-
-## Epic 1: EV Charging Station Management Platform MVP
-
-**Epic Goal**: Deliver a functional multi-tenant SaaS platform that enables charging station companies to manage their infrastructure and provides mobile app access for EV drivers to locate and use charging stations.
-
-**Integration Requirements**: All components must work together seamlessly - backend services, admin web interface, mobile app, payment processing, and hardware communication protocols.
-
-### Story 1.1: Multi-Tenant Foundation and Authentication
-
-As a platform operator,
-I want to establish multi-tenant architecture with authentication,
-so that multiple charging companies can securely use the platform in isolation.
-
-#### Acceptance Criteria
-1. Multi-tenant database architecture implemented with tenant isolation
-2. JWT-based authentication system operational
-3. Role-based access control (Super Admin, Company Admin, Station Manager, User)
-4. Tenant onboarding API created
-5. Session management with refresh tokens
-6. Password reset and email verification flows
-
-#### Integration Verification
-- IV1: Verify complete data isolation between tenants
-- IV2: Confirm authentication tokens work across all services
-- IV3: Load test with 100 concurrent tenant operations
-
-### Story 1.2: Company and Station Management
-
-As a company administrator,
-I want to manage my company profile and charging stations,
-so that I can organize my charging infrastructure hierarchically.
-
-#### Acceptance Criteria
-1. Company profile CRUD operations (name, logo, contact, settings)
-2. Station management interface (create, edit, delete, status)
-3. Station metadata (location, operating hours, amenities, photos)
-4. Charging pile configuration per station
-5. Hierarchical permission model enforced
-6. Bulk import capability for stations
-
-#### Integration Verification
-- IV1: Verify parent-child relationships maintain referential integrity
-- IV2: Confirm permission cascading works correctly
-- IV3: Test bulk operations don't cause performance degradation
-
-### Story 1.3: OCPP Integration and Hardware Communication
-
-As a station operator,
-I want the platform to communicate with charging hardware,
-so that I can monitor and control charging piles remotely.
-
-#### Acceptance Criteria
-1. OCPP 1.6/2.0 WebSocket server implementation
-2. Charger registration and heartbeat handling
-3. Remote start/stop charging commands
-4. Real-time status updates (Available, Charging, Faulted, Offline)
-5. Energy meter value reporting
-6. Firmware update management
-7. Error and diagnostic message handling
-
-#### Integration Verification
-- IV1: Test with at least 3 different charger manufacturers
-- IV2: Verify message queuing handles network disconnections
-- IV3: Confirm 1000 concurrent charger connections supported
-
-### Story 1.4: Web Admin Dashboard
-
-As a company administrator,
-I want a comprehensive web dashboard,
-so that I can monitor and manage all aspects of my charging network.
-
-#### Acceptance Criteria
-1. Real-time dashboard with key metrics (active sessions, revenue, utilization)
-2. Station map view with status indicators
-3. Charging session monitoring interface
-4. User management interface
-5. Financial overview (daily/monthly revenue)
-6. Alert and notification center
-7. Responsive design for tablet access
-
-#### Integration Verification
-- IV1: Real-time updates via WebSocket working
-- IV2: Dashboard loads within 3 seconds
-- IV3: Verify data accuracy between dashboard and database
-
-### Story 1.5: Mobile App - Station Discovery
-
-As an EV driver,
-I want to find available charging stations near me,
-so that I can plan my charging stops effectively.
-
-#### Acceptance Criteria
-1. Map view with station locations
-2. Search by location, address, or station name
-3. Filter by connector type, power level, availability
-4. Real-time availability status
-5. Station details (pricing, amenities, photos, reviews)
-6. Navigation integration
-7. Favorite stations feature
-
-#### Integration Verification
-- IV1: Map loads within 3 seconds on 4G
-- IV2: Real-time updates reflect within 5 seconds
-- IV3: Search returns results within 1 second
-
-### Story 1.6: Charging Session Management
-
-As an EV driver,
-I want to start and manage my charging session via the app,
-so that I have full control over my charging experience.
-
-#### Acceptance Criteria
-1. QR code scanning to identify charger
-2. Charging session initiation with selected payment method
-3. Real-time session monitoring (kWh, time, cost)
-4. Remote stop capability
-5. Session history with receipts
-6. Push notifications for session events
-7. Charging statistics and analytics
-
-#### Integration Verification
-- IV1: Session starts within 10 seconds of request
-- IV2: Real-time updates every 30 seconds during charging
-- IV3: Session data consistency across app and backend
-
-### Story 1.7: Payment and Billing System
-
-As a platform operator,
-I want to process payments and manage billing,
-so that companies can monetize their charging services.
-
-#### Acceptance Criteria
-1. Multiple payment gateway integration (Stripe, Alipay, WeChat Pay)
-2. Credit card tokenization and wallet management
-3. Pay-per-use and subscription billing models
-4. Dynamic pricing engine (time-based, demand-based)
-5. Invoice generation and email delivery
-6. Payment reconciliation and settlement
-7. Refund processing capability
-
-#### Integration Verification
-- IV1: Payment processing completes within 5 seconds
-- IV2: PCI DSS compliance verification
-- IV3: Reconciliation accuracy with test transactions
-
-### Story 1.8: Analytics and Reporting
-
-As a company administrator,
-I want comprehensive analytics and reports,
-so that I can optimize operations and track performance.
-
-#### Acceptance Criteria
-1. Utilization reports by station and time period
-2. Revenue analytics with trends and forecasts
-3. User behavior analytics
-4. Maintenance and fault analysis
-5. Automated report scheduling and email delivery
-6. Data export capabilities (CSV, PDF)
-7. Custom report builder interface
-
-#### Integration Verification
-- IV1: Reports generate within 30 seconds
-- IV2: Data accuracy validation against source
-- IV3: Historical data retrieval for 12 months
-
-### Story 1.9: System Administration and Configuration
-
-As a platform super admin,
-I want to manage system-wide settings and monitor platform health,
-so that I can ensure optimal platform operation.
-
-#### Acceptance Criteria
-1. Tenant management interface
-2. System configuration panel
-3. Platform monitoring dashboard
-4. Audit log viewer
-5. API rate limiting configuration
-6. Backup and restore capabilities
-7. System notification management
-
-#### Integration Verification
-- IV1: Configuration changes propagate within 1 minute
-- IV2: Audit logs capture all critical operations
-- IV3: Monitoring alerts trigger within 2 minutes of issues
-
-### Story 1.10: API Documentation and Developer Portal
-
-As a third-party developer,
-I want comprehensive API documentation,
-so that I can integrate with the charging platform.
-
-#### Acceptance Criteria
-1. OpenAPI 3.0 specification for all endpoints
-2. Interactive API documentation (Swagger UI)
-3. API key management interface
-4. Rate limiting and usage analytics
-5. Webhook configuration for events
-6. SDK examples in multiple languages
-7. Sandbox environment for testing
-
-#### Integration Verification
-- IV1: All APIs documented and testable
-- IV2: Webhook delivery reliability >99%
-- IV3: API response times meet SLA requirements
-
-## Next Steps
-
-### Immediate Actions
-1. Finalize technology stack selection based on team expertise and scalability requirements
-2. Set up development environment and CI/CD pipeline
-3. Create detailed database schema design for multi-tenant architecture
-4. Establish OCPP testing environment with hardware simulators
-5. Design and validate API contracts with OpenAPI specifications
-6. Create UI/UX mockups for web admin and mobile app
-7. Set up monitoring and logging infrastructure
-8. Begin Story 1.1 (Multi-Tenant Foundation) development
-
-### PM Handoff
-This Project Brief provides the full context for the EV Charging Station Management System. Please start in 'PRD Generation Mode', review the brief thoroughly to work with the user to create the PRD section by section as the template indicates, asking for any necessary clarification or suggesting improvements.
+**Goals**
+* Deliver a multi-tenant SaaS platform for electric vehicle charging network operators.
+* Provide a white-labeled management portal for charging companies (tenants).
+* Offer a white-labeled mobile app for end-users (drivers) to manage charging.
+* Achieve 99.9% platform uptime.
+* Onboard 10 charging companies within the first year of operation.
+
+**Background Context**
+Currently, charging network companies often rely on fragmented, expensive, and non-scalable custom software to manage their charging stations. This operational inefficiency hinders their ability to grow and provides a disjointed experience for EV drivers. This PRD outlines a unified, three-tiered SaaS platform designed to solve this problem by providing a centralized management solution for operators and a seamless charging experience for their customers.
+
+**Change Log**
+| Date | Version | Description | Author |
+| :--- | :--- | :--- | :--- |
+| 2025-08-19 | 1.0 | Initial draft | John, PM |
+
+---
+### Requirements
+
+#### Functional Requirements
+* **FR1:** The system must support a multi-tenant architecture to securely isolate data for each charging company.
+* **FR2:** A platform administrator must be able to create, view, update, and deactivate tenant (charging company) accounts.
+* **FR3:** A company user (tenant) must be able to log in to their own sandboxed portal.
+* **FR4:** A company user must be able to add, view, update, and delete their own charging stations and individual charging piles (桩).
+* **FR5:** A company user must be able to view a list of charging sessions and basic data for their stations.
+* **FR6:** An end-user must be able to register and log in to the mobile application.
+* **FR7:** An end-user must be able to find nearby charging stations on a map within the app.
+* **FR8:** An end-user must be able to initiate and terminate a charging session (e.g., via QR code scan).
+* **FR9:** An end-user must be able to view their personal charging history and basic payment receipts.
+
+#### Non-Functional Requirements
+* **NFR1:** The web-based portals (Admin and SaaS) must be built using Chakra UI and be responsive.
+* **NFR2:** The system must maintain 99.9% uptime.
+* **NFR3:** The mobile application must be available for both iOS and Android platforms.
+* **NFR4:** The platform architecture must be scalable to support growth in companies, stations, and users.
+* **NFR5:** All user payment information must be handled by a secure, compliant third-party payment gateway.
+
+---
+### User Interface Design Goals
+
+#### Overall UX Vision
+The user experience should be clean, intuitive, and efficient. For charging company operators, the portal's design will prioritize clarity, providing quick access to management tasks and essential data. For EV drivers, the mobile app will focus on simplicity and speed, making the process of finding a station and starting a charge as seamless as possible.
+
+#### Key Interaction Paradigms
+* **SaaS & Admin Portals:** A dashboard-centric design will serve as the homepage, offering at-a-glance insights. Management of stations, chargers, and users will be handled through clear, data-rich tables with robust filtering and search capabilities.
+* **Mobile App:** The app will feature a map-first interface as the primary screen, allowing users to instantly locate nearby charging stations. The charging process will be initiated via a prominent, easily accessible QR code scanning function.
+
+#### Core Screens and Views
+* **Admin Portal:**
+    * Tenant (Company) List
+    * Tenant Detail & Management View
+* **SaaS Company Portal:**
+    * Main Dashboard (Key metrics)
+    * Stations Management (List and map views)
+    * Charger Detail Page
+    * Charging Sessions History
+* **Mobile App:**
+    * Map View (Home Screen)
+    * Station Detail Page (Available chargers, pricing)
+    * QR Code Scanner
+    * Active Charging Session Screen
+    * User Profile & Charging History
+
+#### Accessibility
+* The product will adhere to **WCAG AA** standards to ensure it is usable by people with a wide range of disabilities.
+
+#### Branding
+* As a white-labeled product, the design will be brand-agnostic and minimalist, using a neutral color palette. The system will be designed to allow tenants to easily customize it with their own logo and primary brand color.
+
+#### Target Device and Platforms
+* **Web Responsive** for the Admin and SaaS portals, ensuring usability on both desktop and tablet devices.
+* **iOS & Android** for the end-user mobile application.
+
+---
+### Technical Assumptions
+
+#### Repository Structure: Monorepo
+* We will use a single monorepo to house the code for the web portals, the mobile app, and the backend services.
+* **Rationale:** This approach simplifies code sharing (e.g., for data types between frontend and backend), streamlines dependency management, and makes cross-platform changes easier to coordinate.
+
+#### Service Architecture: Serverless
+* The backend will be built using a serverless architecture, leveraging cloud functions (e.g., AWS Lambda).
+* **Rationale:** A serverless approach is cost-effective (pay-per-use), scales automatically to handle fluctuating demand, and reduces infrastructure management overhead, which is ideal for an MVP.
+
+#### Testing Requirements: Full Testing Pyramid
+* We will implement a comprehensive testing strategy including unit tests, integration tests, and end-to-end (E2E) tests.
+* **Rationale:** This ensures code quality, reduces regressions, and provides confidence in the application's stability, which is critical for a system handling payments and real-world hardware.
+
+#### Additional Technical Assumptions and Requests
+* **Frontend (Web Portals):** React with the Next.js framework. (Works seamlessly with Chakra UI and serverless deployments).
+* **Mobile App:** React Native. (Allows for code sharing with the React-based web portals).
+* **Backend:** Node.js with TypeScript, using the NestJS framework. (Provides a structured, scalable architecture for building APIs).
+* **Database:** PostgreSQL. (A powerful and reliable open-source relational database that handles multi-tenancy well).
+* **Deployment:** Vercel for the Next.js frontend and AWS for backend services (Lambda, API Gateway, RDS for PostgreSQL).
+* **Charger Integration:** The platform will initially support the OCPP 1.6J protocol for communication with charging hardware.
+
+---
+### Epic List
+
+* **Epic 1: Foundation & Core SaaS Setup**
+    * **Goal:** Establish the core technical infrastructure and deliver the foundational capability for platform administrators to manage tenant (charging company) accounts.
+* **Epic 2: Company Portal & Station Management**
+    * **Goal:** Enable charging company users to log into their portal to manage their charging stations and view basic operational data.
+* **Epic 3: End-User Mobile App & Core Charging Loop**
+    * **Goal:** Launch the end-user mobile app, allowing drivers to find stations, register, and complete a full charging session.
+* **Epic 4: Payments & History**
+    * **Goal:** Integrate a payment system and provide both company operators and drivers with access to their charging and transaction histories.
+
+---
+### Epic 1: Foundation & Core SaaS Setup
+**Epic Goal:** Establish the core technical infrastructure and deliver the foundational capability for platform administrators to manage tenant (charging company) accounts.
+
+#### Story 1.1: Project Initialization
+**As a** developer,
+**I want** to set up the monorepo with separate packages for the web app, backend API, and shared code,
+**so that** we have a clean, organized foundation for building the full-stack application.
+
+**Acceptance Criteria:**
+1. A monorepo is initialized using npm workspaces.
+2. Three initial packages are created: `apps/web`, `apps/api`, and `packages/shared-types`.
+3. Basic tooling (ESLint, Prettier, TypeScript) is configured at the root level and inherited by the packages.
+4. A README.md file is created with instructions for setting up the local development environment.
+5. The initial project structure is committed to a Git repository.
+
+#### Story 1.2: Foundational CI/CD Pipeline
+**As a** DevOps engineer,
+**I want** to create a basic CI/CD pipeline that automatically deploys the web and API applications,
+**so that** we can ensure continuous integration and have a working deployment from day one.
+
+**Acceptance Criteria:**
+1. A CI/CD pipeline is configured using GitHub Actions (or similar).
+2. The pipeline triggers on every push to the `main` branch.
+3. The pipeline successfully builds both the `web` and `api` applications.
+4. A "hello world" version of the Next.js web app is successfully deployed to Vercel.
+5. A "hello world" version of the NestJS API is successfully deployed to AWS Lambda.
+
+#### Story 1.3: Platform Admin Authentication
+**As a** platform administrator,
+**I want** to log in to the admin portal securely,
+**so that** I can access the tenant management features.
+
+**Acceptance Criteria:**
+1. A login page exists for the admin portal.
+2. The administrator can log in using a pre-defined username and password.
+3. Upon successful login, the administrator is redirected to the main dashboard.
+4. An unsuccessful login attempt displays a clear error message.
+5. The user's session is securely managed (e.g., using JWTs).
+
+#### Story 1.4: Tenant Account Management
+**As a** platform administrator,
+**I want** a dashboard to create, view, update, and deactivate tenant (charging company) accounts,
+**so that** I can manage the customers using the SaaS platform.
+
+**Acceptance Criteria:**
+1. When logged in, an administrator can see a page listing all tenant companies.
+2. The list displays key information such as company name, status (active/inactive), and creation date.
+3. The administrator can use a form to create a new tenant account.
+4. The administrator can edit an existing tenant's information.
+5. The administrator can change a tenant's status between "active" and "inactive".
+
+---
+### Epic 2: Company Portal & Station Management
+**Epic Goal:** Enable charging company users to log into their portal to manage their charging stations and view basic operational data.
+
+#### Story 2.1: Company User Authentication
+**As a** charging company user,
+**I want** to log in to my company's portal,
+**so that** I can manage my charging network.
+
+**Acceptance Criteria:**
+1. A unique, tenant-aware login page exists for the SaaS portal.
+2. A company user (created by the platform admin) can log in with their credentials.
+3. Upon successful login, the user is redirected to their company's dashboard.
+4. An unsuccessful login attempt displays a clear error message.
+5. The portal's UI is styled with the company's specific branding (logo and primary color).
+
+#### Story 2.2: Company Dashboard
+**As a** charging company user,
+**I want** to see a dashboard with a high-level overview of my network after I log in,
+**so that** I can quickly understand its current status.
+
+**Acceptance Criteria:**
+1. The dashboard is the default page after a company user logs in.
+2. The dashboard displays simple, key metrics: Total number of stations, total number of chargers, and number of active charging sessions.
+3. The dashboard contains clear navigation links to other sections of the portal (e.g., "Stations").
+4. All data displayed is strictly limited to the company the user belongs to.
+
+#### Story 2.3: Charging Station Management
+**As a** charging company user,
+**I want** to add, view, and update my charging stations,
+**so that** I can accurately represent my physical network in the system.
+
+**Acceptance Criteria:**
+1. A "Stations" page exists that lists all stations belonging to the user's company.
+2. The list displays the station's name, address, and the number of chargers it contains.
+3. A form allows a user to add a new station with a name and physical address.
+4. A user can select a station from the list to view its details.
+5. A user can edit the details (name, address) of an existing station.
+
+#### Story 2.4: Charging Pile (桩) Management
+**As a** charging company user,
+**I want** to add, view, and update the individual charging piles (桩) at a specific station,
+**so that** I can manage my hardware assets and their status.
+
+**Acceptance Criteria:**
+1. From a station's detail page, a user can see a list of all chargers at that station.
+2. The list shows each charger's ID, model, and current status (e.g., Available, Charging, Faulted).
+3. A form allows a user to add a new charger to the station, specifying its model and power rating.
+4. A user can edit the information of an existing charger.
+5. A user can manually change the status of a charger (for MVP purposes, before live data is connected).
+
+---
+### Epic 3: End-User Mobile App & Core Charging Loop
+**Epic Goal:** Launch the end-user mobile app, allowing drivers to find stations, register, and complete a full charging session.
+
+#### Story 3.1: User Registration & Login
+**As an** EV driver,
+**I want** to register for an account and log in to the mobile app,
+**so that** I can find chargers and manage my charging sessions.
+
+**Acceptance Criteria:**
+1. The mobile app provides a clear form for new user registration (e.g., name, email, password).
+2. The mobile app provides a login screen for existing users.
+3. A new user can successfully register and is automatically logged in.
+4. A registered user can successfully log in.
+5. The user's login session is securely stored and managed on the device.
+
+#### Story 3.2: Find Stations on Map
+**As an** EV driver,
+**I want** to see nearby charging stations on a map,
+**so that** I can easily find a place to charge my vehicle.
+
+**Acceptance Criteria:**
+1. The app's home screen displays a map centered on the user's current geographical location.
+2. Pins on the map represent all public charging stations in the viewable area, regardless of the operating company.
+3. The user can pan and zoom the map to explore different areas.
+4. Tapping on a station pin displays a small callout with the station's name and address.
+
+#### Story 3.3: View Station Details
+**As an** EV driver,
+**I want** to view the details of a specific charging station,
+**so that** I can check the availability and types of chargers before I go there.
+
+**Acceptance Criteria:**
+1. From the map, a user can navigate to a detailed screen for a selected station.
+2. The station detail screen displays its full address, operating hours, and a list of all its individual chargers.
+3. Each charger in the list shows its real-time status (e.g., Available, In Use, Out of Order), power rating (e.g., 50kW), and price.
+
+#### Story 3.4: Initiate & Stop Charging via QR Code
+**As an** EV driver,
+**I want** to start and stop a charging session by scanning a QR code on the charger,
+**so that** I can easily and quickly charge my vehicle.
+
+**Acceptance Criteria:**
+1. A "Scan to Charge" button is prominently displayed within the app's main interface.
+2. Tapping the button opens the phone's camera to scan a QR code.
+3. Upon scanning a valid QR code on an "Available" charger, a confirmation screen is shown.
+4. After confirmation, the charging session begins, and the app displays an "Active Session" screen.
+5. The "Active Session" screen shows real-time data, including time elapsed and energy delivered (kWh).
+6. The user can stop the charging session from the "Active Session" screen.
+
+---
+### Epic 4: Payments & History
+**Epic Goal:** Integrate a payment system and provide both company operators and drivers with access to their charging and transaction histories.
+
+#### Story 4.1: End-User Payment Method Management
+**As an** EV driver,
+**I want** to add and manage my credit/debit card information in the app,
+**so that** I can seamlessly pay for my charging sessions.
+
+**Acceptance Criteria:**
+1. There is a "Payment" or "Wallet" section in the user's profile.
+2. The user can add a new credit/debit card using a secure form.
+3. Card information is securely sent to and tokenized by a third-party payment gateway (e.g., Stripe); no raw card data is stored on our servers.
+4. The user can see a list of their saved payment methods (e.g., "Visa ending in 4242").
+5. The user can set one payment method as their default.
+6. The user can delete a saved payment method.
+
+#### Story 4.2: Post-Charging Payment Processing
+**As a** charging company,
+**I want** the system to automatically charge the user's default payment method after a session is complete,
+**so that** I can collect revenue for the energy provided.
+
+**Acceptance Criteria:**
+1. Immediately after a charging session ends, the system calculates the final cost based on the energy consumed and the charger's price.
+2. The system automatically triggers a charge against the user's default payment method via the payment gateway.
+3. A record of the successful transaction is created and linked to the charging session.
+4. If the payment fails, the charging session is marked as "Payment Due," and the user is notified in the app to update their payment method.
+
+#### Story 4.3: End-User Charging History & Receipts
+**As an** EV driver,
+**I want** to view my charging history and access detailed receipts,
+**so that** I can track my spending and energy usage.
+
+**Acceptance Criteria:**
+1. A "History" section in the mobile app lists all past charging sessions in reverse chronological order.
+2. Each item in the list displays the date, station location, and total cost.
+3. Tapping a session opens a detailed receipt view.
+4. The receipt includes the start/end time, duration, total energy delivered (kWh), a cost breakdown, and the payment method used.
+
+#### Story 4.4: Company Portal Charging History
+**As a** charging company user,
+**I want** to view a detailed history of all charging sessions across my network,
+**so that** I can monitor usage, revenue, and station performance.
+
+**Acceptance Criteria:**
+1. A "Charging Sessions" or "History" page in the company portal lists all sessions that occurred at that company's stations.
+2. The list can be filtered by date range and by station.
+3. Each session entry shows the user (anonymized ID), station/charger, duration, energy delivered, and revenue collected.
+4. The company user can export the filtered history data as a CSV file.
+
+---
+### Checklist Results Report
+
+**Overall Readiness:** High
+**Key Risks:** Low. Scope is clear and technical assumptions are well-defined.
+**Final Decision:** **READY FOR ARCHITECT**. The PRD and epics are comprehensive, well-structured, and ready for architectural design.
+
+| Category | Status | Key Issues |
+| :--- | :--- | :--- |
+| 1. Problem Definition & Context | ✅ Pass | None |
+| 2. MVP Scope Definition | ✅ Pass | None |
+| 3. User Experience Requirements | ✅ Pass | High-level goals are defined. Detailed user flows will be fleshed out in the UX phase. |
+| 4. Functional Requirements | ✅ Pass | None |
+| 5. Non-Functional Requirements | ✅ Pass | None |
+| 6. Epic & Story Structure | ✅ Pass | Logical sequence is clear and value-driven. |
+| 7. Technical Guidance | ✅ Pass | Technical assumptions provide clear constraints for the architect. |
+| 8. Cross-Functional Requirements | ✅ Pass | Sufficient at the PRD level; details will emerge in the architecture phase. |
+| 9. Clarity & Communication | ✅ Pass | The document is well-structured. |
+
+---
+### Next Steps
+
+#### UX Expert Prompt
+> "Hi UX Expert, this PRD is complete. Please use it as the basis for creating a detailed UI/UX Specification for the 'Charging Station SaaS System' project. Focus on the user flows for the SaaS portal (for charging companies) and the end-user mobile app, and establish the core design principles and component requirements."
+
+#### Architect Prompt
+> "Hi Architect, this PRD is complete. Please use it as the basis for creating a comprehensive Fullstack Architecture document for the 'Charging Station SaaS System' project. When designing, strictly adhere to the core decisions outlined in the 'Technical Assumptions' section, especially regarding the Monorepo structure, Serverless backend, and multi-tenant requirements."

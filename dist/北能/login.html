@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北能BMS - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #1d1d1f;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        /* iPhone 13 手机外壳 */
+        .phone-container {
+            width: 390px;
+            height: 844px;
+            background: #ffffff;
+            border-radius: 47px;
+            position: relative;
+            overflow: hidden;
+            /* 手机外壳边框 */
+            border: 4px solid #1d1d1f;
+            /* 3D立体效果阴影 */
+            box-shadow: 
+                /* 主要阴影 */
+                0 30px 80px rgba(0, 0, 0, 0.25),
+                0 15px 40px rgba(0, 0, 0, 0.15),
+                /* 边框内阴影 */
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+                /* 侧边高光 */
+                -2px 0 0 rgba(255, 255, 255, 0.05),
+                2px 0 0 rgba(0, 0, 0, 0.1);
+            /* 移除3D效果 */
+            transform: none;
+        }
+        
+        
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000000;
+            border-radius: 19px;
+            z-index: 1000;
+        }
+        
+        /* Home Indicator */
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #000000;
+            border-radius: 3px;
+            z-index: 1000;
+        }
+        
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        .status-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 20px 0;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            z-index: 1001;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 44px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .bluetooth-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+        }
+        
+        .bluetooth-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .bluetooth-button.connected {
+            background: rgba(48, 209, 88, 0.3);
+            border-color: rgba(48, 209, 88, 0.5);
+        }
+        
+        .bluetooth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bluetooth-content {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bluetooth-header {
+            padding: 20px 20px 16px;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .bluetooth-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        .bluetooth-body {
+            padding: 20px;
+        }
+        
+        .device-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .device-item:last-child {
+            border-bottom: none;
+        }
+        
+        .device-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .device-name {
+            font-size: 16px;
+            color: #1d1d1f;
+            margin-left: 12px;
+        }
+        
+        .device-status {
+            font-size: 13px;
+            color: #8e8e93;
+            margin-left: 4px;
+        }
+        
+        .connect-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .connected-indicator {
+            color: #30D158;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .bluetooth-footer {
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .language-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .language-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .language-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .language-content {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            max-width: 280px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .language-header {
+            padding: 20px 20px 16px;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .language-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        .language-body {
+            padding: 8px 0;
+        }
+        
+        .language-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .language-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+        
+        .language-item:last-child {
+            border-bottom: none;
+        }
+        
+        .language-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .language-flag {
+            font-size: 20px;
+        }
+        
+        .language-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .language-name {
+            font-size: 16px;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+        
+        .language-native {
+            font-size: 13px;
+            color: #8e8e93;
+        }
+        
+        .language-check {
+            color: #007AFF;
+            font-size: 16px;
+        }
+        
+        .language-footer {
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .login-content {
+            padding: 80px 40px 40px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .app-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .app-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+        
+        .login-form {
+            width: 100%;
+            max-width: 320px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 16px;
+            color: white;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            background: white;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .forgot-password a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        .forgot-password a:hover {
+            color: white;
+        }
+        
+        .footer-text {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+        
+        .error-message {
+            background: rgba(255, 59, 48, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- Dynamic Island -->
+        <div class="dynamic-island"></div>
+        
+        <!-- Home Indicator -->
+        <div class="home-indicator"></div>
+        
+        <div class="container">
+        <!-- 语言切换和蓝牙连接按钮 - 屏幕上方 -->
+        <div style="position: absolute; top: 80px; left: 20px; right: 20px; z-index: 1002; display: flex; justify-content: space-between; align-items: center;">
+            <!-- 语言切换按钮 -->
+            <button class="language-button" onclick="openLanguageModal()">
+                <span id="currentFlag">🇨🇳</span>
+                <span id="currentLang">中文</span>
+            </button>
+            
+            <!-- 蓝牙连接按钮 -->
+            <button class="bluetooth-button" id="bluetoothBtn" onclick="openBluetoothModal()" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); padding: 12px 20px; border-radius: 12px; color: white; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+                <span>连接设备</span>
+            </button>
+        </div>
+        
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span>9:41</span>
+            </div>
+            <div class="status-right">
+                <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                    <path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H12.5C13.3284 0 14 0.671573 14 1.5V8.5C14 9.32843 13.3284 10 12.5 10H3.5C2.67157 10 2 9.32843 2 8.5V1.5Z" fill="white"/>
+                    <path d="M0.75 3C0.335786 3 0 3.33579 0 3.75V6.25C0 6.66421 0.335786 7 0.75 7H1.5V3H0.75Z" fill="white"/>
+                    <rect x="3" y="2" width="8" height="6" rx="1" fill="#30d158"/>
+                </svg>
+                <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+                    <path d="M2 2V10H16V2C16 0.895431 15.1046 0 14 0H4C2.89543 0 2 0.895431 2 2Z" fill="white"/>
+                    <path d="M0 3C0 2.44772 0.447715 2 1 2C1.55228 2 2 2.44772 2 3V9C2 9.55228 1.55228 10 1 10C0.447715 10 0 9.55228 0 9V3Z" fill="white"/>
+                    <path d="M16 3V9C16 9.55228 16.4477 10 17 10C17.5523 10 18 9.55228 18 9V3C18 2.44772 17.5523 2 17 2C16.4477 2 16 2.44772 16 3Z" fill="white"/>
+                    <rect x="3" y="2" width="10" height="8" rx="0.5" fill="#30d158"/>
+                </svg>
+                <span>100%</span>
+            </div>
+        </div>
+        
+        <!-- 登录内容 -->
+        <div class="login-content">
+            <!-- Logo区域 -->
+            <div class="logo-section">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L22 7V11C22 16.5 18.5 21.08 12 22C5.5 21.08 2 16.5 2 11V7L12 2Z" stroke="white" stroke-width="2" fill="none"/>
+                        <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="app-name">北能BMS</div>
+                <div class="app-subtitle">电池管理系统</div>
+            </div>
+            
+            <!-- 登录表单 -->
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="error-message" id="errorMessage"></div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名</label>
+                    <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+                </div>
+                
+                <button type="submit" class="login-button" id="loginButton">登录</button>
+                
+                <div class="forgot-password">
+                    <a href="#" onclick="showForgotPassword()">忘记密码？</a>
+                </div>
+            </form>
+            
+        </div>
+        
+        <div class="footer-text">
+            © 2024 北能科技 版权所有
+        </div>
+        </div>
+        
+        <!-- 语言切换弹窗 -->
+        <div class="language-modal" id="languageModal" onclick="closeLanguageModal()">
+            <div class="language-content" onclick="event.stopPropagation()">
+                <div class="language-header">
+                    <div class="language-title">选择语言 / Select Language</div>
+                </div>
+                
+                <div class="language-body">
+                    <!-- 中文 -->
+                    <div class="language-item" onclick="switchLanguage('zh', '🇨🇳', '中文', 'Chinese')">
+                        <div class="language-info">
+                            <span class="language-flag">🇨🇳</span>
+                            <div class="language-text">
+                                <div class="language-name">中文</div>
+                                <div class="language-native">Chinese</div>
+                            </div>
+                        </div>
+                        <div class="language-check" id="zh-check">✓</div>
+                    </div>
+                    
+                    <!-- 英文 -->
+                    <div class="language-item" onclick="switchLanguage('en', '🇺🇸', 'English', 'English')">
+                        <div class="language-info">
+                            <span class="language-flag">🇺🇸</span>
+                            <div class="language-text">
+                                <div class="language-name">English</div>
+                                <div class="language-native">English</div>
+                            </div>
+                        </div>
+                        <div class="language-check" id="en-check" style="display: none;">✓</div>
+                    </div>
+                    
+                    <!-- 日文 -->
+                    <div class="language-item" onclick="switchLanguage('ja', '🇯🇵', '日本語', 'Japanese')">
+                        <div class="language-info">
+                            <span class="language-flag">🇯🇵</span>
+                            <div class="language-text">
+                                <div class="language-name">日本語</div>
+                                <div class="language-native">Japanese</div>
+                            </div>
+                        </div>
+                        <div class="language-check" id="ja-check" style="display: none;">✓</div>
+                    </div>
+                    
+                    <!-- 韩文 -->
+                    <div class="language-item" onclick="switchLanguage('ko', '🇰🇷', '한국어', 'Korean')">
+                        <div class="language-info">
+                            <span class="language-flag">🇰🇷</span>
+                            <div class="language-text">
+                                <div class="language-name">한국어</div>
+                                <div class="language-native">Korean</div>
+                            </div>
+                        </div>
+                        <div class="language-check" id="ko-check" style="display: none;">✓</div>
+                    </div>
+                </div>
+                
+                <div class="language-footer">
+                    <button class="close-button" onclick="closeLanguageModal()">关闭 / Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 蓝牙连接弹窗 -->
+        <div class="bluetooth-modal" id="bluetoothModal" onclick="closeBluetoothModal()">
+            <div class="bluetooth-content" onclick="event.stopPropagation()">
+                <div class="bluetooth-header">
+                    <div class="bluetooth-title">蓝牙设备</div>
+                </div>
+                
+                <div class="bluetooth-body">
+                    <!-- BMS设备 -->
+                    <div class="device-item">
+                        <div class="device-info">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </svg>
+                            <div>
+                                <div class="device-name">北能BMS-001</div>
+                                <div class="device-status" id="bmsStatus">未连接</div>
+                            </div>
+                        </div>
+                        <button class="connect-button" id="bmsConnectBtn" onclick="connectBMSDevice()">连接</button>
+                    </div>
+                    
+                    <!-- 逆变器设备 -->
+                    <div class="device-item">
+                        <div class="device-info">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect x="3" y="4" width="18" height="16" rx="2" stroke="#8e8e93" stroke-width="2" fill="none"/>
+                                <path d="M7 8H17M7 12H17M7 16H13" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <div>
+                                <div class="device-name">逆变器-INV001</div>
+                                <div class="device-status" id="invStatus">未连接</div>
+                            </div>
+                        </div>
+                        <button class="connect-button" id="invConnectBtn" onclick="connectInverterDevice()">连接</button>
+                    </div>
+                    
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(142, 142, 147, 0.1); border-radius: 8px;">
+                        <div style="font-size: 13px; color: #8e8e93; text-align: center;">
+                            请确保设备已开启蓝牙并处于配对模式
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bluetooth-footer">
+                    <button class="close-button" onclick="closeBluetoothModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const loginButton = document.getElementById('loginButton');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 隐藏错误信息
+            errorMessage.style.display = 'none';
+            
+            // 验证输入
+            if (!username || !password) {
+                showError('请填写完整的登录信息');
+                return;
+            }
+            
+            // 显示加载状态
+            loginButton.classList.add('loading');
+            loginButton.textContent = '登录中';
+            loginButton.disabled = true;
+            
+            // 模拟登录验证（跳过用户名密码验证）
+            setTimeout(() => {
+                // 直接登录成功，保存登录状态并跳转到主页面
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username || 'user');
+                window.location.href = 'solar-energy-app-new.html';
+            }, 1500);
+        }
+        
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            // 3秒后自动隐藏错误信息
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        function resetLoginButton() {
+            const loginButton = document.getElementById('loginButton');
+            loginButton.classList.remove('loading');
+            loginButton.textContent = '登录';
+            loginButton.disabled = false;
+        }
+        
+        function showForgotPassword() {
+            alert('请联系系统管理员重置密码\n电话：400-888-8888\n邮箱：support@beining.com');
+        }
+        
+        // 页面加载完成后自动聚焦到用户名输入框
+        window.addEventListener('load', function() {
+            document.getElementById('username').focus();
+            initializeLanguage(); // 初始化语言设置
+        });
+        
+        // 回车键快速登录
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const form = document.querySelector('.login-form');
+                if (document.activeElement.tagName === 'INPUT') {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+        
+        // 蓝牙连接相关函数
+        function openBluetoothModal() {
+            document.getElementById('bluetoothModal').style.display = 'flex';
+        }
+        
+        function closeBluetoothModal() {
+            document.getElementById('bluetoothModal').style.display = 'none';
+        }
+        
+        function connectBMSDevice() {
+            const statusEl = document.getElementById('bmsStatus');
+            const btnEl = document.getElementById('bmsConnectBtn');
+            const bluetoothBtn = document.getElementById('bluetoothBtn');
+            
+            btnEl.textContent = '连接中...';
+            btnEl.disabled = true;
+            
+            // 模拟连接过程
+            setTimeout(() => {
+                statusEl.textContent = '已连接';
+                statusEl.style.color = '#30D158';
+                btnEl.textContent = '已连接';
+                btnEl.style.background = '#30D158';
+                btnEl.disabled = true;
+                
+                // 更新蓝牙按钮状态
+                bluetoothBtn.style.background = 'rgba(48, 209, 88, 0.3)';
+                bluetoothBtn.style.borderColor = 'rgba(48, 209, 88, 0.5)';
+                bluetoothBtn.querySelector('span').textContent = '设备已连接';
+                
+                // 显示连接成功提示并跳转
+                showToast('BMS设备连接成功，正在进入主页面...');
+                
+                // 设置登录状态并跳转到home.html
+                setTimeout(() => {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', 'bluetooth_user');
+                    window.location.href = 'home.html';
+                }, 1000);
+            }, 2000);
+        }
+        
+        function connectInverterDevice() {
+            const statusEl = document.getElementById('invStatus');
+            const btnEl = document.getElementById('invConnectBtn');
+            
+            btnEl.textContent = '连接中...';
+            btnEl.disabled = true;
+            
+            // 模拟连接过程
+            setTimeout(() => {
+                statusEl.textContent = '已连接';
+                statusEl.style.color = '#30D158';
+                btnEl.textContent = '已连接';
+                btnEl.style.background = '#30D158';
+                btnEl.disabled = true;
+                
+                // 显示连接成功提示并跳转
+                showToast('逆变器设备连接成功，正在进入主页面...');
+                
+                // 设置登录状态并跳转到home.html
+                setTimeout(() => {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', 'bluetooth_user');
+                    window.location.href = 'home.html';
+                }, 1000);
+            }, 1500);
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 12px;
+                font-size: 14px;
+                z-index: 3000;
+                backdrop-filter: blur(10px);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 2000);
+        }
+        
+        // 语言切换相关函数
+        let currentLanguage = 'zh';
+        
+        function openLanguageModal() {
+            document.getElementById('languageModal').style.display = 'flex';
+        }
+        
+        function closeLanguageModal() {
+            document.getElementById('languageModal').style.display = 'none';
+        }
+        
+        function switchLanguage(langCode, flag, displayName, nativeName) {
+            // 隐藏所有选中标记
+            document.querySelectorAll('.language-check').forEach(check => {
+                check.style.display = 'none';
+            });
+            
+            // 显示当前选中的标记
+            document.getElementById(langCode + '-check').style.display = 'block';
+            
+            // 更新状态栏显示
+            document.getElementById('currentFlag').textContent = flag;
+            document.getElementById('currentLang').textContent = displayName;
+            
+            // 保存语言设置
+            currentLanguage = langCode;
+            localStorage.setItem('selectedLanguage', langCode);
+            
+            // 关闭弹窗
+            closeLanguageModal();
+            
+            // 显示切换成功提示
+            showToast(`语言已切换为 ${displayName} / Language switched to ${nativeName}`);
+            
+            // 这里可以添加实际的语言切换逻辑
+            // updatePageLanguage(langCode);
+        }
+        
+        // 页面加载时恢复语言设置
+        function initializeLanguage() {
+            const savedLanguage = localStorage.getItem('selectedLanguage');
+            if (savedLanguage) {
+                const languageMap = {
+                    'zh': { flag: '🇨🇳', name: '中文' },
+                    'en': { flag: '🇺🇸', name: 'English' },
+                    'ja': { flag: '🇯🇵', name: '日本語' },
+                    'ko': { flag: '🇰🇷', name: '한국어' }
+                };
+                
+                if (languageMap[savedLanguage]) {
+                    currentLanguage = savedLanguage;
+                    document.getElementById('currentFlag').textContent = languageMap[savedLanguage].flag;
+                    document.getElementById('currentLang').textContent = languageMap[savedLanguage].name;
+                    
+                    // 更新选中状态
+                    document.querySelectorAll('.language-check').forEach(check => {
+                        check.style.display = 'none';
+                    });
+                    document.getElementById(savedLanguage + '-check').style.display = 'block';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
