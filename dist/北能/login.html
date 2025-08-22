@@ -540,7 +540,7 @@
             </button>
             
             <!-- 蓝牙连接按钮 -->
-            <button class="bluetooth-button" id="bluetoothBtn" onclick="openBluetoothModal()" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); padding: 12px 20px; border-radius: 12px; color: white; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+            <button class="bluetooth-button" id="bluetoothBtn" onclick="openBluetoothPage()" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); padding: 12px 20px; border-radius: 12px; color: white; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
@@ -750,10 +750,11 @@
             
             // 模拟登录验证（跳过用户名密码验证）
             setTimeout(() => {
-                // 直接登录成功，保存登录状态并跳转到主页面
+                // 直接登录成功，保存登录状态并跳转到云连接版主页
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('username', username || 'user');
-                window.location.href = 'solar-energy-app-new.html';
+                localStorage.setItem('connectionType', 'cloud');
+                window.location.href = 'home-cloud.html';
             }, 1500);
         }
         
@@ -796,6 +797,11 @@
         });
         
         // 蓝牙连接相关函数
+        function openBluetoothPage() {
+            // 跳转到蓝牙选择页面
+            window.location.href = 'bluetooth-select.html';
+        }
+        
         function openBluetoothModal() {
             document.getElementById('bluetoothModal').style.display = 'flex';
         }

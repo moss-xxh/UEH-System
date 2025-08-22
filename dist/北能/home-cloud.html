@@ -28,6 +28,24 @@
             position: relative;
         }
         
+        /* 云连接模式横幅 */
+        .mode-banner {
+            background: linear-gradient(135deg, #30D158, #1DB954);
+            color: white;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            position: fixed;
+            top: 44px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            z-index: 999;
+            box-shadow: 0 2px 8px rgba(48, 209, 88, 0.3);
+        }
+        
         .status-bar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -65,7 +83,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 44px 20px 12px;
+            padding: 72px 20px 12px;
             border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
             position: fixed;
             top: 0;
@@ -108,7 +126,7 @@
         .main-content {
             flex: 1;
             overflow-y: auto;
-            padding: 140px 20px 100px 20px;
+            padding: 168px 20px 100px 20px;
             background: #f2f2f7;
         }
         
@@ -512,12 +530,6 @@
         <!-- 状态栏 -->
         <div class="status-bar">
             <div class="status-left">
-                <button style="background: none; border: none; color: #007aff; font-size: 14px; font-weight: 400; cursor: pointer; padding: 4px; margin: -4px; display: flex; align-items: center; gap: 2px; margin-top: 20px;" onclick="window.location.href='solar-energy-app-new.html'">
-                    <svg width="7" height="12" viewBox="0 0 7 12" fill="currentColor">
-                        <path d="M6.5 0.5L1.5 5.5C1.22386 5.77614 1.22386 6.22386 1.5 6.5L6.5 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                    </svg>
-                    返回
-                </button>
                 <span style="margin-left: 8px;">9:41</span>
             </div>
             <div class="status-right">
@@ -534,6 +546,11 @@
                 </svg>
                 <span>100%</span>
             </div>
+        </div>
+        
+        <!-- 云连接模式横幅 -->
+        <div class="mode-banner">
+            云连接模式
         </div>
         
         <!-- 顶部导航 -->
@@ -555,9 +572,9 @@
                     <div class="battery-title">电池状态</div>
                     <div class="connection-status" id="connectionStatus">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
-                            <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="#30D158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <path d="M18 10H16.5C16.5 6.96243 14.0376 4.5 11 4.5C7.96243 4.5 5.5 6.96243 5.5 10C4.11929 10 3 11.1193 3 12.5C3 13.8807 4.11929 15 5.5 15H18C19.6569 15 21 13.6569 21 12C21 10.3431 19.6569 9 18 9V10Z" stroke="#30D158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                         </svg>
-                        <span style="color: #30D158; font-size: 13px; font-weight: 500;">蓝牙连接</span>
+                        <span style="color: #30D158; font-size: 13px; font-weight: 500;">云连接</span>
                     </div>
                 </div>
                 
@@ -749,8 +766,8 @@
     <div id="exitConfirmModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 3000; display: none;">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 14px; width: 270px; overflow: hidden;">
             <div style="padding: 20px; text-align: center;">
-                <div style="font-size: 17px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">确定要退出蓝牙连接吗？</div>
-                <div style="font-size: 13px; color: #86868b;">退出后将断开与设备的连接</div>
+                <div style="font-size: 17px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">确定要退出云连接吗？</div>
+                <div style="font-size: 13px; color: #86868b;">退出后将断开与云服务的连接</div>
             </div>
             <div style="display: flex; border-top: 0.5px solid rgba(0, 0, 0, 0.1);">
                 <button onclick="cancelExit()" style="flex: 1; background: none; border: none; padding: 12px; font-size: 17px; color: #007aff; cursor: pointer; border-right: 0.5px solid rgba(0, 0, 0, 0.1);">
@@ -822,9 +839,9 @@
             
             statusElement.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
-                    <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="#30D158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
-                <span style="color: #30D158; font-size: 13px; font-weight: 500;">蓝牙连接</span>
+                <span style="color: #007AFF; font-size: 13px; font-weight: 500;">蓝牙连接</span>
             `;
             
             if (dataCardStatus) {
@@ -840,9 +857,9 @@
             
             statusElement.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
-                    <path d="M18 10H16.5C16.5 6.96243 14.0376 4.5 11 4.5C7.96243 4.5 5.5 6.96243 5.5 10C4.11929 10 3 11.1193 3 12.5C3 13.8807 4.11929 15 5.5 15H18C19.6569 15 21 13.6569 21 12C21 10.3431 19.6569 9 18 9V10Z" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M18 10H16.5C16.5 6.96243 14.0376 4.5 11 4.5C7.96243 4.5 5.5 6.96243 5.5 10C4.11929 10 3 11.1193 3 12.5C3 13.8807 4.11929 15 5.5 15H18C19.6569 15 21 13.6569 21 12C21 10.3431 19.6569 9 18 9V10Z" stroke="#30D158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
-                <span style="color: #007AFF; font-size: 13px; font-weight: 500;">云连接</span>
+                <span style="color: #30D158; font-size: 13px; font-weight: 500;">云连接</span>
             `;
             
             if (dataCardStatus) {

@@ -225,6 +225,7 @@
             border-radius: 16px;
             margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            padding-bottom: 4px;
         }
         
         .section-header {
@@ -376,12 +377,13 @@
         }
         
         .status-connected {
-            color: #30d158;
+            color: #30d158 !important;
             font-weight: 600;
         }
         
         .status-disconnected {
-            color: #8e8e93;
+            color: #FF3B30 !important;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -416,80 +418,70 @@
             <div class="main-content">
                 <div class="network-title">网络配置</div>
                 
-                <!-- 当前连接状态 -->
+                <!-- 网络配置输入 -->
                 <div class="network-section">
                     <div class="section-header">
-                        <div class="section-title">当前状态</div>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div class="section-title">网络配置</div>
+                                <div class="section-subtitle">输入WiFi网络信息进行连接</div>
+                            </div>
+                            <div id="connection-status" style="display: none; color: #30D158; font-size: 14px; font-weight: 600;">已连接</div>
+                        </div>
                     </div>
-                    <div class="network-status">
-                        <div id="connection-status" class="status-disconnected">未连接</div>
-                        <div id="current-network" style="font-size: 14px; color: #8e8e93; margin-top: 4px;"></div>
+                    
+                    <div style="padding: 0 20px;">
+                        <!-- 网络名称输入 -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-size: 14px; color: #8e8e93; margin-bottom: 8px;">网络名称 (SSID)</label>
+                            <input type="text" id="wifi-ssid" placeholder="请输入WiFi名称" style="width: 100%; padding: 14px 16px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; font-size: 16px; background: white; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#007AFF'" onblur="this.style.borderColor='rgba(0, 0, 0, 0.1)'">
+                        </div>
+                        
+                        <!-- 密码输入 -->
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; font-size: 14px; color: #8e8e93; margin-bottom: 8px;">密码</label>
+                            <div style="position: relative;">
+                                <input type="password" id="wifi-password" placeholder="请输入WiFi密码" style="width: 100%; padding: 14px 40px 14px 16px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; font-size: 16px; background: white; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#007AFF'" onblur="this.style.borderColor='rgba(0, 0, 0, 0.1)'">
+                                <button onclick="togglePassword()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 4px; cursor: pointer;">
+                                    <svg id="password-eye" width="20" height="20" viewBox="0 0 24 24" fill="#8e8e93">
+                                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 连接按钮 -->
+                        <button onclick="connectToWifi()" style="width: 100%; padding: 16px; background: #007AFF; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 20px;">
+                            连接网络
+                        </button>
                     </div>
                 </div>
                 
-                <!-- 可用网络列表 -->
-                <div class="network-section">
+                <!-- 已保存的网络列表（可选） -->
+                <div class="network-section" style="margin-top: 20px; display: none;">
                     <div class="section-header">
-                        <div class="section-title">可用网络</div>
-                        <div class="section-subtitle">选择要连接的WiFi网络</div>
+                        <div class="section-title">已保存的网络</div>
                     </div>
                     <div class="wifi-list">
-                        <div class="wifi-item" onclick="selectWifi(this, 'BeiNeng_5G', 5)">
+                        <div class="wifi-item" onclick="fillSavedNetwork('BeiNeng_5G')">
                             <div class="wifi-left">
                                 <svg class="wifi-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M1 9L12 2L23 9M5 12L12 7L19 12M9 15L12 12.5L15 15"/>
                                 </svg>
                                 <div class="wifi-name">BeiNeng_5G</div>
                             </div>
-                            <div class="wifi-right">
-                                <svg class="wifi-signal" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18 8H20C20 4.7 16.3 2 12 2V4C15.2 4 18 5.8 18 8"/>
-                                    <path d="M14 8H16C16 6.9 14.1 6 12 6V8"/>
-                                    <path d="M10 8H12V6C9.9 6 8 6.9 8 8H10"/>
-                                    <rect x="6" y="16" width="12" height="4" rx="2"/>
-                                </svg>
-                                <svg class="wifi-check" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                </svg>
-                            </div>
                         </div>
                         
-                        <div class="wifi-item" onclick="selectWifi(this, 'BeiNeng_2.4G', 4)">
+                        <div class="wifi-item" onclick="fillSavedNetwork('BeiNeng_2.4G')">
                             <div class="wifi-left">
                                 <svg class="wifi-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M1 9L12 2L23 9M5 12L12 7L19 12"/>
                                 </svg>
                                 <div class="wifi-name">BeiNeng_2.4G</div>
                             </div>
-                            <div class="wifi-right">
-                                <svg class="wifi-signal" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18 8H20C20 4.7 16.3 2 12 2V4C15.2 4 18 5.8 18 8"/>
-                                    <path d="M14 8H16C16 6.9 14.1 6 12 6V8"/>
-                                    <rect x="6" y="16" width="12" height="4" rx="2"/>
-                                </svg>
-                                <svg class="wifi-check" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                </svg>
                             </div>
                         </div>
                         
-                        <div class="wifi-item" onclick="selectWifi(this, 'Office_WiFi', 3)">
-                            <div class="wifi-left">
-                                <svg class="wifi-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M1 9L12 2L23 9"/>
-                                </svg>
-                                <div class="wifi-name">Office_WiFi</div>
-                            </div>
-                            <div class="wifi-right">
-                                <svg class="wifi-signal" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18 8H20C20 4.7 16.3 2 12 2V4C15.2 4 18 5.8 18 8"/>
-                                    <rect x="6" y="16" width="12" height="4" rx="2"/>
-                                </svg>
-                                <svg class="wifi-check" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                </svg>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 
@@ -510,56 +502,69 @@
     </div>
 
     <script>
-        let selectedWifi = null;
-        
-        // 选择WiFi
-        function selectWifi(element, wifiName, signalStrength) {
-            // 移除所有选中状态
-            const allItems = document.querySelectorAll('.wifi-item');
-            allItems.forEach(item => item.classList.remove('selected'));
+        // 切换密码显示/隐藏
+        function togglePassword() {
+            const passwordInput = document.getElementById('wifi-password');
+            const eyeIcon = document.getElementById('password-eye');
             
-            // 设置当前选中状态
-            element.classList.add('selected');
-            selectedWifi = wifiName;
-            
-            // 显示密码输入区域
-            document.getElementById('password-section').style.display = 'block';
-            document.getElementById('selected-network-name').textContent = wifiName;
-            document.getElementById('wifi-password').value = '';
-            document.getElementById('connect-btn').disabled = true;
-            
-            // 滚动到密码输入区域
-            document.getElementById('password-section').scrollIntoView({ behavior: 'smooth' });
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/><path d="M2 2L22 22" stroke="currentColor" stroke-width="2"/>';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+            }
         }
         
-        // 监听密码输入
-        document.getElementById('wifi-password').addEventListener('input', function() {
-            const password = this.value.trim();
-            document.getElementById('connect-btn').disabled = password.length === 0;
-        });
+        // 填充已保存的网络
+        function fillSavedNetwork(networkName) {
+            document.getElementById('wifi-ssid').value = networkName;
+            document.getElementById('wifi-password').focus();
+        }
         
         // 连接WiFi
         function connectToWifi() {
+            const ssid = document.getElementById('wifi-ssid').value.trim();
             const password = document.getElementById('wifi-password').value;
-            if (!selectedWifi || !password) {
-                alert('请选择网络并输入密码');
+            
+            if (!ssid) {
+                alert('请输入网络名称');
+                document.getElementById('wifi-ssid').focus();
                 return;
             }
             
-            const connectBtn = document.getElementById('connect-btn');
+            if (!password || password.length < 8) {
+                alert('请输入至少8位密码');
+                document.getElementById('wifi-password').focus();
+                return;
+            }
+            
+            const connectBtn = event.target || document.querySelector('button[onclick="connectToWifi()"]');
             connectBtn.textContent = '连接中...';
             connectBtn.disabled = true;
+            connectBtn.style.background = '#86868b';
             
             // 模拟连接过程
             setTimeout(() => {
-                // 更新连接状态
-                document.getElementById('connection-status').textContent = '已连接';
-                document.getElementById('connection-status').className = 'status-connected';
-                document.getElementById('current-network').textContent = selectedWifi;
+                // 显示已连接状态
+                const statusElement = document.getElementById('connection-status');
+                statusElement.style.display = 'block';
+                statusElement.textContent = '已连接';
                 
                 // 重置按钮
-                connectBtn.textContent = '连接';
-                connectBtn.disabled = false;
+                connectBtn.textContent = '连接成功';
+                connectBtn.style.background = '#30D158';
+                
+                // 2秒后恢复按钮
+                setTimeout(() => {
+                    connectBtn.textContent = '连接网络';
+                    connectBtn.disabled = false;
+                    connectBtn.style.background = '#007AFF';
+                    
+                    // 清空输入框
+                    document.getElementById('wifi-ssid').value = '';
+                    document.getElementById('wifi-password').value = '';
+                }, 2000);
                 
                 // 隐藏密码输入区域
                 document.getElementById('password-section').style.display = 'none';
