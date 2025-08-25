@@ -548,26 +548,6 @@
             </button>
         </div>
         
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <div class="status-left">
-                <span>9:41</span>
-            </div>
-            <div class="status-right">
-                <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
-                    <path d="M2 1.5C2 0.671573 2.67157 0 3.5 0H12.5C13.3284 0 14 0.671573 14 1.5V8.5C14 9.32843 13.3284 10 12.5 10H3.5C2.67157 10 2 9.32843 2 8.5V1.5Z" fill="white"/>
-                    <path d="M0.75 3C0.335786 3 0 3.33579 0 3.75V6.25C0 6.66421 0.335786 7 0.75 7H1.5V3H0.75Z" fill="white"/>
-                    <rect x="3" y="2" width="8" height="6" rx="1" fill="#30d158"/>
-                </svg>
-                <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
-                    <path d="M2 2V10H16V2C16 0.895431 15.1046 0 14 0H4C2.89543 0 2 0.895431 2 2Z" fill="white"/>
-                    <path d="M0 3C0 2.44772 0.447715 2 1 2C1.55228 2 2 2.44772 2 3V9C2 9.55228 1.55228 10 1 10C0.447715 10 0 9.55228 0 9V3Z" fill="white"/>
-                    <path d="M16 3V9C16 9.55228 16.4477 10 17 10C17.5523 10 18 9.55228 18 9V3C18 2.44772 17.5523 2 17 2C16.4477 2 16 2.44772 16 3Z" fill="white"/>
-                    <rect x="3" y="2" width="10" height="8" rx="0.5" fill="#30d158"/>
-                </svg>
-                <span>100%</span>
-            </div>
-        </div>
         
         <!-- 登录内容 -->
         <div class="login-content">
@@ -589,12 +569,12 @@
                 
                 <div class="form-group">
                     <label class="form-label" for="username">用户名</label>
-                    <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
+                    <input type="text" id="username" class="form-input" placeholder="请输入用户名">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label" for="password">密码</label>
-                    <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+                    <input type="password" id="password" class="form-input" placeholder="请输入密码">
                 </div>
                 
                 <button type="submit" class="login-button" id="loginButton">登录</button>
@@ -729,33 +709,16 @@
         function handleLogin(event) {
             event.preventDefault();
             
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const loginButton = document.getElementById('loginButton');
-            const errorMessage = document.getElementById('errorMessage');
+            const username = document.getElementById('username').value.trim() || 'user';
             
-            // 隐藏错误信息
-            errorMessage.style.display = 'none';
+            // 直接保存登录状态并跳转，不做任何验证
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('username', username);
+            localStorage.setItem('connectionType', 'cloud');
+            localStorage.setItem('defaultPage', 'device'); // 设置默认页面为设备页
             
-            // 验证输入
-            if (!username || !password) {
-                showError('请填写完整的登录信息');
-                return;
-            }
-            
-            // 显示加载状态
-            loginButton.classList.add('loading');
-            loginButton.textContent = '登录中';
-            loginButton.disabled = true;
-            
-            // 模拟登录验证（跳过用户名密码验证）
-            setTimeout(() => {
-                // 直接登录成功，保存登录状态并跳转到云连接版主页
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username || 'user');
-                localStorage.setItem('connectionType', 'cloud');
-                window.location.href = 'home-cloud.html';
-            }, 1500);
+            // 立即跳转到 solar-energy-app-new.html 并通过hash定位到设备页面
+            window.location.href = 'solar-energy-app-new.html#device';
         }
         
         function showError(message) {
@@ -798,8 +761,577 @@
         
         // 蓝牙连接相关函数
         function openBluetoothPage() {
-            // 跳转到蓝牙选择页面
+            // 直接跳转到蓝牙选择页面，权限检查在那个页面进行
             window.location.href = 'bluetooth-select.html';
+        }
+        
+        // 显示位置权限请求弹窗
+        function showLocationPermissionDialog() {
+            // 创建弹窗容器
+            const dialog = document.createElement('div');
+            dialog.id = 'locationPermissionDialog';
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            `;
+            
+            // 创建弹窗内容
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: #f2f2f7;
+                border-radius: 14px;
+                max-width: 320px;
+                width: 90%;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            `;
+            
+            // 标题部分
+            const header = document.createElement('div');
+            header.style.cssText = `
+                padding: 20px 20px 12px;
+                text-align: center;
+                background: white;
+            `;
+            
+            const title = document.createElement('div');
+            title.style.cssText = `
+                font-size: 17px;
+                font-weight: 600;
+                color: #000;
+                margin-bottom: 8px;
+            `;
+            title.innerHTML = '允许"北能BMS"<br>使用你的位置？';
+            
+            const subtitle = document.createElement('div');
+            subtitle.style.cssText = `
+                font-size: 13px;
+                color: #3C3C43;
+                line-height: 18px;
+                opacity: 0.6;
+                margin-top: 8px;
+            `;
+            subtitle.textContent = '位置权限用于快速连接设备、识别定位以及发现附近的设备和Wi-Fi列表。';
+            
+            header.appendChild(title);
+            header.appendChild(subtitle);
+            
+            // 地图预览部分
+            const mapContainer = document.createElement('div');
+            mapContainer.style.cssText = `
+                height: 160px;
+                background: linear-gradient(to bottom, #e8f4f8, #d4e8ee);
+                position: relative;
+                overflow: hidden;
+            `;
+            
+            // 添加简单的地图元素
+            const mapContent = document.createElement('div');
+            mapContent.innerHTML = `
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    <div style="width: 20px; height: 20px; background: #007AFF; border-radius: 50%; box-shadow: 0 0 0 8px rgba(0, 122, 255, 0.2);"></div>
+                </div>
+                <div style="position: absolute; bottom: 10px; left: 10px; background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #666;">
+                    <span>📍 当前位置</span>
+                </div>
+            `;
+            mapContainer.appendChild(mapContent);
+            
+            // 按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                background: white;
+                padding: 0;
+            `;
+            
+            // 允许一次按钮
+            const allowOnceBtn = document.createElement('button');
+            allowOnceBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                border-bottom: 0.5px solid rgba(60, 60, 67, 0.13);
+                transition: background-color 0.2s;
+            `;
+            allowOnceBtn.textContent = '允许一次';
+            allowOnceBtn.onmouseover = () => allowOnceBtn.style.background = '#f9f9f9';
+            allowOnceBtn.onmouseout = () => allowOnceBtn.style.background = 'white';
+            allowOnceBtn.onclick = () => handleLocationPermission('once');
+            
+            // 使用App时允许按钮
+            const allowWhileUsingBtn = document.createElement('button');
+            allowWhileUsingBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                border-bottom: 0.5px solid rgba(60, 60, 67, 0.13);
+                transition: background-color 0.2s;
+            `;
+            allowWhileUsingBtn.textContent = '使用 App 时允许';
+            allowWhileUsingBtn.onmouseover = () => allowWhileUsingBtn.style.background = '#f9f9f9';
+            allowWhileUsingBtn.onmouseout = () => allowWhileUsingBtn.style.background = 'white';
+            allowWhileUsingBtn.onclick = () => handleLocationPermission('while-using');
+            
+            // 不允许按钮
+            const denyBtn = document.createElement('button');
+            denyBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            `;
+            denyBtn.textContent = '不允许';
+            denyBtn.onmouseover = () => denyBtn.style.background = '#f9f9f9';
+            denyBtn.onmouseout = () => denyBtn.style.background = 'white';
+            denyBtn.onclick = () => handleLocationPermission('denied');
+            
+            buttonContainer.appendChild(allowOnceBtn);
+            buttonContainer.appendChild(allowWhileUsingBtn);
+            buttonContainer.appendChild(denyBtn);
+            
+            content.appendChild(header);
+            content.appendChild(mapContainer);
+            content.appendChild(buttonContainer);
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+        }
+        
+        // 处理位置权限选择
+        function handleLocationPermission(permission) {
+            const dialog = document.getElementById('locationPermissionDialog');
+            if (dialog) {
+                document.body.removeChild(dialog);
+            }
+            
+            // 保存权限选择
+            localStorage.setItem('locationPermission', permission);
+            
+            switch(permission) {
+                case 'once':
+                    showToast('已允许使用位置（仅限本次）');
+                    console.log('Location permission granted once, showing bluetooth dialog...');
+                    // 显示蓝牙权限弹窗
+                    setTimeout(() => {
+                        console.log('Calling showBluetoothPermissionDialog...');
+                        showBluetoothPermissionDialog();
+                    }, 1000); // 增加延迟时间
+                    // 本次使用后清除权限
+                    setTimeout(() => {
+                        localStorage.removeItem('locationPermission');
+                    }, 30000); // 30秒后清除
+                    break;
+                    
+                case 'while-using':
+                    showToast('已允许在使用App时访问位置');
+                    console.log('Location permission granted while-using, showing bluetooth dialog...');
+                    // 显示蓝牙权限弹窗
+                    setTimeout(() => {
+                        console.log('Calling showBluetoothPermissionDialog...');
+                        showBluetoothPermissionDialog();
+                    }, 1000); // 增加延迟时间
+                    break;
+                    
+                case 'denied':
+                    showToast('已拒绝位置权限');
+                    // 不继续蓝牙连接
+                    break;
+            }
+        }
+        
+        // 显示蓝牙权限请求弹窗
+        function showBluetoothPermissionDialog() {
+            console.log('showBluetoothPermissionDialog function called');
+            
+            // 创建弹窗容器
+            const dialog = document.createElement('div');
+            dialog.id = 'bluetoothPermissionDialog';
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            `;
+            
+            // 创建弹窗内容
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 14px;
+                max-width: 320px;
+                width: 90%;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            `;
+            
+            // 内容部分
+            const body = document.createElement('div');
+            body.style.cssText = `
+                padding: 32px 20px 20px;
+                text-align: center;
+                background: white;
+            `;
+            
+            // 蓝牙图标
+            const iconContainer = document.createElement('div');
+            iconContainer.style.cssText = `
+                margin-bottom: 20px;
+            `;
+            iconContainer.innerHTML = `
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style="margin: 0 auto;">
+                    <rect width="56" height="56" rx="14" fill="#007AFF" fill-opacity="0.1"/>
+                    <path d="M28 16L35 23L30 28L35 33L28 40V28L23 33L21 31L26 26L21 21L23 19L28 24V16Z" 
+                          stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            `;
+            
+            const title = document.createElement('div');
+            title.style.cssText = `
+                font-size: 17px;
+                font-weight: 600;
+                color: #000;
+                margin-bottom: 12px;
+                line-height: 24px;
+            `;
+            title.innerHTML = '"北能BMS"想要使用蓝牙';
+            
+            const message = document.createElement('div');
+            message.style.cssText = `
+                font-size: 13px;
+                color: #3C3C43;
+                opacity: 0.6;
+                line-height: 18px;
+                margin-bottom: 4px;
+            `;
+            message.textContent = '连接逆变器时需要打开蓝牙。请允许"北能BMS"使用蓝牙来发现、连接附近的设备。';
+            
+            body.appendChild(iconContainer);
+            body.appendChild(title);
+            body.appendChild(message);
+            
+            // 按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                border-top: 0.5px solid rgba(60, 60, 67, 0.13);
+            `;
+            
+            // 不允许按钮
+            const denyBtn = document.createElement('button');
+            denyBtn.style.cssText = `
+                flex: 1;
+                padding: 17px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                border-right: 0.5px solid rgba(60, 60, 67, 0.13);
+                transition: background-color 0.2s;
+            `;
+            denyBtn.textContent = '不允许';
+            denyBtn.onmouseover = () => denyBtn.style.background = '#f9f9f9';
+            denyBtn.onmouseout = () => denyBtn.style.background = 'white';
+            denyBtn.onclick = () => handleBluetoothPermission('denied');
+            
+            // 好按钮（允许）
+            const allowBtn = document.createElement('button');
+            allowBtn.style.cssText = `
+                flex: 1;
+                padding: 17px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            `;
+            allowBtn.textContent = '好';
+            allowBtn.onmouseover = () => allowBtn.style.background = '#f9f9f9';
+            allowBtn.onmouseout = () => allowBtn.style.background = 'white';
+            allowBtn.onclick = () => handleBluetoothPermission('allowed');
+            
+            buttonContainer.appendChild(denyBtn);
+            buttonContainer.appendChild(allowBtn);
+            
+            content.appendChild(body);
+            content.appendChild(buttonContainer);
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+        }
+        
+        // 处理蓝牙权限选择
+        function handleBluetoothPermission(permission) {
+            const dialog = document.getElementById('bluetoothPermissionDialog');
+            if (dialog) {
+                document.body.removeChild(dialog);
+            }
+            
+            // 保存蓝牙权限选择
+            localStorage.setItem('bluetoothPermission', permission);
+            
+            if (permission === 'allowed') {
+                showToast('已允许使用蓝牙');
+                // 跳转到蓝牙选择页面
+                setTimeout(() => {
+                    window.location.href = 'bluetooth-select.html';
+                }, 500);
+            } else {
+                showToast('已拒绝蓝牙权限');
+            }
+        }
+        
+        // 检查蓝牙可用性
+        async function checkBluetoothAvailability() {
+            const result = {
+                available: false,
+                errorType: null,
+                errorMessage: ''
+            };
+            
+            // 检查是否支持Web Bluetooth API
+            if (!('bluetooth' in navigator)) {
+                result.errorType = 'not_supported';
+                result.errorMessage = '您的浏览器不支持蓝牙功能';
+                return result;
+            }
+            
+            try {
+                // 尝试获取蓝牙可用性
+                const available = await navigator.bluetooth.getAvailability();
+                
+                if (!available) {
+                    result.errorType = 'bluetooth_off';
+                    result.errorMessage = '蓝牙未开启';
+                    return result;
+                }
+                
+                // 检查权限状态（如果支持Permissions API）
+                if ('permissions' in navigator) {
+                    try {
+                        const permission = await navigator.permissions.query({ name: 'bluetooth' });
+                        
+                        if (permission.state === 'denied') {
+                            result.errorType = 'permission_denied';
+                            result.errorMessage = '蓝牙权限被拒绝';
+                            return result;
+                        }
+                    } catch (permError) {
+                        // 某些浏览器可能不支持bluetooth权限查询
+                        console.log('无法查询蓝牙权限状态');
+                    }
+                }
+                
+                result.available = true;
+                return result;
+                
+            } catch (error) {
+                console.error('蓝牙检测错误:', error);
+                result.errorType = 'unknown';
+                result.errorMessage = '无法检测蓝牙状态';
+                return result;
+            }
+        }
+        
+        // 处理蓝牙错误
+        function handleBluetoothError(status) {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            switch (status.errorType) {
+                case 'not_supported':
+                    showBluetoothDialog(
+                        '不支持蓝牙',
+                        '您的浏览器不支持蓝牙功能。请使用支持Web Bluetooth API的浏览器（如Chrome、Edge等）。',
+                        [{ text: '确定', action: 'close' }]
+                    );
+                    break;
+                    
+                case 'bluetooth_off':
+                    if (isIOS) {
+                        showBluetoothDialog(
+                            '请开启蓝牙',
+                            '请前往 设置 > 蓝牙 开启蓝牙功能，然后返回此应用。',
+                            [
+                                { text: '前往设置', action: 'settings' },
+                                { text: '取消', action: 'close' }
+                            ]
+                        );
+                    } else {
+                        showBluetoothDialog(
+                            '请开启蓝牙',
+                            '请在系统设置中开启蓝牙功能，然后重试。',
+                            [{ text: '确定', action: 'close' }]
+                        );
+                    }
+                    break;
+                    
+                case 'permission_denied':
+                    if (isIOS) {
+                        showBluetoothDialog(
+                            '需要蓝牙权限',
+                            '请前往 设置 > 隐私与安全性 > 蓝牙，允许此应用使用蓝牙。',
+                            [
+                                { text: '前往设置', action: 'settings' },
+                                { text: '取消', action: 'close' }
+                            ]
+                        );
+                    } else {
+                        showBluetoothDialog(
+                            '需要蓝牙权限',
+                            '请在浏览器设置中允许此网站使用蓝牙功能。',
+                            [{ text: '确定', action: 'close' }]
+                        );
+                    }
+                    break;
+                    
+                default:
+                    showBluetoothDialog(
+                        '蓝牙连接失败',
+                        status.errorMessage || '无法连接蓝牙设备，请稍后重试。',
+                        [{ text: '确定', action: 'close' }]
+                    );
+            }
+        }
+        
+        // 显示蓝牙对话框
+        function showBluetoothDialog(title, message, buttons) {
+            // 创建对话框容器
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            `;
+            
+            // 创建对话框内容
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 14px;
+                max-width: 280px;
+                width: 90%;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            `;
+            
+            // 标题和消息
+            const header = document.createElement('div');
+            header.style.cssText = `
+                padding: 20px 16px 8px;
+                text-align: center;
+            `;
+            
+            const titleEl = document.createElement('div');
+            titleEl.style.cssText = `
+                font-size: 17px;
+                font-weight: 600;
+                color: #000;
+                margin-bottom: 8px;
+            `;
+            titleEl.textContent = title;
+            
+            const messageEl = document.createElement('div');
+            messageEl.style.cssText = `
+                font-size: 13px;
+                color: #3C3C43;
+                line-height: 18px;
+                opacity: 0.6;
+            `;
+            messageEl.textContent = message;
+            
+            header.appendChild(titleEl);
+            header.appendChild(messageEl);
+            
+            // 按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                border-top: 0.5px solid rgba(60, 60, 67, 0.13);
+                margin-top: 20px;
+            `;
+            
+            // 创建按钮
+            buttons.forEach((button, index) => {
+                const btn = document.createElement('button');
+                btn.style.cssText = `
+                    flex: 1;
+                    padding: 11px;
+                    border: none;
+                    background: none;
+                    font-size: 17px;
+                    color: ${button.action === 'settings' ? '#007AFF' : '#007AFF'};
+                    font-weight: ${button.action === 'settings' ? '600' : '400'};
+                    cursor: pointer;
+                    ${index > 0 ? 'border-left: 0.5px solid rgba(60, 60, 67, 0.13);' : ''}
+                `;
+                btn.textContent = button.text;
+                
+                btn.onclick = () => {
+                    document.body.removeChild(dialog);
+                    
+                    if (button.action === 'settings') {
+                        // iOS无法直接打开设置，提示用户手动操作
+                        showToast('请手动打开系统设置');
+                    } else if (button.action === 'retry') {
+                        openBluetoothPage();
+                    }
+                };
+                
+                buttonContainer.appendChild(btn);
+            });
+            
+            content.appendChild(header);
+            content.appendChild(buttonContainer);
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+        }
+        
+        // 显示蓝牙警告
+        function showBluetoothWarning(message) {
+            showBluetoothDialog(
+                '提示',
+                message,
+                [{ text: '确定', action: 'close' }]
+            );
         }
         
         function openBluetoothModal() {
@@ -810,7 +1342,7 @@
             document.getElementById('bluetoothModal').style.display = 'none';
         }
         
-        function connectBMSDevice() {
+        async function connectBMSDevice() {
             const statusEl = document.getElementById('bmsStatus');
             const btnEl = document.getElementById('bmsConnectBtn');
             const bluetoothBtn = document.getElementById('bluetoothBtn');
@@ -818,7 +1350,72 @@
             btnEl.textContent = '连接中...';
             btnEl.disabled = true;
             
-            // 模拟连接过程
+            try {
+                // 如果支持Web Bluetooth API，尝试真实连接
+                if ('bluetooth' in navigator) {
+                    try {
+                        // 请求蓝牙设备
+                        const device = await navigator.bluetooth.requestDevice({
+                            filters: [
+                                { namePrefix: '北能BMS' },
+                                { services: ['battery_service'] }
+                            ],
+                            optionalServices: ['device_information']
+                        }).catch(err => {
+                            console.log('用户取消或无可用设备');
+                            throw err;
+                        });
+                        
+                        // 连接到GATT服务器
+                        const server = await device.gatt.connect();
+                        
+                        // 连接成功
+                        statusEl.textContent = '已连接';
+                        statusEl.style.color = '#30D158';
+                        btnEl.textContent = '已连接';
+                        btnEl.style.background = '#30D158';
+                        btnEl.disabled = true;
+                        
+                        // 更新蓝牙按钮状态
+                        bluetoothBtn.style.background = 'rgba(48, 209, 88, 0.3)';
+                        bluetoothBtn.style.borderColor = 'rgba(48, 209, 88, 0.5)';
+                        bluetoothBtn.querySelector('span').textContent = '设备已连接';
+                        
+                        // 显示连接成功提示并跳转
+                        showToast('BMS设备连接成功，正在进入主页面...');
+                        
+                        // 保存设备信息
+                        localStorage.setItem('connectedDevice', device.name || 'BMS设备');
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('username', 'bluetooth_user');
+                        
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 1000);
+                        
+                    } catch (error) {
+                        // 如果真实连接失败，使用模拟连接
+                        simulateBMSConnection();
+                    }
+                } else {
+                    // 不支持Web Bluetooth，使用模拟连接
+                    simulateBMSConnection();
+                }
+            } catch (error) {
+                btnEl.textContent = '连接';
+                btnEl.disabled = false;
+                statusEl.textContent = '连接失败';
+                statusEl.style.color = '#FF3B30';
+                showToast('连接失败，请重试');
+            }
+        }
+        
+        // 模拟BMS连接
+        function simulateBMSConnection() {
+            const statusEl = document.getElementById('bmsStatus');
+            const btnEl = document.getElementById('bmsConnectBtn');
+            const bluetoothBtn = document.getElementById('bluetoothBtn');
+            
             setTimeout(() => {
                 statusEl.textContent = '已连接';
                 statusEl.style.color = '#30D158';
@@ -826,15 +1423,12 @@
                 btnEl.style.background = '#30D158';
                 btnEl.disabled = true;
                 
-                // 更新蓝牙按钮状态
                 bluetoothBtn.style.background = 'rgba(48, 209, 88, 0.3)';
                 bluetoothBtn.style.borderColor = 'rgba(48, 209, 88, 0.5)';
                 bluetoothBtn.querySelector('span').textContent = '设备已连接';
                 
-                // 显示连接成功提示并跳转
                 showToast('BMS设备连接成功，正在进入主页面...');
                 
-                // 设置登录状态并跳转到home.html
                 setTimeout(() => {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', 'bluetooth_user');
@@ -843,14 +1437,14 @@
             }, 2000);
         }
         
-        function connectInverterDevice() {
+        async function connectInverterDevice() {
             const statusEl = document.getElementById('invStatus');
             const btnEl = document.getElementById('invConnectBtn');
             
             btnEl.textContent = '连接中...';
             btnEl.disabled = true;
             
-            // 模拟连接过程
+            // 模拟连接过程（逆变器设备）
             setTimeout(() => {
                 statusEl.textContent = '已连接';
                 statusEl.style.color = '#30D158';
@@ -858,10 +1452,8 @@
                 btnEl.style.background = '#30D158';
                 btnEl.disabled = true;
                 
-                // 显示连接成功提示并跳转
                 showToast('逆变器设备连接成功，正在进入主页面...');
                 
-                // 设置登录状态并跳转到home.html
                 setTimeout(() => {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', 'bluetooth_user');

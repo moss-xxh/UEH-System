@@ -1860,6 +1860,30 @@
                 }
             }, 5000);
         });
+        // 页面加载时检查是否需要跳转到特定页面
+        window.addEventListener('DOMContentLoaded', function() {
+            // 检查URL中的hash参数
+            const hash = window.location.hash;
+            if (hash === '#device') {
+                // 自动切换到设备页面
+                const deviceNavItem = document.querySelector('.nav-item[onclick*="device"]');
+                if (deviceNavItem) {
+                    deviceNavItem.click();
+                }
+            }
+            
+            // 检查localStorage中的默认页面设置
+            const defaultPage = localStorage.getItem('defaultPage');
+            if (defaultPage === 'device' && !hash) {
+                // 如果设置了默认页面且URL没有hash，则跳转到设备页面
+                const deviceNavItem = document.querySelector('.nav-item[onclick*="device"]');
+                if (deviceNavItem) {
+                    deviceNavItem.click();
+                }
+                // 清除默认页面设置，避免每次都跳转
+                localStorage.removeItem('defaultPage');
+            }
+        });
     </script>
 </body>
 </html>
