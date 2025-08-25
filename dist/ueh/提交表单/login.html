@@ -282,12 +282,12 @@
             <!-- Login Form -->
             <form id="loginForm">
                 <div class="input-group">
-                    <input type="text" id="username" class="input-field" placeholder=" " required>
+                    <input type="text" id="username" class="input-field" placeholder=" ">
                     <label for="username" class="input-label" data-i18n="username_label">用户名</label>
                 </div>
 
                 <div class="input-group">
-                    <input type="password" id="password" class="input-field" placeholder=" " required>
+                    <input type="password" id="password" class="input-field" placeholder=" ">
                     <label for="password" class="input-label" data-i18n="password_label">密码</label>
                 </div>
 
@@ -383,38 +383,34 @@
             showToast(translations[currentLang].forgot_password_msg, 'error');
         }
 
-        // 登录表单处理
+        // 登录表单处理 - 无需校验，直接登录
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value || 'guest';
+            const password = document.getElementById('password').value || '';
             const remember = document.getElementById('remember').checked;
             
-            // 简单的登录验证（实际项目中应该与后端API交互）
-            if (username === 'admin' && password === 'admin123') {
-                showToast(translations[currentLang].login_success, 'success');
-                
-                // 保存登录状态
-                const loginData = {
-                    username: username,
-                    loginTime: new Date().toISOString(),
-                    remember: remember
-                };
-                
-                if (remember) {
-                    localStorage.setItem('loginData', JSON.stringify(loginData));
-                } else {
-                    sessionStorage.setItem('loginData', JSON.stringify(loginData));
-                }
-                
-                // 2秒后跳转到管理页面
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 2000);
+            // 直接登录，无需校验
+            showToast(translations[currentLang].login_success, 'success');
+            
+            // 保存登录状态
+            const loginData = {
+                username: username,
+                loginTime: new Date().toISOString(),
+                remember: remember
+            };
+            
+            if (remember) {
+                localStorage.setItem('loginData', JSON.stringify(loginData));
             } else {
-                showToast(translations[currentLang].login_error, 'error');
+                sessionStorage.setItem('loginData', JSON.stringify(loginData));
             }
+            
+            // 2秒后跳转到管理页面
+            setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, 2000);
         });
 
         // 检查是否已经登录
