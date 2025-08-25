@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统集成流程图 - System Integration Flow</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Mermaid for flowcharts -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* 自定义样式 */
+        .tab-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .mermaid {
+            text-align: center;
+        }
+        
+        .process-step {
+            border-left: 3px solid #667eea;
+            padding-left: 20px;
+            margin-left: 10px;
+            position: relative;
+        }
+        
+        .process-step::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 5px;
+            width: 13px;
+            height: 13px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 头部导航 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-network-wired text-purple-600 text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">系统集成流程管理</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="toggleLanguage()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        <i class="fas fa-language mr-2"></i>
+                        <span id="langBtn">English</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- 选项卡 -->
+        <div class="flex flex-wrap gap-2 mb-8">
+            <button onclick="showTab('overview')" id="tab-overview" class="tab-btn px-6 py-3 bg-white rounded-lg shadow hover:shadow-md transition tab-active">
+                <i class="fas fa-home mr-2"></i>
+                <span data-lang="overview">总览</span>
+            </button>
+            <button onclick="showTab('registration')" id="tab-registration" class="tab-btn px-6 py-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                <i class="fas fa-user-plus mr-2"></i>
+                <span data-lang="registration">注册添加流程</span>
+            </button>
+            <button onclick="showTab('deletion')" id="tab-deletion" class="tab-btn px-6 py-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                <i class="fas fa-trash-alt mr-2"></i>
+                <span data-lang="deletion">删除注销流程</span>
+            </button>
+            <button onclick="showTab('sync')" id="tab-sync" class="tab-btn px-6 py-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                <i class="fas fa-sync mr-2"></i>
+                <span data-lang="sync">数据同步流程</span>
+            </button>
+            <button onclick="showTab('issues')" id="tab-issues" class="tab-btn px-6 py-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span data-lang="issues">逻辑缺陷分析</span>
+            </button>
+            <button onclick="showTab('improvements')" id="tab-improvements" class="tab-btn px-6 py-3 bg-white rounded-lg shadow hover:shadow-md transition">
+                <i class="fas fa-tools mr-2"></i>
+                <span data-lang="improvements">改进建议</span>
+            </button>
+        </div>
+
+        <!-- 总览内容 -->
+        <div id="content-overview" class="tab-content">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-sitemap mr-2 text-purple-600"></i>
+                    <span data-lang="system_architecture">系统架构概览</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <i class="fas fa-mobile-alt text-blue-600 text-2xl mb-2"></i>
+                        <h3 class="font-semibold">Mobile App</h3>
+                        <p class="text-sm text-gray-600" data-lang="app_desc">用户端应用</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <i class="fas fa-server text-green-600 text-2xl mb-2"></i>
+                        <h3 class="font-semibold">Our Platform</h3>
+                        <p class="text-sm text-gray-600" data-lang="platform_desc">授权管理平台</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <i class="fas fa-cloud text-purple-600 text-2xl mb-2"></i>
+                        <h3 class="font-semibold">Third-party Cloud</h3>
+                        <p class="text-sm text-gray-600" data-lang="cloud_desc">第三方云平台</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                        <i class="fas fa-home text-orange-600 text-2xl mb-2"></i>
+                        <h3 class="font-semibold">UEH Home Page</h3>
+                        <p class="text-sm text-gray-600" data-lang="ueh_desc">统一展示界面</p>
+                    </div>
+                </div>
+                
+                <div class="mermaid">
+                    graph TB
+                        subgraph User[用户端 User Side]
+                            APP[Mobile App]
+                            WEB[UEH Web Page]
+                        end
+                        
+                        subgraph Backend[后端服务 Backend Services]
+                            OUR[Our Platform API]
+                            THIRD[Third-party API]
+                            SYNC[Sync Service]
+                        end
+                        
+                        subgraph Data[数据层 Data Layer]
+                            DB1[(Our Database)]
+                            DB2[(Third-party DB)]
+                            CACHE[(Cache)]
+                        end
+                        
+                        APP -->|注册/添加| OUR
+                        OUR -->|同步| SYNC
+                        SYNC -->|推送| THIRD
+                        WEB -->|请求| OUR
+                        WEB -->|请求| THIRD
+                        OUR --> DB1
+                        THIRD --> DB2
+                        OUR --> CACHE
+                        THIRD --> CACHE
+                        
+                        style APP fill:#e1f5fe
+                        style WEB fill:#fff3e0
+                        style OUR fill:#e8f5e9
+                        style THIRD fill:#f3e5f5
+                        style SYNC fill:#fce4ec
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册添加流程 -->
+        <div id="content-registration" class="tab-content hidden">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-user-plus mr-2 text-green-600"></i>
+                    <span data-lang="reg_flow">用户注册与设备添加流程</span>
+                </h2>
+                
+                <div class="mermaid mb-6">
+                    flowchart TD
+                        Start([开始]) --> A[用户下载App]
+                        A --> B[用户注册账号]
+                        B --> C{注册成功?}
+                        C -->|否| B
+                        C -->|是| D[登录App]
+                        D --> E[添加设备]
+                        E --> F{扫描二维码?}
+                        F -->|是| G[扫描设备二维码]
+                        F -->|否| H[手动输入SN]
+                        G --> I[配置网络]
+                        H --> I
+                        I --> J{设备绑定成功?}
+                        J -->|否| E
+                        J -->|是| K[管理员录入平台]
+                        K --> L[添加账号和SN]
+                        L --> M[收集设备信息]
+                        M --> N[推送到第三方]
+                        N --> O[第三方处理数据]
+                        O --> P[数据同步完成]
+                        P --> End([结束])
+                        
+                        style A fill:#e1f5fe
+                        style B fill:#e1f5fe
+                        style D fill:#e1f5fe
+                        style E fill:#e1f5fe
+                        style K fill:#fff3e0
+                        style L fill:#fff3e0
+                        style M fill:#fff3e0
+                        style N fill:#f3e5f5
+                        style O fill:#f3e5f5
+                        style P fill:#c8e6c9
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-3">
+                            <i class="fas fa-list-ol mr-2"></i>
+                            <span data-lang="steps">操作步骤</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="process-step">
+                                <h4 class="font-medium">1. 用户注册</h4>
+                                <p class="text-sm text-gray-600">下载App → 填写信息 → 验证账号</p>
+                            </div>
+                            <div class="process-step">
+                                <h4 class="font-medium">2. 设备添加</h4>
+                                <p class="text-sm text-gray-600">扫描/输入SN → 配置网络 → 绑定设备</p>
+                            </div>
+                            <div class="process-step">
+                                <h4 class="font-medium">3. 平台录入</h4>
+                                <p class="text-sm text-gray-600">管理员登录 → 添加账号SN → 保存信息</p>
+                            </div>
+                            <div class="process-step">
+                                <h4 class="font-medium">4. 数据同步</h4>
+                                <p class="text-sm text-gray-600">推送第三方 → 数据处理 → 同步完成</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-3">
+                            <i class="fas fa-database mr-2"></i>
+                            <span data-lang="data_fields">数据字段</span>
+                        </h3>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-2 text-left">字段</th>
+                                    <th class="p-2 text-left">示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-2">账号 Account</td>
+                                    <td class="p-2">user1001</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">设备SN</td>
+                                    <td class="p-2">SN20240001</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">品牌 Brand</td>
+                                    <td class="p-2">ipotisedge</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">地址 Address</td>
+                                    <td class="p-2">Sydney, NSW</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">电表号 NMI</td>
+                                    <td class="p-2">83646256</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除注销流程 -->
+        <div id="content-deletion" class="tab-content hidden">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-trash-alt mr-2 text-red-600"></i>
+                    <span data-lang="del_flow">设备删除与账号注销流程</span>
+                </h2>
+                
+                <div class="mermaid mb-6">
+                    flowchart TD
+                        Start([开始]) --> Choice{操作类型}
+                        
+                        Choice -->|删除设备| DD[选择要删除的设备]
+                        Choice -->|注销账号| CA[进入账号设置]
+                        
+                        DD --> DD1[确认删除提示]
+                        DD1 --> DD2{用户确认?}
+                        DD2 -->|否| End1([取消])
+                        DD2 -->|是| DD3[App删除本地数据]
+                        DD3 --> DD4[通知我们平台]
+                        DD4 --> DD5[平台标记删除]
+                        DD5 --> DD6[同步第三方]
+                        DD6 --> DD7[第三方删除/归档]
+                        DD7 --> DD8[UEH不再显示]
+                        
+                        CA --> CA1[显示注销警告]
+                        CA1 --> CA2[输入密码验证]
+                        CA2 --> CA3{密码正确?}
+                        CA3 -->|否| End2([验证失败])
+                        CA3 -->|是| CA4[删除所有设备]
+                        CA4 --> CA5[通知我们平台]
+                        CA5 --> CA6[平台删除用户]
+                        CA6 --> CA7[同步第三方]
+                        CA7 --> CA8[第三方删除]
+                        CA8 --> CA9[清除缓存]
+                        CA9 --> CA10[返回登录页]
+                        
+                        DD8 --> End([完成])
+                        CA10 --> End
+                        
+                        style DD fill:#ffebee
+                        style CA fill:#ffebee
+                        style DD5 fill:#fff3e0
+                        style DD6 fill:#f3e5f5
+                        style CA6 fill:#fff3e0
+                        style CA7 fill:#f3e5f5
+                        style DD8 fill:#ffcdd2
+                        style CA10 fill:#ffcdd2
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-3">
+                            <i class="fas fa-trash mr-2"></i>
+                            设备删除注意事项
+                        </h3>
+                        <div class="warning-box">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong>警告：</strong>删除后30天内可恢复
+                        </div>
+                        <ul class="list-disc list-inside text-sm space-y-2">
+                            <li>需要确认操作</li>
+                            <li>本地数据立即删除</li>
+                            <li>云端数据异步删除</li>
+                            <li>30天后永久删除</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-3">
+                            <i class="fas fa-user-times mr-2"></i>
+                            账号注销注意事项
+                        </h3>
+                        <div class="error-box">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            <strong>危险：</strong>注销后数据不可恢复
+                        </div>
+                        <ul class="list-disc list-inside text-sm space-y-2">
+                            <li>需要密码验证</li>
+                            <li>所有设备将解绑</li>
+                            <li>历史数据将删除</li>
+                            <li>无法恢复账号</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据同步流程 -->
+        <div id="content-sync" class="tab-content hidden">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-sync mr-2 text-blue-600"></i>
+                    <span data-lang="sync_flow">数据同步与匹配流程</span>
+                </h2>
+                
+                <div class="mermaid mb-6">
+                    sequenceDiagram
+                        participant U as 用户
+                        participant H as UEH页面
+                        participant O as 我们平台
+                        participant T as 第三方平台
+                        participant C as 缓存
+                        
+                        U->>H: 访问家庭页面
+                        H->>C: 检查缓存
+                        alt 缓存有效
+                            C-->>H: 返回缓存数据
+                        else 缓存失效
+                            par 并行请求
+                                H->>O: 请求设备列表
+                                and
+                                H->>T: 请求设备详情
+                            end
+                            O-->>H: 返回我们的数据
+                            T-->>H: 返回第三方数据
+                            H->>H: 数据匹配算法
+                            Note over H: 匹配规则：<br/>1. Account相同<br/>2. SN相同<br/>3. 状态为活跃
+                            H->>C: 更新缓存
+                        end
+                        H-->>U: 显示匹配设备
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-clock mr-2"></i>
+                            实时同步
+                        </h3>
+                        <p class="text-sm">设备状态变更立即同步</p>
+                        <p class="text-xs text-gray-600 mt-2">延迟: < 1秒</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-calendar mr-2"></i>
+                            定时同步
+                        </h3>
+                        <p class="text-sm">每15分钟批量同步</p>
+                        <p class="text-xs text-gray-600 mt-2">延迟: < 15分钟</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-bolt mr-2"></i>
+                            事件触发
+                        </h3>
+                        <p class="text-sm">用户操作触发同步</p>
+                        <p class="text-xs text-gray-600 mt-2">延迟: 即时</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-3">匹配算法</h3>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
+function matchDevices(ourData, thirdPartyData) {
+    const matched = [];
+    
+    ourData.forEach(device => {
+        const match = thirdPartyData.find(tpDevice => 
+            tpDevice.account === device.account && 
+            tpDevice.sn === device.sn &&
+            tpDevice.status === 'active' &&
+            device.status === 'active'
+        );
+        
+        if (match) {
+            matched.push({
+                ...device,
+                ...match,
+                matched: true,
+                lastSync: new Date()
+            });
+        }
+    });
+    
+    return matched;
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 逻辑缺陷分析 -->
+        <div id="content-issues" class="tab-content hidden">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-bug mr-2 text-orange-600"></i>
+                    <span data-lang="logic_issues">当前流程逻辑缺陷分析</span>
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="error-box">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            缺陷1：数据一致性问题
+                        </h3>
+                        <p class="mb-2">当前流程中，用户在App添加设备后，需要管理员手动在平台录入，存在时间差和人为错误风险。</p>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>用户添加设备和管理员录入之间存在时间延迟</li>
+                            <li>手动录入可能出现SN输入错误</li>
+                            <li>可能出现重复录入或遗漏</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            缺陷2：同步机制不完善
+                        </h3>
+                        <p class="mb-2">数据同步缺少失败重试和状态追踪机制。</p>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>同步失败没有自动重试机制</li>
+                            <li>无法追踪同步状态和历史</li>
+                            <li>缺少同步冲突解决方案</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-trash mr-2"></i>
+                            缺陷3：删除流程不完整
+                        </h3>
+                        <p class="mb-2">删除操作缺少事务性保证和回滚机制。</p>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>部分删除失败时无法回滚</li>
+                            <li>删除操作没有审计日志</li>
+                            <li>误删除后恢复流程不明确</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-user-shield mr-2"></i>
+                            缺陷4：权限控制缺失
+                        </h3>
+                        <p class="mb-2">系统缺少细粒度的权限控制。</p>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>没有区分操作权限级别</li>
+                            <li>缺少操作审批流程</li>
+                            <li>无法限制敏感操作</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3 class="font-semibold mb-2">
+                            <i class="fas fa-bell mr-2"></i>
+                            缺陷5：缺少通知机制
+                        </h3>
+                        <p class="mb-2">用户和管理员缺少实时通知。</p>
+                        <ul class="list-disc list-inside text-sm">
+                            <li>设备状态变更无通知</li>
+                            <li>同步失败无告警</li>
+                            <li>重要操作无确认邮件</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 改进建议 -->
+        <div id="content-improvements" class="tab-content hidden">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
+                    <span data-lang="improvements_title">流程改进建议</span>
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-4">
+                            <i class="fas fa-check-circle mr-2 text-green-600"></i>
+                            改进方案1：自动化数据录入
+                        </h3>
+                        <div class="success-box mb-4">
+                            <strong>解决方案：</strong>App直接调用API自动同步
+                        </div>
+                        <div class="mermaid">
+                            flowchart LR
+                                A[App添加设备] --> B[自动API调用]
+                                B --> C[平台自动录入]
+                                C --> D[实时同步第三方]
+                                D --> E[返回确认]
+                                
+                                style B fill:#c8e6c9
+                                style C fill:#c8e6c9
+                        </div>
+                        <ul class="list-disc list-inside text-sm mt-4 space-y-1">
+                            <li>减少人工操作</li>
+                            <li>降低错误率</li>
+                            <li>提高效率</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-4">
+                            <i class="fas fa-redo mr-2 text-blue-600"></i>
+                            改进方案2：增强同步机制
+                        </h3>
+                        <div class="success-box mb-4">
+                            <strong>解决方案：</strong>引入消息队列和重试机制
+                        </div>
+                        <div class="mermaid">
+                            flowchart LR
+                                A[数据变更] --> B[消息队列]
+                                B --> C{同步成功?}
+                                C -->|否| D[重试队列]
+                                D --> B
+                                C -->|是| E[更新状态]
+                                
+                                style B fill:#e3f2fd
+                                style D fill:#fff3e0
+                        </div>
+                        <ul class="list-disc list-inside text-sm mt-4 space-y-1">
+                            <li>保证数据最终一致性</li>
+                            <li>失败自动重试</li>
+                            <li>可追踪同步状态</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-4">
+                            <i class="fas fa-database mr-2 text-purple-600"></i>
+                            改进方案3：事务性删除
+                        </h3>
+                        <div class="success-box mb-4">
+                            <strong>解决方案：</strong>使用分布式事务
+                        </div>
+                        <pre class="bg-gray-900 text-green-400 p-3 rounded text-xs">
+BEGIN TRANSACTION;
+  1. 标记设备为待删除
+  2. 通知所有相关系统
+  3. 等待确认响应
+  4. 执行删除操作
+  IF 全部成功 THEN
+    COMMIT;
+  ELSE
+    ROLLBACK;
+END;</pre>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold mb-4">
+                            <i class="fas fa-shield-alt mr-2 text-red-600"></i>
+                            改进方案4：权限管理系统
+                        </h3>
+                        <div class="success-box mb-4">
+                            <strong>解决方案：</strong>RBAC权限模型
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-2 text-left">角色</th>
+                                    <th class="p-2 text-left">权限</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-2">普通用户</td>
+                                    <td class="p-2">查看、添加自己的设备</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">管理员</td>
+                                    <td class="p-2">所有设备管理</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2">审计员</td>
+                                    <td class="p-2">只读访问、查看日志</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-4">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        改进后的完整流程
+                    </h3>
+                    <div class="mermaid">
+                        flowchart TD
+                            Start([开始]) --> A[用户App操作]
+                            A --> B[自动API调用]
+                            B --> C[平台接收请求]
+                            C --> D[数据验证]
+                            D --> E{验证通过?}
+                            E -->|否| F[返回错误]
+                            E -->|是| G[写入数据库]
+                            G --> H[发送到消息队列]
+                            H --> I[异步同步第三方]
+                            I --> J{同步成功?}
+                            J -->|否| K[加入重试队列]
+                            K --> I
+                            J -->|是| L[更新同步状态]
+                            L --> M[发送通知]
+                            M --> N[缓存更新]
+                            N --> End([完成])
+                            F --> End
+                            
+                            style B fill:#c8e6c9
+                            style G fill:#c8e6c9
+                            style H fill:#e3f2fd
+                            style L fill:#c8e6c9
+                            style M fill:#fff3e0
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部信息 -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>系统集成流程管理平台 © 2024</p>
+            <p class="text-sm mt-2 text-gray-400">System Integration Flow Management Platform</p>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // 语言切换
+        let currentLang = 'zh';
+        const translations = {
+            zh: {
+                overview: '总览',
+                registration: '注册添加流程',
+                deletion: '删除注销流程',
+                sync: '数据同步流程',
+                issues: '逻辑缺陷分析',
+                improvements: '改进建议',
+                system_architecture: '系统架构概览',
+                app_desc: '用户端应用',
+                platform_desc: '授权管理平台',
+                cloud_desc: '第三方云平台',
+                ueh_desc: '统一展示界面',
+                reg_flow: '用户注册与设备添加流程',
+                del_flow: '设备删除与账号注销流程',
+                sync_flow: '数据同步与匹配流程',
+                logic_issues: '当前流程逻辑缺陷分析',
+                improvements_title: '流程改进建议',
+                steps: '操作步骤',
+                data_fields: '数据字段'
+            },
+            en: {
+                overview: 'Overview',
+                registration: 'Registration Flow',
+                deletion: 'Deletion Flow',
+                sync: 'Sync Flow',
+                issues: 'Logic Issues',
+                improvements: 'Improvements',
+                system_architecture: 'System Architecture Overview',
+                app_desc: 'User Application',
+                platform_desc: 'Authorization Platform',
+                cloud_desc: 'Third-party Cloud',
+                ueh_desc: 'Unified Display Interface',
+                reg_flow: 'User Registration & Device Addition Flow',
+                del_flow: 'Device Deletion & Account Cancellation Flow',
+                sync_flow: 'Data Synchronization & Matching Flow',
+                logic_issues: 'Current Process Logic Issues Analysis',
+                improvements_title: 'Process Improvement Suggestions',
+                steps: 'Operation Steps',
+                data_fields: 'Data Fields'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'English' : '中文';
+            
+            // 更新所有带有data-lang属性的元素
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+        }
+
+        // 标签页切换
+        function showTab(tabName) {
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // 移除所有标签的激活状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+            });
+            
+            // 显示选中的内容
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+        }
+
+        // 页面加载完成后
+        document.addEventListener('DOMContentLoaded', function() {
+            // 重新渲染Mermaid图表
+            mermaid.contentLoaded();
+        });
+    </script>
+</body>
+</html>

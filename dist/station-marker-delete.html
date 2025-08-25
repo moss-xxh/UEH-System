@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电站立标管理 - 删除视图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-back {
+            background: #f3f4f6;
+            color: #333;
+        }
+
+        .btn-back:hover {
+            background: #e5e7eb;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .station-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .station-card.selected {
+            box-shadow: 0 0 0 3px #ef4444;
+            transform: scale(0.98);
+        }
+
+        .station-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .station-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .status-maintenance {
+            background: #ef4444;
+            color: white;
+        }
+
+        .station-info {
+            padding: 20px;
+        }
+
+        .station-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .station-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .station-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn-select {
+            flex: 1;
+            background: #f3f4f6;
+            color: #333;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .btn-select:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-select.selected {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-view {
+            flex: 1;
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .btn-view:hover {
+            background: #764ba2;
+        }
+
+        .delete-actions {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .delete-actions.show {
+            display: flex;
+        }
+
+        .selected-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .selected-count strong {
+            color: #ef4444;
+            font-size: 18px;
+        }
+
+        .btn-delete-all {
+            background: #ef4444;
+            color: white;
+            padding: 12px 30px;
+        }
+
+        .btn-delete-all:hover {
+            background: #dc2626;
+        }
+
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #333;
+            padding: 12px 30px;
+        }
+
+        /* 删除确认弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .warning-icon {
+            width: 48px;
+            height: 48px;
+            background: #fef2f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ef4444;
+            font-size: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .delete-list {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .delete-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .delete-item:last-child {
+            border-bottom: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn-confirm-delete {
+            background: #ef4444;
+            color: white;
+            padding: 12px 30px;
+        }
+
+        .btn-confirm-delete:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        .empty-text {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .stations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .delete-actions {
+                left: 20px;
+                right: 20px;
+                transform: none;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>电站立标删除管理</h1>
+            <div class="header-actions">
+                <button class="btn btn-back" onclick="history.back()">← 返回</button>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="搜索电站名称或编号...">
+            <select class="filter-select">
+                <option>全部状态</option>
+                <option>运行中</option>
+                <option>维护中</option>
+                <option>已停用</option>
+            </select>
+            <select class="filter-select">
+                <option>全部地区</option>
+                <option>深圳</option>
+                <option>北京</option>
+                <option>上海</option>
+                <option>广州</option>
+            </select>
+            <button class="btn btn-search">搜索</button>
+        </div>
+
+        <div class="stations-grid" id="stationsGrid">
+            <!-- 电站卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">📍</div>
+            <div class="empty-text">暂无电站立标数据</div>
+        </div>
+    </div>
+
+    <!-- 删除操作栏 -->
+    <div class="delete-actions" id="deleteActions">
+        <div class="selected-count">
+            已选择 <strong id="selectedCount">0</strong> 个电站
+        </div>
+        <button class="btn btn-cancel" onclick="cancelSelection()">取消选择</button>
+        <button class="btn btn-delete-all" onclick="showDeleteModal()">批量删除</button>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="warning-icon">⚠️</div>
+                <div class="modal-title">确认删除电站立标</div>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除以下电站立标吗？此操作不可恢复。</p>
+                <div class="delete-list" id="deleteList">
+                    <!-- 待删除项目列表 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-confirm-delete" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟电站数据
+        const stationsData = [
+            {
+                id: 'CS001',
+                name: '深圳南山科技园充电站',
+                status: 'active',
+                location: '深圳市南山区科技南路',
+                chargers: 20,
+                available: 12,
+                power: '120kW'
+            },
+            {
+                id: 'CS002',
+                name: '北京朝阳CBD充电站',
+                status: 'active',
+                location: '北京市朝阳区建国路',
+                chargers: 15,
+                available: 8,
+                power: '180kW'
+            },
+            {
+                id: 'CS003',
+                name: '上海浦东金桥充电站',
+                status: 'maintenance',
+                location: '上海市浦东新区金桥路',
+                chargers: 25,
+                available: 0,
+                power: '240kW'
+            },
+            {
+                id: 'CS004',
+                name: '广州天河体育中心充电站',
+                status: 'active',
+                location: '广州市天河区体育西路',
+                chargers: 18,
+                available: 15,
+                power: '150kW'
+            },
+            {
+                id: 'CS005',
+                name: '深圳福田中心充电站',
+                status: 'inactive',
+                location: '深圳市福田区福中路',
+                chargers: 22,
+                available: 0,
+                power: '200kW'
+            },
+            {
+                id: 'CS006',
+                name: '杭州西湖文化广场充电站',
+                status: 'active',
+                location: '杭州市下城区武林广场',
+                chargers: 16,
+                available: 10,
+                power: '160kW'
+            }
+        ];
+
+        let selectedStations = new Set();
+
+        // 初始化页面
+        function initStations() {
+            const grid = document.getElementById('stationsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (stationsData.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            grid.innerHTML = stationsData.map(station => `
+                <div class="station-card" data-id="${station.id}">
+                    <div class="station-image">
+                        <span class="station-status ${getStatusClass(station.status)}">
+                            ${getStatusText(station.status)}
+                        </span>
+                        ⚡
+                    </div>
+                    <div class="station-info">
+                        <div class="station-name">${station.name}</div>
+                        <div class="station-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span>${station.location}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🔌</span>
+                                <span>充电枪: ${station.available}/${station.chargers}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⚡</span>
+                                <span>最大功率: ${station.power}</span>
+                            </div>
+                        </div>
+                        <div class="station-actions">
+                            <button class="btn btn-select" onclick="toggleSelection('${station.id}')">
+                                选择删除
+                            </button>
+                            <button class="btn btn-view" onclick="viewStation('${station.id}')">
+                                查看详情
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'active': 'status-active',
+                'inactive': 'status-inactive',
+                'maintenance': 'status-maintenance'
+            };
+            return statusMap[status] || 'status-inactive';
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'active': '运行中',
+                'inactive': '已停用',
+                'maintenance': '维护中'
+            };
+            return statusMap[status] || '未知';
+        }
+
+        function toggleSelection(stationId) {
+            const card = document.querySelector(`[data-id="${stationId}"]`);
+            const selectBtn = card.querySelector('.btn-select');
+            
+            if (selectedStations.has(stationId)) {
+                selectedStations.delete(stationId);
+                card.classList.remove('selected');
+                selectBtn.classList.remove('selected');
+                selectBtn.textContent = '选择删除';
+            } else {
+                selectedStations.add(stationId);
+                card.classList.add('selected');
+                selectBtn.classList.add('selected');
+                selectBtn.textContent = '取消选择';
+            }
+            
+            updateDeleteActions();
+        }
+
+        function updateDeleteActions() {
+            const deleteActions = document.getElementById('deleteActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedStations.size > 0) {
+                deleteActions.classList.add('show');
+                selectedCount.textContent = selectedStations.size;
+            } else {
+                deleteActions.classList.remove('show');
+            }
+        }
+
+        function cancelSelection() {
+            selectedStations.clear();
+            document.querySelectorAll('.station-card').forEach(card => {
+                card.classList.remove('selected');
+                const selectBtn = card.querySelector('.btn-select');
+                selectBtn.classList.remove('selected');
+                selectBtn.textContent = '选择删除';
+            });
+            updateDeleteActions();
+        }
+
+        function showDeleteModal() {
+            if (selectedStations.size === 0) return;
+            
+            const modal = document.getElementById('deleteModal');
+            const deleteList = document.getElementById('deleteList');
+            
+            const selectedItems = Array.from(selectedStations).map(id => {
+                const station = stationsData.find(s => s.id === id);
+                return `<div class="delete-item">${station.name} (${station.id})</div>`;
+            }).join('');
+            
+            deleteList.innerHTML = selectedItems;
+            modal.classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        function confirmDelete() {
+            // 执行删除操作
+            const remainingStations = stationsData.filter(station => 
+                !selectedStations.has(station.id)
+            );
+            
+            // 更新数据
+            stationsData.length = 0;
+            stationsData.push(...remainingStations);
+            
+            // 清空选择
+            selectedStations.clear();
+            
+            // 关闭弹窗
+            closeDeleteModal();
+            
+            // 更新界面
+            initStations();
+            updateDeleteActions();
+            
+            // 显示成功提示
+            showSuccessMessage();
+        }
+
+        function showSuccessMessage() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #10b981;
+                color: white;
+                padding: 15px 30px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 3000;
+                animation: slideDown 0.3s ease;
+            `;
+            message.textContent = '电站立标删除成功！';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        }
+
+        function viewStation(stationId) {
+            alert(`查看电站详情: ${stationId}`);
+        }
+
+        // 搜索功能
+        document.querySelector('.btn-search').addEventListener('click', function() {
+            const searchValue = document.querySelector('.search-input').value.toLowerCase();
+            const statusFilter = document.querySelector('.filter-select').value;
+            
+            document.querySelectorAll('.station-card').forEach(card => {
+                const name = card.querySelector('.station-name').textContent.toLowerCase();
+                const shouldShow = name.includes(searchValue);
+                card.style.display = shouldShow ? 'block' : 'none';
+            });
+        });
+
+        // 点击模态框外部关闭
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // 初始化
+        initStations();
+    </script>
+</body>
+</html>
