@@ -471,113 +471,6 @@
             }
         }
         
-        /* 蓝牙连接弹窗样式 */
-        .bluetooth-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .bluetooth-content {
-            background: white;
-            border-radius: 16px;
-            padding: 0;
-            max-width: 320px;
-            width: 90%;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .bluetooth-header {
-            padding: 20px 20px 16px;
-            text-align: center;
-            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .bluetooth-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #1d1d1f;
-        }
-        
-        .bluetooth-body {
-            padding: 20px;
-        }
-        
-        .device-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .device-item:last-of-type {
-            border-bottom: none;
-        }
-        
-        .device-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .device-name {
-            font-size: 16px;
-            font-weight: 500;
-            color: #1d1d1f;
-            margin-bottom: 2px;
-        }
-        
-        .device-status {
-            font-size: 13px;
-            color: #8e8e93;
-        }
-        
-        .connect-button {
-            background: #007AFF;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .connected-indicator {
-            color: #30D158;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .bluetooth-footer {
-            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
-            padding: 16px;
-            text-align: center;
-        }
-        
-        .close-button {
-            background: none;
-            border: none;
-            color: #007AFF;
-            font-size: 17px;
-            font-weight: 400;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 8px;
-        }
-        
-        .close-button:hover {
-            background: rgba(0, 122, 255, 0.1);
-        }
     </style>
 </head>
 <body>
@@ -740,10 +633,22 @@
                 </div>
                 
                 <div style="display: grid; gap: 12px;">
-                    <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div id="networkConfigItem" onclick="openNetworkSettingsPanel()" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#ffffff'">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>网络配置</span>
-                            <span style="color: #10B981; font-size: 14px;">已连接</span>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #10B981, #059669); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
+                                        <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                                    </svg>
+                                </div>
+                                <span style="font-size: 16px; font-weight: 500;">网络配置</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #10B981; font-size: 14px;">已连接</span>
+                                <svg width="20" height="20" fill="#9ca3af" viewBox="0 0 24 24">
+                                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                     
@@ -830,54 +735,6 @@
             </div>
         </div>
         
-        <!-- 蓝牙连接弹窗 -->
-        <div class="bluetooth-modal" id="bluetoothModal" onclick="closeBluetoothModal()">
-            <div class="bluetooth-content" onclick="event.stopPropagation()">
-                <div class="bluetooth-header">
-                    <div class="bluetooth-title">蓝牙设备</div>
-                </div>
-                
-                <div class="bluetooth-body">
-                    <!-- BMS设备 -->
-                    <div class="device-item">
-                        <div class="device-info">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            </svg>
-                            <div>
-                                <div class="device-name">北能BMS-001</div>
-                                <div class="device-status" id="bmsStatus">未连接</div>
-                            </div>
-                        </div>
-                        <button class="connect-button" id="bmsConnectBtn" onclick="connectBMSDevice()">连接</button>
-                    </div>
-                    
-                    <!-- 逆变器设备 -->
-                    <div class="device-item">
-                        <div class="device-info">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 2L17 7L13 11L17 15L12 20V12L8 16L6 14L10 10L6 6L8 4L12 8V2Z" stroke="#5856D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            </svg>
-                            <div>
-                                <div class="device-name">逆变器-INV02</div>
-                                <div class="device-status" id="invStatus">未连接</div>
-                            </div>
-                        </div>
-                        <button class="connect-button" id="invConnectBtn" onclick="connectInverterDevice()">连接</button>
-                    </div>
-                    
-                    <div style="margin-top: 16px; padding: 12px; background: rgba(142, 142, 147, 0.1); border-radius: 8px;">
-                        <div style="font-size: 13px; color: #8e8e93; text-align: center;">
-                            请确保设备已开启蓝牙并处于配对模式
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bluetooth-footer">
-                    <button class="close-button" onclick="closeBluetoothModal()">关闭</button>
-                </div>
-            </div>
-        </div>
         
         <!-- 添加设备页面 -->
         <div id="addDevicePage" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #ffffff; z-index: 1500; display: none; transform: translateX(100%);">
@@ -1099,6 +956,7 @@
         
         // 设备数据存储
         let devices = [];
+        let lastAddedDevice = null; // 记录最后添加的设备
         
         function openAddDevice() {
             // 直接进入添加设备页面
@@ -1247,6 +1105,7 @@
             };
             
             devices.push(newDevice);
+            lastAddedDevice = newDevice; // 记录最后添加的设备
             
             // 显示成功提示
             showSuccessMessage('添加成功');
@@ -1255,6 +1114,10 @@
             setTimeout(() => {
                 closeAddDevicePage();
                 updateDeviceDisplay();
+                // 显示网络配置弹窗
+                setTimeout(() => {
+                    showNetworkConfigModal();
+                }, 500);
             }, 2000);
         }
         
@@ -1372,13 +1235,20 @@
                 icon: deviceType === '储能系统' ? '🔋' : deviceType === '光伏逆变器' ? '☀️' : '⚡',
                 soc: Math.floor(Math.random() * 40) + 60,
                 soh: Math.floor(Math.random() * 10) + 90,
-                status: Math.random() > 0.5 ? '充电' : '放电'
+                status: Math.random() > 0.5 ? '充电' : '放电',
+                networkConfigured: false // 新添加的设备默认未配网
             };
             
             devices.push(newDevice);
+            lastAddedDevice = newDevice; // 记录最后添加的设备
             closeBluetooth();
             updateDeviceDisplay();
             showSuccessMessage('添加成功');
+            
+            // 显示网络配置弹窗
+            setTimeout(() => {
+                showNetworkConfigModal();
+            }, 500);
         }
         
         function closeBluetooth() {
@@ -1472,16 +1342,23 @@
                 icon: deviceIcons[deviceType],
                 soc: Math.floor(Math.random() * 40) + 60, // 60-100%
                 soh: Math.floor(Math.random() * 10) + 90,  // 90-100%
-                status: Math.random() > 0.5 ? '充电' : '待机'
+                status: Math.random() > 0.5 ? '充电' : '待机',
+                networkConfigured: false // 新添加的设备默认未配网
             };
             
             devices.push(newDevice);
+            lastAddedDevice = newDevice; // 记录最后添加的设备
             closeAddDevice();
             closeManualAdd();
             updateDeviceDisplay();
             
             // 显示添加成功提示
             showSuccessMessage(`${deviceType} 添加成功！`);
+            
+            // 显示网络配置弹窗
+            setTimeout(() => {
+                showNetworkConfigModal();
+            }, 500);
         }
         
         function updateDeviceDisplay() {
@@ -1505,8 +1382,11 @@
                 deviceContainer.innerHTML = devices.map((device, index) => `
                     <div onclick="openDeviceDetail('${device.name}', '${device.sn}', ${device.online})" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 18px; border: 0.5px solid rgba(0, 0, 0, 0.04); padding: 20px; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <div style="display: flex; align-items: center; flex: 1;">
+                            <div style="display: flex; align-items: center; flex: 1; gap: 8px;">
                                 <div style="font-weight: 600; font-size: 17px; color: #1d1d1f;">${device.name}</div>
+                                <div onclick="event.stopPropagation(); goToNetworkConfig()" style="color: ${device.networkConfigured ? '#2e7d0d' : '#d97706'}; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                                    ${device.networkConfigured ? '已配网' : '未配网'}>
+                                </div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <div style="color: ${device.online ? '#30d158' : '#86868b'}; font-size: 13px; font-weight: 600;">● ${device.online ? '在线' : '离线'}</div>
@@ -1617,6 +1497,270 @@
                     setTimeout(() => msg.remove(), 300);
                 }
             }, 2000);
+        }
+        
+        // 网络配置弹窗
+        function showNetworkConfigModal() {
+            const modalHTML = `
+                <div id="networkConfigModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s ease;">
+                    <div style="background: #ffffff; border-radius: 24px; width: 90%; max-width: 340px; padding: 0; overflow: hidden; position: relative; animation: slideUp 0.3s ease;">
+                        <!-- 图标和标题 -->
+                        <div style="padding: 32px 24px 20px; text-align: center;">
+                            <!-- WiFi图标 -->
+                            <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #007aff 0%, #0056b3 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                                <svg width="36" height="36" fill="white" viewBox="0 0 24 24">
+                                    <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                                </svg>
+                            </div>
+                            
+                            <h2 style="font-size: 22px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px 0;">设置网络连接</h2>
+                            <p style="font-size: 15px; color: #86868b; margin: 0; line-height: 1.4;">为新添加的设备配置网络，确保设备能够正常联网运行</p>
+                        </div>
+                        
+                        <!-- 按钮组 -->
+                        <div style="padding: 0 24px 24px;">
+                            <!-- 前往设置按钮 -->
+                            <button onclick="goToNetworkSettings()" style="width: 100%; background: #007aff; color: white; border: none; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; cursor: pointer; margin-bottom: 12px; transition: all 0.2s ease;">
+                                前往设置
+                            </button>
+                            
+                            <!-- 稍后设置按钮 -->
+                            <button onclick="closeNetworkConfigModal()" style="width: 100%; background: rgba(0, 0, 0, 0.04); color: #007aff; border: none; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                                稍后设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加样式动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.querySelector('.phone-container').insertAdjacentHTML('beforeend', modalHTML);
+        }
+        
+        // 关闭网络配置弹窗
+        function closeNetworkConfigModal() {
+            const modal = document.getElementById('networkConfigModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        }
+        
+        // 前往网络设置页面
+        function goToNetworkSettings() {
+            closeNetworkConfigModal();
+            
+            // 直接跳转到网络配置页面
+            window.location.href = './network-config.html';
+        }
+        
+        // 跳转到网络配置页面
+        function goToNetworkConfig() {
+            window.location.href = './network-config.html';
+        }
+        
+        // 打开网络设置面板（从设置页面点击）
+        function openNetworkSettingsPanel() {
+            showNetworkSettingsPage();
+        }
+        
+        // 显示网络设置页面
+        function showNetworkSettingsPage() {
+            const networkPageHTML = `
+                <div id="networkSettingsPage" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f2f2f7; z-index: 2500; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+                    <!-- 状态栏 -->
+                    <div class="status-bar">
+                        <div class="status-time">13:34</div>
+                        <div class="status-icons">
+                            <svg width="18" height="18" fill="#1d1d1f" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                            <svg width="18" height="18" fill="#1d1d1f" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.077 13.308-5.077 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1v0a1 1 0 110 2v0a1 1 0 01-1-1z"></path>
+                            </svg>
+                            <div class="battery">
+                                <div class="battery-level"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 导航栏 -->
+                    <div style="background: white; border-bottom: 0.5px solid rgba(0, 0, 0, 0.1); padding: 0 20px; height: 44px; display: flex; align-items: center;">
+                        <button onclick="closeNetworkSettingsPage()" style="background: none; border: none; padding: 8px; margin-left: -8px; cursor: pointer;">
+                            <svg width="24" height="24" fill="#007aff" viewBox="0 0 24 24">
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                            </svg>
+                        </button>
+                        <div style="flex: 1; text-align: center; font-size: 17px; font-weight: 600;">网络配置</div>
+                        <div style="width: 40px;"></div>
+                    </div>
+                    
+                    <!-- 内容区域 -->
+                    <div style="flex: 1; overflow-y: auto; padding: 20px;">
+                        <!-- WiFi设置卡片 -->
+                        <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 32px; height: 32px; background: #007aff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
+                                            <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #1d1d1f;">Wi-Fi</div>
+                                        <div style="font-size: 13px; color: #86868b;">已连接到 Office_5G</div>
+                                    </div>
+                                </div>
+                                <label style="position: relative; display: inline-block; width: 51px; height: 31px;">
+                                    <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #34c759; transition: .4s; border-radius: 31px;">
+                                        <span style="position: absolute; content: ''; height: 27px; width: 27px; left: 2px; bottom: 2px; background: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transform: translateX(20px);"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            <!-- 可用网络列表 -->
+                            <div style="border-top: 1px solid #e5e7eb; padding-top: 12px;">
+                                <div style="font-size: 13px; color: #86868b; margin-bottom: 12px;">可用网络</div>
+                                
+                                <div onclick="connectToWiFi('Office_5G')" style="display: flex; align-items: center; justify-content: between; padding: 12px; background: #f2f2f7; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 15px; color: #1d1d1f;">Office_5G</div>
+                                        <div style="font-size: 12px; color: #007aff;">已连接</div>
+                                    </div>
+                                    <svg width="20" height="20" fill="#86868b" viewBox="0 0 24 24">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                </div>
+                                
+                                <div onclick="connectToWiFi('Home_Network')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f2f2f7'" onmouseout="this.style.background='transparent'">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 15px; color: #1d1d1f;">Home_Network</div>
+                                        <div style="font-size: 12px; color: #86868b;">信号强</div>
+                                    </div>
+                                    <svg width="16" height="16" fill="#c7c7cc" viewBox="0 0 24 24">
+                                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                                    </svg>
+                                </div>
+                                
+                                <div onclick="connectToWiFi('Guest_WiFi')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f2f2f7'" onmouseout="this.style.background='transparent'">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 15px; color: #1d1d1f;">Guest_WiFi</div>
+                                        <div style="font-size: 12px; color: #86868b;">信号中等</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 设备网络信息 -->
+                        <div style="background: white; border-radius: 12px; padding: 16px;">
+                            <div style="font-size: 16px; font-weight: 600; color: #1d1d1f; margin-bottom: 16px;">设备网络信息</div>
+                            <div style="display: grid; gap: 12px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #86868b; font-size: 14px;">IP地址</span>
+                                    <span style="color: #1d1d1f; font-size: 14px;">192.168.1.128</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #86868b; font-size: 14px;">子网掩码</span>
+                                    <span style="color: #1d1d1f; font-size: 14px;">255.255.255.0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #86868b; font-size: 14px;">网关</span>
+                                    <span style="color: #1d1d1f; font-size: 14px;">192.168.1.1</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #86868b; font-size: 14px;">DNS</span>
+                                    <span style="color: #1d1d1f; font-size: 14px;">8.8.8.8</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 底部按钮 -->
+                    <div style="padding: 20px; background: white; border-top: 0.5px solid rgba(0, 0, 0, 0.1);">
+                        <button onclick="saveNetworkSettings()" style="width: 100%; background: #007aff; color: white; border: none; border-radius: 12px; padding: 16px; font-size: 17px; font-weight: 600; cursor: pointer;">
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.phone-container').insertAdjacentHTML('beforeend', networkPageHTML);
+            
+            // 显示页面动画
+            setTimeout(() => {
+                document.getElementById('networkSettingsPage').style.transform = 'translateX(0)';
+            }, 10);
+        }
+        
+        // 关闭网络设置页面
+        function closeNetworkSettingsPage() {
+            const page = document.getElementById('networkSettingsPage');
+            if (page) {
+                page.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    page.remove();
+                }, 300);
+            }
+        }
+        
+        // 连接到WiFi
+        function connectToWiFi(networkName) {
+            if (networkName === 'Home_Network' || networkName === 'Guest_WiFi') {
+                // 显示密码输入框
+                showPasswordPrompt(networkName);
+            }
+        }
+        
+        // 显示密码输入弹窗
+        function showPasswordPrompt(networkName) {
+            const promptHTML = `
+                <div id="passwordPrompt" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 3000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 14px; width: 90%; max-width: 320px; padding: 20px;">
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">输入密码</h3>
+                        <p style="font-size: 14px; color: #86868b; margin-bottom: 16px;">请输入 "${networkName}" 的密码</p>
+                        <input type="password" id="wifiPassword" placeholder="密码" style="width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 8px; font-size: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; gap: 12px;">
+                            <button onclick="cancelPasswordPrompt()" style="flex: 1; padding: 12px; border: 1px solid #d1d1d6; background: white; border-radius: 8px; font-size: 16px; color: #007aff; cursor: pointer;">取消</button>
+                            <button onclick="confirmWiFiConnection('${networkName}')" style="flex: 1; padding: 12px; border: none; background: #007aff; color: white; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">连接</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.querySelector('.phone-container').insertAdjacentHTML('beforeend', promptHTML);
+        }
+        
+        // 取消密码输入
+        function cancelPasswordPrompt() {
+            const prompt = document.getElementById('passwordPrompt');
+            if (prompt) prompt.remove();
+        }
+        
+        // 确认WiFi连接
+        function confirmWiFiConnection(networkName) {
+            cancelPasswordPrompt();
+            showSuccessMessage(`已连接到 ${networkName}`);
+        }
+        
+        // 保存网络设置
+        function saveNetworkSettings() {
+            closeNetworkSettingsPage();
+            showSuccessMessage('网络设置已保存');
         }
         
         
@@ -1745,10 +1889,12 @@
                 icon: deviceIcons[deviceType],
                 soc: Math.floor(Math.random() * 40) + 60,
                 soh: Math.floor(Math.random() * 10) + 90,
-                status: Math.random() > 0.5 ? '充电' : '放电'
+                status: Math.random() > 0.5 ? '充电' : '放电',
+                networkConfigured: false // 新添加的设备默认未配网
             };
             
             devices.push(newDevice);
+            lastAddedDevice = newDevice; // 记录最后添加的设备
             closeQRScanner();
             closeAddDevicePage();
             updateDeviceDisplay();
@@ -1757,6 +1903,11 @@
             const pages = document.querySelectorAll('.page-content');
             pages.forEach(page => page.classList.remove('active'));
             document.getElementById('device').classList.add('active');
+            
+            // 显示网络配置弹窗
+            setTimeout(() => {
+                showNetworkConfigModal();
+            }, 1000);
             
             // 更新导航状态
             const navItems = document.querySelectorAll('.nav-item');
@@ -1771,11 +1922,12 @@
         
         // 蓝牙连接相关函数
         function openBluetoothModal() {
-            document.getElementById('bluetoothModal').style.display = 'flex';
+            openAddDevice();
         }
         
         function closeBluetoothModal() {
-            document.getElementById('bluetoothModal').style.display = 'none';
+            // 这个函数保留以兼容性，但实际使用 closeAddDevicePage
+            closeAddDevicePage();
         }
         
         function connectBMSDevice() {
