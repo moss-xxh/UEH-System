@@ -360,15 +360,6 @@
             
             <!-- 查询结果区域 -->
             <div id="query-result" class="hidden mt-6">
-                <!-- 返回图标 -->
-                <div class="flex justify-start mb-3">
-                    <button id="query-result-back-btn" class="touchable flex items-center gap-1.5 -ml-1">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span class="text-blue-500 text-base">返回</span>
-                    </button>
-                </div>
                 <div class="card-apple p-4">
                     <div id="query-result-content" class="space-y-3 text-sm"></div>
                     <button id="edit-query-btn" class="btn-outline-black w-full mt-4 flex justify-center items-center gap-2">
@@ -758,6 +749,7 @@
                 authorized: '已授权',
                 unauthorized: '未授权',
                 authorizing: '授权中',
+                exited: '已退出',
                 submit_time: '提交时间',
                 edit_message: '您现在可以修改信息',
                 address_label: '设备地址',
@@ -1191,7 +1183,6 @@
             const queryResult = document.getElementById('query-result');
             const noDataMessage = document.getElementById('no-data-message');
             const editQueryBtn = document.getElementById('edit-query-btn');
-            const queryResultBackBtn = document.getElementById('query-result-back-btn');
             const queryFormBackBtn = document.getElementById('query-form-back-btn');
             
             let queryToggle = false;
@@ -1230,79 +1221,288 @@
                     return;
                 }
                 
-                queryToggle = !queryToggle;
+                // 按顺序循环切换查询结果场景（与桌面版保持一致）
+                const scenarios = ['two_records', 'authorized', 'authorizing', 'exited', 'fail'];
                 
-                if (queryToggle) {
+                // 获取或初始化场景索引
+                if (!window.queryScenarioIndex) {
+                    window.queryScenarioIndex = 0;
+                }
+                
+                // 获取当前场景
+                const scenario = scenarios[window.queryScenarioIndex];
+                
+                // 更新场景索引
+                window.queryScenarioIndex = (window.queryScenarioIndex + 1) % scenarios.length;
+                
+                if (scenario === 'fail') {
+                    // 查询失败
+                    queryResult.classList.add('hidden');
+                    noDataMessage.classList.remove('hidden');
+                } else {
                     const resultContent = document.getElementById('query-result-content');
                     const brandDisplay = document.getElementById('query-brand-display').textContent;
                     
-                    // 模拟不同的授权状态
-                    const isAuthorized = Math.random() > 0.3; // 70%概率已授权
-                    const randomSN = 'SN2024' + Math.floor(Math.random() * 10000);
-                    const randomMeter = Math.floor(Math.random() * 100000000).toString();
-                    const currentAddress = currentLang === 'zh' ? '悉尼, 新南威尔士州, 澳大利亚' : 'Sydney, NSW, Australia';
-                    const submitTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                    if (scenario === 'two_records') {
+                        // 查询成功 - 显示两条记录（一个已授权，一个授权中）
+                        const authorizedDevice = {
+                            sn: 'SN20231125',
+                            submitTime: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                            isAuthorized: true
+                        };
+                        
+                        const authorizingDevice = {
+                            sn: 'SN20241208',
+                            submitTime: new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                            isAuthorized: false
+                        };
+                        
+                        queryResultData = {
+                            brand: brand,
+                            brandDisplay: brandDisplay,
+                            account: account,
+                            sn: authorizingDevice.sn,
+                            address: currentLang === 'zh' ? '悉尼, 新南威尔士州, 澳大利亚' : 'Sydney, NSW, Australia',
+                            meter: Math.floor(Math.random() * 100000000).toString()
+                        };
+                        
+                        resultContent.innerHTML = `
+                            <div class="text-sm text-tertiary mb-3">
+                                ${currentLang === 'zh' ? '共找到 2 条记录' : 'Found 2 records'}
+                            </div>
+                            
+                            <!-- 记录1 - 已授权设备 -->
+                            <div class="bg-light/70 rounded-xl p-3 mb-3">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-semibold text-sm">${currentLang === 'zh' ? '设备 1' : 'Device 1'}</span>
+                                    <span class="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full font-medium">
+                                        ${translations[currentLang].authorized || '已授权'}
+                                    </span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">品牌:</span>
+                                        <span class="font-medium">${brandDisplay}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">账号:</span>
+                                        <span class="font-medium">${account}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备SN:</span>
+                                        <span class="font-medium">${authorizedDevice.sn}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备地址:</span>
+                                        <span class="font-medium text-right max-w-[60%]">${currentLang === 'zh' ? '墨尔本, 维多利亚州' : 'Melbourne, VIC'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">提交时间:</span>
+                                        <span class="font-medium">${authorizedDevice.submitTime}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 记录2 - 授权中设备 -->
+                            <div class="bg-light/70 rounded-xl p-3">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-semibold text-sm">${currentLang === 'zh' ? '设备 2' : 'Device 2'}</span>
+                                    <span class="px-2 py-0.5 bg-warning/10 text-warning text-xs rounded-full font-medium">
+                                        ${translations[currentLang].authorizing || '授权中'}
+                                    </span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">品牌:</span>
+                                        <span class="font-medium">${brandDisplay}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">账号:</span>
+                                        <span class="font-medium">${account}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备SN:</span>
+                                        <span class="font-medium">${authorizingDevice.sn}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备地址:</span>
+                                        <span class="font-medium text-right max-w-[60%]">${currentLang === 'zh' ? '墨尔本, 维多利亚州' : 'Melbourne, VIC'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">提交时间:</span>
+                                        <span class="font-medium">${authorizingDevice.submitTime}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        editQueryBtn.textContent = translations[currentLang].edit_btn || '编辑';
+                        
+                    } else if (scenario === 'authorized') {
+                        // 查询成功 - 单条已授权记录
+                        const deviceSN = 'SN2024' + Math.floor(Math.random() * 10000);
+                        const submitTime = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                        
+                        queryResultData = {
+                            brand: brand,
+                            brandDisplay: brandDisplay,
+                            account: account,
+                            sn: deviceSN,
+                            address: currentLang === 'zh' ? '悉尼, 新南威尔士州, 澳大利亚' : 'Sydney, NSW, Australia',
+                            meter: Math.floor(Math.random() * 100000000).toString(),
+                            isAuthorized: true
+                        };
+                        
+                        resultContent.innerHTML = `
+                            <div class="text-sm text-tertiary mb-3">
+                                ${currentLang === 'zh' ? '共找到 1 条记录' : 'Found 1 record'}
+                            </div>
+                            <div class="bg-light/70 rounded-xl p-3">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-semibold text-sm">${currentLang === 'zh' ? '设备信息' : 'Device Info'}</span>
+                                    <span class="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full font-medium">
+                                        ${translations[currentLang].authorized || '已授权'}
+                                    </span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">品牌:</span>
+                                        <span class="font-medium">${brandDisplay}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">账号:</span>
+                                        <span class="font-medium">${account}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备SN:</span>
+                                        <span class="font-medium">${deviceSN}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备地址:</span>
+                                        <span class="font-medium text-right max-w-[60%]">${currentLang === 'zh' ? '墨尔本, 维多利亚州' : 'Melbourne, VIC'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">提交时间:</span>
+                                        <span class="font-medium">${submitTime}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        editQueryBtn.textContent = translations[currentLang].edit_btn || '编辑';
+                        
+                    } else if (scenario === 'authorizing') {
+                        // 查询成功 - 单条授权中记录
+                        const deviceSN = 'SN2024' + Math.floor(Math.random() * 10000);
+                        const submitTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                        
+                        queryResultData = {
+                            brand: brand,
+                            brandDisplay: brandDisplay,
+                            account: account,
+                            sn: deviceSN,
+                            address: currentLang === 'zh' ? '悉尼, 新南威尔士州, 澳大利亚' : 'Sydney, NSW, Australia',
+                            meter: Math.floor(Math.random() * 100000000).toString(),
+                            isAuthorized: false
+                        };
+                        
+                        resultContent.innerHTML = `
+                            <div class="text-sm text-tertiary mb-3">
+                                ${currentLang === 'zh' ? '共找到 1 条记录' : 'Found 1 record'}
+                            </div>
+                            <div class="bg-light/70 rounded-xl p-3">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-semibold text-sm">${currentLang === 'zh' ? '设备信息' : 'Device Info'}</span>
+                                    <span class="px-2 py-0.5 bg-warning/10 text-warning text-xs rounded-full font-medium">
+                                        ${translations[currentLang].authorizing || '授权中'}
+                                    </span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">品牌:</span>
+                                        <span class="font-medium">${brandDisplay}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">账号:</span>
+                                        <span class="font-medium">${account}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备SN:</span>
+                                        <span class="font-medium">${deviceSN}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备地址:</span>
+                                        <span class="font-medium text-right max-w-[60%]">${currentLang === 'zh' ? '墨尔本, 维多利亚州' : 'Melbourne, VIC'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">提交时间:</span>
+                                        <span class="font-medium">${submitTime}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        editQueryBtn.textContent = translations[currentLang].edit_btn || '编辑';
+                        
+                    } else if (scenario === 'exited') {
+                        // 查询成功 - 单条已退出记录
+                        const exitedDeviceSN = 'SN2023' + Math.floor(1000 + Math.random() * 9000);
+                        const exitedSubmitTime = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                        
+                        queryResultData = {
+                            brand: brand,
+                            brandDisplay: brandDisplay,
+                            account: account,
+                            sn: exitedDeviceSN,
+                            address: currentLang === 'zh' ? '布里斯班, 昆士兰州, 澳大利亚' : 'Brisbane, QLD, Australia',
+                            meter: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                            isExited: true
+                        };
+                        
+                        resultContent.innerHTML = `
+                            <div class="text-sm text-tertiary mb-3">
+                                ${currentLang === 'zh' ? '共找到 1 条记录' : 'Found 1 record'}
+                            </div>
+                            <div class="bg-light/70 rounded-xl p-3">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-semibold text-sm">${currentLang === 'zh' ? '设备信息' : 'Device Info'}</span>
+                                    <span class="px-2 py-0.5 bg-danger/10 text-danger text-xs rounded-full font-medium">
+                                        ${translations[currentLang].exited || '已退出'}
+                                    </span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">品牌:</span>
+                                        <span class="font-medium">${brandDisplay}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">账号:</span>
+                                        <span class="font-medium">${account}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备SN:</span>
+                                        <span class="font-medium">${exitedDeviceSN}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">设备地址:</span>
+                                        <span class="font-medium text-right max-w-[60%]">${currentLang === 'zh' ? '布里斯班, 昆士兰州' : 'Brisbane, QLD'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">提交时间:</span>
+                                        <span class="font-medium">${exitedSubmitTime}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        editQueryBtn.textContent = currentLang === 'zh' ? '重新授权' : 'Re-authorize';
+                    }
                     
-                    // 保存查询结果数据，用于编辑
-                    queryResultData = {
-                        brand: brand,
-                        brandDisplay: brandDisplay,
-                        account: account,
-                        sn: randomSN,
-                        address: currentAddress,
-                        meter: randomMeter
-                    };
-                    
-                    resultContent.innerHTML = `
-                        <div class="space-y-3">
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].brand_label || '品牌'}:</span>
-                                <span class="font-medium text-sm">${brandDisplay}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].account_label || '账号'}:</span>
-                                <span class="font-medium text-sm">${account}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].sn_label || '设备SN'}:</span>
-                                <span class="font-medium text-sm">${randomSN}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].address_label || '设备地址'}:</span>
-                                <span class="font-medium text-sm text-right max-w-[60%]">${currentAddress}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].meter_label || '电表号'}:</span>
-                                <span class="font-medium text-sm">${randomMeter}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].submit_time || '提交时间'}:</span>
-                                <span class="font-medium text-sm">${submitTime}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-tertiary text-sm">${translations[currentLang].auth_status || '授权状态'}:</span>
-                                <span class="font-medium text-sm ${isAuthorized ? 'text-success' : 'text-warning'}">
-                                    ${isAuthorized ? (translations[currentLang].authorized || '已授权') : (translations[currentLang].authorizing || '授权中')}
-                                </span>
-                            </div>
-                        </div>
-                    `;
                     queryResult.classList.remove('hidden');
                     noDataMessage.classList.add('hidden');
-                } else {
-                    queryResult.classList.add('hidden');
-                    noDataMessage.classList.remove('hidden');
                 }
             });
             
-            // 查询结果卡片的返回按钮 - 返回到表单页面
-            if (queryResultBackBtn) {
-                queryResultBackBtn.addEventListener('click', function() {
-                    queryPage.classList.add('hidden');
-                    formPage.classList.remove('hidden');
-                    submitBtnContainer.classList.remove('hidden');
-                });
-            }
             
             editQueryBtn.addEventListener('click', function() {
                 if (queryResultData) {
