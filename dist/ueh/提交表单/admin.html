@@ -404,10 +404,6 @@
                             </button>
                         </div>
                         <div class="flex gap-2">
-                            <button id="batch-detect-btn" class="btn-black px-4 py-2 hidden">
-                                <i class="fa fa-check-circle mr-2"></i>
-                                <span data-i18n="batch_detect">全部检测</span>
-                            </button>
                             <button id="table-export-btn" class="btn-outline-black px-4 py-2">
                                 <i class="fa fa-download mr-2"></i>
                                 <span data-i18n="export">导出</span>
@@ -621,7 +617,6 @@
                 confirm_reject: 'Confirm Reject',
                 detect: 'Check',
                 reject: 'Reject',
-                batch_detect: 'Detect All',
                 detect_success: 'Detection successful, authorized',
                 reject_success: 'Successfully rejected',
                 rejection_reason: 'Rejection Reason',
@@ -701,7 +696,6 @@
                 confirm_reject: '确认驳回',
                 detect: '检测',
                 reject: '驳回',
-                batch_detect: '全部检测',
                 detect_success: '检测成功，已授权',
                 reject_success: '已成功驳回',
                 rejection_reason: '驳回原因',
@@ -1280,8 +1274,8 @@
                 checkboxes.forEach(cb => cb.checked = this.checked);
             });
             
-            // 批量检测按钮
-            document.getElementById('batch-detect-btn').addEventListener('click', performBatchDetection);
+            // 批量检测按钮 - 已移除
+            // document.getElementById('batch-detect-btn').addEventListener('click', performBatchDetection);
             
             // 表格导出按钮
             document.getElementById('table-export-btn').addEventListener('click', function() {
@@ -1324,15 +1318,15 @@
             currentTab = tab;
             currentPage = 1;
             
-            // 更新批量检测按钮显示
-            const batchDetectBtn = document.getElementById('batch-detect-btn');
-            if (batchDetectBtn) {
-                if (tab === 'unauthorized' || tab === 'authorized') {
-                    batchDetectBtn.classList.remove('hidden');
-                } else {
-                    batchDetectBtn.classList.add('hidden');
-                }
-            }
+            // 批量检测按钮显示 - 已移除
+            // const batchDetectBtn = document.getElementById('batch-detect-btn');
+            // if (batchDetectBtn) {
+            //     if (tab === 'unauthorized' || tab === 'authorized') {
+            //         batchDetectBtn.classList.remove('hidden');
+            //     } else {
+            //         batchDetectBtn.classList.add('hidden');
+            //     }
+            // }
             
             // 更新Tab样式
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1512,81 +1506,81 @@
             }, isFromBatch ? 500 : 1500); // 批量检测时更快
         }
         
-        // 批量检测
-        window.performBatchDetection = function() {
-            // 根据当前tab选择不同的项目
-            let itemsToDetect;
-            if (currentTab === 'unauthorized') {
-                itemsToDetect = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected);
-            } else if (currentTab === 'authorized') {
-                itemsToDetect = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected);
-            } else {
-                return;
-            }
-            
-            const unauthorizedItems = itemsToDetect;
-            
-            if (unauthorizedItems.length === 0) {
-                showSuccessToast(currentLang === 'zh' ? '没有需要检测的项目' : 'No items to detect', 'black');
-                return;
-            }
-            
-            showSuccessToast(currentLang === 'zh' ? `正在批量检测 ${unauthorizedItems.length} 个项目...` : `Detecting ${unauthorizedItems.length} items...`, 'black');
-            
-            let processed = 0;
-            let authorizedCount = 0;
-            let failedCount = 0;
-            
-            unauthorizedItems.forEach((item, index) => {
-                setTimeout(() => {
-                    const deviceIndex = mockData.findIndex(d => d.id === item.id);
-                    if (deviceIndex !== -1) {
-                        mockData[deviceIndex].hasDetected = true;
-                        
-                        if (!mockData[deviceIndex].remarkType) {
-                            mockData[deviceIndex].status = 'active';
-                            authorizedCount++;
-                        } else {
-                            failedCount++;
-                        }
-                    }
-                    
-                    processed++;
-                    
-                    if (processed === unauthorizedItems.length) {
-                        // 全部完成
-                        setTimeout(() => {
-                            if (currentTab === 'authorized') {
-                                // 已授权tab的检测结果
-                                showSuccessToast(
-                                    currentLang === 'zh' ? 
-                                    `检测完成，${unauthorizedItems.length} 个项目状态正常` : 
-                                    `Detection completed, ${unauthorizedItems.length} items status normal`,
-                                    'success'
-                                );
-                            } else if (failedCount > 0) {
-                                showSuccessToast(
-                                    currentLang === 'zh' ? 
-                                    `批量检测完成：${authorizedCount} 个已授权，${failedCount} 个检测失败` : 
-                                    `Batch detection completed: ${authorizedCount} authorized, ${failedCount} failed`,
-                                    'black'
-                                );
-                            } else {
-                                showSuccessToast(
-                                    currentLang === 'zh' ? 
-                                    `批量检测完成，${authorizedCount} 个项目已授权` : 
-                                    `Batch detection completed, ${authorizedCount} items authorized`,
-                                    'success'
-                                );
-                            }
-                            updateStats();
-                            renderTable();
-                            updateTabCounts();
-                        }, 600);
-                    }
-                }, index * 200); // 每个间隔200ms
-            });
-        }
+        // 批量检测 - 已移除
+        // window.performBatchDetection = function() {
+        //     // 根据当前tab选择不同的项目
+        //     let itemsToDetect;
+        //     if (currentTab === 'unauthorized') {
+        //         itemsToDetect = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected);
+        //     } else if (currentTab === 'authorized') {
+        //         itemsToDetect = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected);
+        //     } else {
+        //         return;
+        //     }
+        //     
+        //     const unauthorizedItems = itemsToDetect;
+        //     
+        //     if (unauthorizedItems.length === 0) {
+        //         showSuccessToast(currentLang === 'zh' ? '没有需要检测的项目' : 'No items to detect', 'black');
+        //         return;
+        //     }
+        //     
+        //     showSuccessToast(currentLang === 'zh' ? `正在批量检测 ${unauthorizedItems.length} 个项目...` : `Detecting ${unauthorizedItems.length} items...`, 'black');
+        //     
+        //     let processed = 0;
+        //     let authorizedCount = 0;
+        //     let failedCount = 0;
+        //     
+        //     unauthorizedItems.forEach((item, index) => {
+        //         setTimeout(() => {
+        //             const deviceIndex = mockData.findIndex(d => d.id === item.id);
+        //             if (deviceIndex !== -1) {
+        //                 mockData[deviceIndex].hasDetected = true;
+        //                 
+        //                 if (!mockData[deviceIndex].remarkType) {
+        //                     mockData[deviceIndex].status = 'active';
+        //                     authorizedCount++;
+        //                 } else {
+        //                     failedCount++;
+        //                 }
+        //             }
+        //             
+        //             processed++;
+        //             
+        //             if (processed === unauthorizedItems.length) {
+        //                 // 全部完成
+        //                 setTimeout(() => {
+        //                     if (currentTab === 'authorized') {
+        //                         // 已授权tab的检测结果
+        //                         showSuccessToast(
+        //                             currentLang === 'zh' ? 
+        //                             `检测完成，${unauthorizedItems.length} 个项目状态正常` : 
+        //                             `Detection completed, ${unauthorizedItems.length} items status normal`,
+        //                             'success'
+        //                         );
+        //                     } else if (failedCount > 0) {
+        //                         showSuccessToast(
+        //                             currentLang === 'zh' ? 
+        //                             `批量检测完成：${authorizedCount} 个已授权，${failedCount} 个检测失败` : 
+        //                             `Batch detection completed: ${authorizedCount} authorized, ${failedCount} failed`,
+        //                             'black'
+        //                         );
+        //                     } else {
+        //                         showSuccessToast(
+        //                             currentLang === 'zh' ? 
+        //                             `批量检测完成，${authorizedCount} 个项目已授权` : 
+        //                             `Batch detection completed, ${authorizedCount} items authorized`,
+        //                             'success'
+        //                         );
+        //                     }
+        //                     updateStats();
+        //                     renderTable();
+        //                     updateTabCounts();
+        //                 }, 600);
+        //             }
+        //         }, index * 200); // 每个间隔200ms
+        //     });
+        // }
         
         // 导出函数到全局
         window.switchTab = switchTab;
