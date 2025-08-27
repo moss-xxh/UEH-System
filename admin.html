@@ -326,7 +326,7 @@
                         <div class="flex items-center gap-3">
                             <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="time_label">时间</label>
                             <div class="relative flex-1">
-                                <input type="date" id="date-filter" class="input-apple input-with-icon w-full">
+                                <input type="date" id="date-filter" class="input-apple input-with-icon w-full" placeholder="YYYY-MM-DD">
                                 <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary">
                                     <i class="fa fa-calendar"></i>
                                 </div>
@@ -1180,6 +1180,19 @@
             document.getElementById('sn-input').placeholder = lang === 'zh' ? '输入设备SN' : 'Enter device SN';
             document.getElementById('meter-input').placeholder = lang === 'zh' ? '输入电表号' : 'Enter NMI';
             document.getElementById('current-lang').textContent = lang === 'zh' ? '中文' : 'English';
+            
+            // 更新日期输入的标签格式
+            const dateInput = document.getElementById('date-filter');
+            if (dateInput) {
+                // 为日期输入添加格式提示
+                if (lang === 'zh') {
+                    dateInput.setAttribute('title', '选择日期');
+                    dateInput.setAttribute('placeholder', 'YYYY-MM-DD');
+                } else {
+                    dateInput.setAttribute('title', 'Select date');
+                    dateInput.setAttribute('placeholder', 'YYYY-MM-DD');
+                }
+            }
             
             // 重新生成数据和渲染
             generateMockData();
