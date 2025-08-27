@@ -1695,7 +1695,7 @@
                 }
                 
                 // 按顺序循环切换查询结果场景
-                const scenarios = ['two_records', 'authorized', 'authorizing', 'exited', 'fail'];
+                const scenarios = ['two_records', 'authorized', 'authorizing', 'exited', 'fail', 'rejected'];
                 
                 // 获取或初始化场景索引
                 if (!window.queryScenarioIndex) {
@@ -1714,6 +1714,113 @@
                     editQueryBtn.classList.add('hidden');
                     querySuccessMessage.classList.add('hidden');
                     noDataMessage.classList.remove('hidden');
+                } else if (scenario === 'rejected') {
+                    // 被驳回状态
+                    queryResult.classList.remove('hidden');
+                    editQueryBtn.classList.remove('hidden');
+                    querySuccessMessage.classList.remove('hidden');
+                    noDataMessage.classList.add('hidden');
+                    
+                    // 查询成功 - 显示单条被驳回的设备
+                    const brandSelect = document.getElementById('query-brand');
+                    const brandText = brandSelect.options[brandSelect.selectedIndex].text;
+                    
+                    // 生成被驳回设备数据
+                    const rejectedDeviceSN = 'SN2024' + Math.floor(1000 + Math.random() * 9000);
+                    const rejectedAddress = currentLang === 'zh' ? '悉尼, 新南威尔士州' : 'Sydney, NSW';
+                    const rejectedMeterNumber = Math.floor(10000000 + Math.random() * 90000000).toString();
+                    const rejectedSubmitTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                    const rejectReason = currentLang === 'zh' ? '设备信息不完整，请重新提交' : 'Incomplete device information, please resubmit';
+                    
+                    queryResultContent.innerHTML = `
+                        <div class="space-y-4">
+                            <!-- 单条被驳回记录 -->
+                            <div class="p-4 bg-light rounded-lg border border-border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-semibold text-base">${currentLang === 'zh' ? '设备信息' : 'Device Info'}</span>
+                                    <span class="px-2 py-1 bg-orange-500/10 text-orange-600 text-xs rounded-full font-medium">
+                                        ${currentLang === 'zh' ? '已驳回' : 'Rejected'}
+                                    </span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">${translations[currentLang].brand_label || '品牌'}:</span>
+                                        <span class="font-medium">${brandText}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">${translations[currentLang].account_label || '账号'}:</span>
+                                        <span class="font-medium">${account}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">${translations[currentLang].device_sn_label || '设备SN'}:</span>
+                                        <span class="font-medium">${rejectedDeviceSN}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">${translations[currentLang].device_address_label || '设备地址'}:</span>
+                                        <span class="font-medium">${rejectedAddress}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-tertiary">${translations[currentLang].submit_time_label || '提交时间'}:</span>
+                                        <span class="font-medium">${rejectedSubmitTime}</span>
+                                    </div>
+                                </div>
+                                <!-- 驳回原因 -->
+                                <div class="mt-3 p-3 bg-orange-500/5 border border-orange-200 rounded-lg">
+                                    <div class="flex items-start gap-2">
+                                        <i class="fa fa-exclamation-triangle text-orange-600 mt-0.5"></i>
+                                        <div>
+                                            <p class="font-medium text-orange-800 text-sm">${currentLang === 'zh' ? '驳回原因' : 'Rejection Reason'}</p>
+                                            <p class="text-orange-700 text-sm mt-1">${rejectReason}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 修改按钮文本和功能为"重新提交"
+                    editQueryBtn.innerHTML = `<i class="fa fa-edit mr-2"></i>${currentLang === 'zh' ? '重新提交' : 'Resubmit'}`;
+                    
+                    // 保存被驳回设备数据
+                    const savedRejectedDeviceSN = rejectedDeviceSN;
+                    const savedRejectedAddress = rejectedAddress;
+                    const savedRejectedMeterNumber = rejectedMeterNumber;
+                    const savedBrand = brand;
+                    const savedAccount = account;
+                    
+                    // 重新提交按钮功能 - 回到提交页面
+                    editQueryBtn.onclick = function() {
+                        // 切换到提交视图
+                        queryView.classList.add('hidden');
+                        submitView.classList.remove('hidden');
+                        
+                        // 填充表单数据（回显被驳回设备的信息）
+                        const accountInput = document.getElementById('user-account');
+                        const brandSelect = document.getElementById('brand');
+                        const deviceSnInput = document.getElementById('device-sn');
+                        const deviceAddressInput = document.getElementById('device-address');
+                        const meterNumberInput = document.getElementById('meter-number');
+                        
+                        // 设置品牌和账号
+                        brandSelect.value = savedBrand;
+                        accountInput.value = savedAccount;
+                        
+                        // 设置设备信息
+                        deviceSnInput.value = savedRejectedDeviceSN;
+                        deviceAddressInput.value = savedRejectedAddress;
+                        meterNumberInput.value = savedRejectedMeterNumber;
+                        
+                        // 滚动到表单顶部
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    };
+                    
+                    // 重置返回按钮文本
+                    const queryBackBtn = document.getElementById('query-back-btn');
+                    queryBackBtn.innerHTML = `<i class="fa fa-arrow-left mr-2"></i>${translations[currentLang].back_btn || '返回'}`;
+                    queryBackBtn.onclick = function() {
+                        queryView.classList.add('hidden');
+                        submitView.classList.remove('hidden');
+                    };
                 } else if (scenario === 'two_records') {
                     // 查询成功 - 显示两条记录（一个已授权，一个授权中）
                     const brandSelect = document.getElementById('query-brand');
@@ -1974,64 +2081,8 @@
                     
                     querySuccessMessage.classList.remove('hidden');
                     queryResult.classList.remove('hidden');
-                    editQueryBtn.classList.remove('hidden'); // 显示重新授权按钮
+                    editQueryBtn.classList.add('hidden'); // 隐藏重新授权按钮（已退出的设备不允许重新授权）
                     noDataMessage.classList.add('hidden');
-                    
-                    // 修改按钮文本为"重新授权"
-                    editQueryBtn.textContent = currentLang === 'zh' ? '重新授权' : 'Re-authorize';
-                    
-                    // 保存已退出设备数据到闭包
-                    const savedExitedDeviceSN = exitedDeviceSN;
-                    const savedExitedAddress = exitedAddress;
-                    const savedExitedMeterNumber = exitedMeterNumber;
-                    const savedBrand = brand;
-                    const savedAccount = account;
-                    
-                    // 重新授权按钮功能
-                    editQueryBtn.onclick = function() {
-                        // 填充表单数据（回显已退出设备的信息）
-                        const accountInput = document.getElementById('user-account');
-                        const brandSelect = document.getElementById('brand');
-                        const deviceSnInput = document.getElementById('device-sn');
-                        const deviceAddressInput = document.getElementById('device-address');
-                        const meterNumberInput = document.getElementById('meter-number');
-                        
-                        // 设置品牌和账号
-                        brandSelect.value = savedBrand;
-                        accountInput.value = savedAccount;
-                        
-                        // 设置其他字段
-                        deviceSnInput.value = savedExitedDeviceSN;
-                        deviceAddressInput.value = savedExitedAddress;
-                        meterNumberInput.value = savedExitedMeterNumber;
-                        
-                        // 清空可能存在的其他字段
-                        const signaturePad = document.getElementById('signature-pad');
-                        if (signaturePad && window.signaturePadInstance) {
-                            window.signaturePadInstance.clear();
-                        }
-                        
-                        // 重置隐私协议复选框
-                        const privacyCheckbox = document.getElementById('privacy-agreement');
-                        if (privacyCheckbox) {
-                            privacyCheckbox.checked = false;
-                        }
-                        
-                        // 所有字段都可以编辑（重新授权）
-                        accountInput.removeAttribute('readonly');
-                        accountInput.style.backgroundColor = '';
-                        accountInput.style.cursor = '';
-                        brandSelect.removeAttribute('disabled');
-                        brandSelect.style.backgroundColor = '';
-                        brandSelect.style.cursor = '';
-                        
-                        // 切换到表单编辑页面
-                        queryPage.classList.add('hidden');
-                        formContainer.classList.remove('hidden');
-                        submissionInfo.classList.add('hidden');
-                        
-                        showStatusMessage(currentLang === 'zh' ? '重新授权设备 - 所有字段均可修改' : 'Re-authorize device - All fields are editable', 'info');
-                    };
                 } else if (scenario === 'authorizing') {
                     // 查询成功 - 单条授权中记录
                     const brandSelect = document.getElementById('query-brand');

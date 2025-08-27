@@ -394,15 +394,25 @@
                                 <span data-i18n="unauthorized_tab">未授权</span>
                                 <span class="ml-1 text-xs opacity-60" id="unauthorized-count">(0)</span>
                             </button>
+                            <button id="tab-rejected" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('rejected')">
+                                <span data-i18n="rejected_tab">已驳回</span>
+                                <span class="ml-1 text-xs opacity-60" id="rejected-count">(0)</span>
+                            </button>
                             <button id="tab-exited" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('exited')">
                                 <span data-i18n="exited_tab">已退出</span>
                                 <span class="ml-1 text-xs opacity-60" id="exited-count">(0)</span>
                             </button>
                         </div>
-                        <button id="table-export-btn" class="btn-outline-black px-4 py-2">
-                            <i class="fa fa-download mr-2"></i>
-                            <span data-i18n="export">导出</span>
-                        </button>
+                        <div class="flex gap-2">
+                            <button id="batch-detect-btn" class="btn-black px-4 py-2 hidden">
+                                <i class="fa fa-check-circle mr-2"></i>
+                                <span data-i18n="batch_detect">全部检测</span>
+                            </button>
+                            <button id="table-export-btn" class="btn-outline-black px-4 py-2">
+                                <i class="fa fa-download mr-2"></i>
+                                <span data-i18n="export">导出</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="table-container">
@@ -462,6 +472,32 @@
             </div>
             <div class="p-5 overflow-y-auto max-h-[70vh]" id="detail-content">
                 <!-- 详情内容将通过JavaScript动态添加 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 驳回模态框 -->
+    <div id="reject-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-apple">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-times-circle text-danger mr-2"></i>
+                    <span data-i18n="reject_title">驳回申请</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-600 mb-3 text-sm" data-i18n="reject_message">请输入驳回原因（选填）：</p>
+                <textarea id="reject-reason" rows="4" class="input-apple w-full resize-none" placeholder="请输入驳回原因..."></textarea>
+                <input type="hidden" id="reject-device-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeRejectModal()" class="btn-outline-black px-4 py-2">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmReject()" class="px-4 py-2 bg-danger text-white rounded-full hover:bg-danger/90 transition-colors">
+                    <i class="fa fa-times mr-2"></i>
+                    <span data-i18n="confirm_reject">确认驳回</span>
+                </button>
             </div>
         </div>
     </div>
@@ -579,6 +615,17 @@
                 refresh: 'Refresh',
                 auth_management: 'Authorization Management',
                 exit_users: 'Exited Users',
+                rejected_tab: 'Rejected',
+                reject_title: 'Reject Application',
+                reject_message: 'Please enter rejection reason (optional):',
+                confirm_reject: 'Confirm Reject',
+                detect: 'Check',
+                reject: 'Reject',
+                batch_detect: 'Detect All',
+                detect_success: 'Detection successful, authorized',
+                reject_success: 'Successfully rejected',
+                rejection_reason: 'Rejection Reason',
+                rejected_time: 'Rejected Time',
                 restore_vpp: 'Restore to VPP',
                 exit_time: 'Exit Time',
                 no_exited_users: 'No exited users',
@@ -648,6 +695,17 @@
                 refresh: '刷新',
                 auth_management: '授权管理',
                 exit_users: '退出用户',
+                rejected_tab: '已驳回',
+                reject_title: '驳回申请',
+                reject_message: '请输入驳回原因（选填）：',
+                confirm_reject: '确认驳回',
+                detect: '检测',
+                reject: '驳回',
+                batch_detect: '全部检测',
+                detect_success: '检测成功，已授权',
+                reject_success: '已成功驳回',
+                rejection_reason: '驳回原因',
+                rejected_time: '驳回时间',
                 restore_vpp: '恢复到VPP',
                 exit_time: '退出时间',
                 no_exited_users: '暂无退出用户',
@@ -676,32 +734,30 @@
             mockData = [];
             const today = new Date();
             
-            // 生成50条数据，其中36条已授权，14条未授权
-            for (let i = 1; i <= 50; i++) {
+            // 生成数据：37条已授权，2条未授权
+            for (let i = 1; i <= 39; i++) {
                 const date = new Date();
-                // 4条是今天的数据（3条已授权，1条未授权）
+                // 今天的数据
                 if (i <= 4) {
                     date.setHours(date.getHours() - Math.floor(Math.random() * 24));
                 } else {
                     date.setDate(date.getDate() - Math.floor(Math.random() * 29 + 1));
                 }
                 
-                // 前3条今天已授权，第4条今天未授权，然后33条已授权，最后13条未授权
                 let status = 'active';
                 let remarkType = ''; // 备注类型
                 
-                if (i <= 3) {
-                    status = 'active'; // 今天的前3条已授权
-                } else if (i == 4) {
-                    status = 'inactive'; // 今天的第4条未授权
-                    remarkType = 'account_not_exist';
-                } else if (i <= 37) {
-                    status = 'active'; // 其他已授权（总计36条：前3条+后33条）
+                if (i === 38) {
+                    // 第38条：未授权，检测后会成功
+                    status = 'inactive';
+                    remarkType = ''; // 没有问题，检测后会变成已授权
+                } else if (i === 39) {
+                    // 第39条：未授权，检测后会失败
+                    status = 'inactive';
+                    remarkType = 'account_not_exist'; // 账号不存在，检测后仍然失败
                 } else {
-                    status = 'inactive'; // 其他未授权（总计14条）
-                    // 随机分配未授权原因
-                    const reasons = ['account_not_exist', 'device_not_exist', 'both_not_exist'];
-                    remarkType = reasons[Math.floor(Math.random() * reasons.length)];
+                    // 其他都是已授权
+                    status = 'active';
                 }
                 
                 mockData.push({
@@ -778,13 +834,13 @@
 
         // 更新统计数据
         function updateStats() {
-            // 总用户数
-            const totalUsers = mockData.length;
+            // 总用户数（不包括已退出和已驳回的）
+            const totalUsers = mockData.filter(item => !item.isExited && !item.isRejected).length;
             document.getElementById('total-users').textContent = totalUsers;
             
-            // 已授权和未授权统计
-            const authorizedCount = mockData.filter(item => item.status === 'active').length;
-            const unauthorizedCount = mockData.filter(item => item.status === 'inactive').length;
+            // 已授权和未授权统计（不包括已退出和已驳回的）
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected).length;
             
             document.getElementById('total-authorized').textContent = authorizedCount;
             document.getElementById('total-unauthorized').textContent = unauthorizedCount;
@@ -792,7 +848,7 @@
             // 今日数据统计
             const today = new Date().toDateString();
             const todayData = mockData.filter(item => {
-                return new Date(item.submitTime).toDateString() === today;
+                return new Date(item.submitTime).toDateString() === today && !item.isExited && !item.isRejected;
             });
             
             const todayAuthorized = todayData.filter(item => item.status === 'active').length;
@@ -839,6 +895,8 @@
                     <td class="px-4 py-3">
                         ${currentTab === 'exited' ? 
                             `<span class="text-sm">${item.exitTime || '-'}</span>` :
+                            currentTab === 'rejected' ?
+                            `<span class="text-sm">${item.rejectedTime || '-'}</span>` :
                             `<span class="px-2 py-1 text-xs rounded-full ${
                                 item.status === 'active' 
                                     ? 'bg-success/10 text-success' 
@@ -849,8 +907,12 @@
                         }
                     </td>
                     <td class="px-4 py-3 text-sm">
-                        ${item.status === 'inactive' && item.remarkType ? 
+                        ${currentTab === 'unauthorized' && !item.hasDetected ?
+                            '-' :
+                            item.status === 'inactive' && item.remarkType && item.hasDetected ? 
                             `<span class="text-danger">${translations[currentLang][item.remarkType]}</span>` : 
+                            item.rejectionReason ? 
+                            `<span class="text-gray-600">${item.rejectionReason}</span>` :
                             '-'}
                     </td>
                     <td class="px-4 py-3" onclick="event.stopPropagation()">
@@ -859,6 +921,19 @@
                                 <i class="fa fa-undo mr-1"></i>
                                 ${translations[currentLang].restore || '恢复'}
                             </button>` :
+                            currentTab === 'unauthorized' ?
+                            `<div class="flex gap-2">
+                                <button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
+                                    <i class="fa fa-check mr-1"></i>
+                                    ${translations[currentLang].detect || '检测'}
+                                </button>
+                                <button onclick="showRejectModal(${item.id})" class="px-3 py-1.5 text-xs text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-all duration-200">
+                                    <i class="fa fa-times mr-1"></i>
+                                    ${translations[currentLang].reject || '驳回'}
+                                </button>
+                            </div>` :
+                            currentTab === 'rejected' ?
+                            `-` :
                             `<button onclick="showExitVPPModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
                                 <i class="fa fa-sign-out mr-1"></i>
                                 ${translations[currentLang].exit_vpp}
@@ -877,9 +952,11 @@
             let data;
             
             if (currentTab === 'authorized') {
-                data = [...mockData.filter(item => item.status === 'active' && !item.isExited)];
+                data = [...mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected)];
             } else if (currentTab === 'unauthorized') {
-                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited)];
+                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected)];
+            } else if (currentTab === 'rejected') {
+                data = [...rejectedUsers];
             } else if (currentTab === 'exited') {
                 data = [...exitedUsers];
             } else {
@@ -1030,6 +1107,8 @@
         
         // 存储退出的用户
         let exitedUsers = JSON.parse(localStorage.getItem('exitedVPPUsers') || '[]');
+        // 存储驳回的用户
+        let rejectedUsers = JSON.parse(localStorage.getItem('rejectedUsers') || '[]');
         
         // 确认退出VPP
         window.confirmExitVPP = function() {
@@ -1065,12 +1144,15 @@
         }
         
         // 显示成功提示
-        function showSuccessToast(message) {
+        function showSuccessToast(message, type = 'success') {
             // 创建toast元素
             const toast = document.createElement('div');
-            toast.className = 'fixed top-20 right-6 bg-success text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : type === 'black' ? 'bg-black' : 'bg-primary';
+            const iconClass = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'black' ? 'fa-info-circle' : 'fa-info-circle';
+            
+            toast.className = `fixed top-20 right-6 ${bgClass} text-white px-5 py-3 rounded-lg shadow-apple z-50 flex items-center gap-2`;
             toast.innerHTML = `
-                <i class="fa fa-check-circle"></i>
+                <i class="fa ${iconClass}"></i>
                 <span>${message}</span>
             `;
             document.body.appendChild(toast);
@@ -1198,6 +1280,9 @@
                 checkboxes.forEach(cb => cb.checked = this.checked);
             });
             
+            // 批量检测按钮
+            document.getElementById('batch-detect-btn').addEventListener('click', performBatchDetection);
+            
             // 表格导出按钮
             document.getElementById('table-export-btn').addEventListener('click', function() {
                 alert(currentLang === 'zh' ? '导出功能开发中...' : 'Export feature in development...');
@@ -1239,6 +1324,16 @@
             currentTab = tab;
             currentPage = 1;
             
+            // 更新批量检测按钮显示
+            const batchDetectBtn = document.getElementById('batch-detect-btn');
+            if (batchDetectBtn) {
+                if (tab === 'unauthorized' || tab === 'authorized') {
+                    batchDetectBtn.classList.remove('hidden');
+                } else {
+                    batchDetectBtn.classList.add('hidden');
+                }
+            }
+            
             // 更新Tab样式
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-black', 'text-white', 'font-medium');
@@ -1276,6 +1371,8 @@
             if (statusHeader) {
                 if (currentTab === 'exited') {
                     statusHeader.textContent = translations[currentLang].exit_time || '退出时间';
+                } else if (currentTab === 'rejected') {
+                    statusHeader.textContent = translations[currentLang].rejected_time || '驳回时间';
                 } else {
                     statusHeader.textContent = translations[currentLang].th_auth_status || '授权状态';
                 }
@@ -1284,8 +1381,9 @@
         
         // 更新Tab计数
         function updateTabCounts() {
-            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited).length;
-            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited).length;
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected).length;
+            const rejectedCount = rejectedUsers.length;
             const exitedCount = exitedUsers.length;
             
             if (document.getElementById('authorized-count')) {
@@ -1293,6 +1391,9 @@
             }
             if (document.getElementById('unauthorized-count')) {
                 document.getElementById('unauthorized-count').textContent = `(${unauthorizedCount})`;
+            }
+            if (document.getElementById('rejected-count')) {
+                document.getElementById('rejected-count').textContent = `(${rejectedCount})`;
             }
             if (document.getElementById('exited-count')) {
                 document.getElementById('exited-count').textContent = `(${exitedCount})`;
@@ -1322,6 +1423,169 @@
                 updateTabCounts();
                 updateStats();
             }
+        }
+        
+        // 显示驳回模态框
+        window.showRejectModal = function(id) {
+            document.getElementById('reject-device-id').value = id;
+            document.getElementById('reject-reason').value = '';
+            document.getElementById('reject-modal').classList.remove('hidden');
+        }
+        
+        // 关闭驳回模态框
+        window.closeRejectModal = function() {
+            document.getElementById('reject-modal').classList.add('hidden');
+            document.getElementById('reject-device-id').value = '';
+            document.getElementById('reject-reason').value = '';
+        }
+        
+        // 确认驳回
+        window.confirmReject = function() {
+            const deviceId = parseInt(document.getElementById('reject-device-id').value);
+            const reason = document.getElementById('reject-reason').value || '未提供原因';
+            
+            if (!deviceId) return;
+            
+            // 查找要驳回的设备
+            const deviceIndex = mockData.findIndex(d => d.id === deviceId);
+            if (deviceIndex !== -1) {
+                const rejectedDevice = {...mockData[deviceIndex]};
+                rejectedDevice.rejectedTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                rejectedDevice.rejectionReason = reason;
+                rejectedDevice.isRejected = true;
+                
+                // 添加到驳回用户列表
+                rejectedUsers.push(rejectedDevice);
+                localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+                
+                // 标记为已驳回
+                mockData[deviceIndex].isRejected = true;
+                
+                showSuccessToast(translations[currentLang].reject_success || '已成功驳回', 'error');
+            }
+            
+            closeRejectModal();
+            updateStats();
+            renderTable();
+            updateTabCounts();
+        }
+        
+        // 执行检测
+        window.performDetection = function(id, isFromBatch = false) {
+            // 如果不是批量检测，显示单个检测提示
+            if (!isFromBatch) {
+                showSuccessToast(currentLang === 'zh' ? '正在检测中...' : 'Detecting...', 'black');
+            }
+            
+            setTimeout(() => {
+                // 查找设备
+                const deviceIndex = mockData.findIndex(d => d.id === id);
+                if (deviceIndex !== -1) {
+                    // 标记为已检测，保持未授权状态但显示原因
+                    mockData[deviceIndex].hasDetected = true;
+                    
+                    // 根据remarkType判断是否可以授权
+                    if (!mockData[deviceIndex].remarkType) {
+                        // 如果没有问题，更新为已授权
+                        mockData[deviceIndex].status = 'active';
+                        if (!isFromBatch) {
+                            showSuccessToast(translations[currentLang].detect_success || '检测成功，已授权');
+                        }
+                    } else {
+                        // 如果有问题，保持未授权状态，但显示原因
+                        if (!isFromBatch) {
+                            showSuccessToast(
+                                currentLang === 'zh' ? 
+                                `检测完成：${translations[currentLang][mockData[deviceIndex].remarkType]}` : 
+                                `Detection completed: ${translations[currentLang][mockData[deviceIndex].remarkType]}`,
+                                'error'
+                            );
+                        }
+                    }
+                    
+                    if (!isFromBatch) {
+                        updateStats();
+                        renderTable();
+                        updateTabCounts();
+                    }
+                }
+            }, isFromBatch ? 500 : 1500); // 批量检测时更快
+        }
+        
+        // 批量检测
+        window.performBatchDetection = function() {
+            // 根据当前tab选择不同的项目
+            let itemsToDetect;
+            if (currentTab === 'unauthorized') {
+                itemsToDetect = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected);
+            } else if (currentTab === 'authorized') {
+                itemsToDetect = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected);
+            } else {
+                return;
+            }
+            
+            const unauthorizedItems = itemsToDetect;
+            
+            if (unauthorizedItems.length === 0) {
+                showSuccessToast(currentLang === 'zh' ? '没有需要检测的项目' : 'No items to detect', 'black');
+                return;
+            }
+            
+            showSuccessToast(currentLang === 'zh' ? `正在批量检测 ${unauthorizedItems.length} 个项目...` : `Detecting ${unauthorizedItems.length} items...`, 'black');
+            
+            let processed = 0;
+            let authorizedCount = 0;
+            let failedCount = 0;
+            
+            unauthorizedItems.forEach((item, index) => {
+                setTimeout(() => {
+                    const deviceIndex = mockData.findIndex(d => d.id === item.id);
+                    if (deviceIndex !== -1) {
+                        mockData[deviceIndex].hasDetected = true;
+                        
+                        if (!mockData[deviceIndex].remarkType) {
+                            mockData[deviceIndex].status = 'active';
+                            authorizedCount++;
+                        } else {
+                            failedCount++;
+                        }
+                    }
+                    
+                    processed++;
+                    
+                    if (processed === unauthorizedItems.length) {
+                        // 全部完成
+                        setTimeout(() => {
+                            if (currentTab === 'authorized') {
+                                // 已授权tab的检测结果
+                                showSuccessToast(
+                                    currentLang === 'zh' ? 
+                                    `检测完成，${unauthorizedItems.length} 个项目状态正常` : 
+                                    `Detection completed, ${unauthorizedItems.length} items status normal`,
+                                    'success'
+                                );
+                            } else if (failedCount > 0) {
+                                showSuccessToast(
+                                    currentLang === 'zh' ? 
+                                    `批量检测完成：${authorizedCount} 个已授权，${failedCount} 个检测失败` : 
+                                    `Batch detection completed: ${authorizedCount} authorized, ${failedCount} failed`,
+                                    'black'
+                                );
+                            } else {
+                                showSuccessToast(
+                                    currentLang === 'zh' ? 
+                                    `批量检测完成，${authorizedCount} 个项目已授权` : 
+                                    `Batch detection completed, ${authorizedCount} items authorized`,
+                                    'success'
+                                );
+                            }
+                            updateStats();
+                            renderTable();
+                            updateTabCounts();
+                        }, 600);
+                    }
+                }, index * 200); // 每个间隔200ms
+            });
         }
         
         // 导出函数到全局
