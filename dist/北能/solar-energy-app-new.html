@@ -946,6 +946,7 @@
             navElement.classList.add('active');
         }
         
+        
         // 设备详情相关函数
         function openDeviceDetail(deviceName, deviceSN, isOnline) {
             // 跳转到设备详情页面
@@ -959,11 +960,34 @@
         let lastAddedDevice = null; // 记录最后添加的设备
         
         function openAddDevice() {
+            // 临时清理权限用于测试 - 可以删除这两行
+            localStorage.removeItem('locationPermission');
+            localStorage.removeItem('bluetoothPermission');
+            
             // 直接进入添加设备页面
             showAddDevicePage();
         }
         
         function showAddDevicePage() {
+            // 检查权限状态
+            const locationPermission = localStorage.getItem('locationPermission');
+            const bluetoothPermission = localStorage.getItem('bluetoothPermission');
+            
+            console.log('Checking permissions:', { locationPermission, bluetoothPermission });
+            
+            // 如果已有权限，直接显示添加设备页面
+            if (locationPermission && bluetoothPermission === 'allowed') {
+                console.log('Permissions already granted, showing device page directly');
+                showAddDevicePageDirectly();
+                return;
+            }
+            
+            // 否则先显示权限请求弹窗
+            console.log('Showing location permission dialog');
+            showLocationPermissionDialog();
+        }
+        
+        function showAddDevicePageDirectly() {
             const addPage = document.getElementById('addDevicePage');
             const phoneContainer = document.querySelector('.phone-container');
             
@@ -2036,6 +2060,346 @@
                 localStorage.removeItem('defaultPage');
             }
         });
+
+        // 显示位置权限请求弹窗
+        function showLocationPermissionDialog() {
+            // 创建弹窗容器
+            const dialog = document.createElement('div');
+            dialog.id = 'locationPermissionDialog';
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            `;
+            
+            // 创建弹窗内容
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: #f2f2f7;
+                border-radius: 14px;
+                max-width: 320px;
+                width: 90%;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            `;
+            
+            // 标题部分
+            const header = document.createElement('div');
+            header.style.cssText = `
+                padding: 20px 20px 12px;
+                text-align: center;
+                background: white;
+            `;
+            
+            const title = document.createElement('div');
+            title.style.cssText = `
+                font-size: 17px;
+                font-weight: 600;
+                color: #000;
+                margin-bottom: 8px;
+            `;
+            title.innerHTML = '允许"北能BMS"<br>使用你的位置？';
+            
+            const subtitle = document.createElement('div');
+            subtitle.style.cssText = `
+                font-size: 13px;
+                color: #3C3C43;
+                line-height: 18px;
+                opacity: 0.6;
+                margin-top: 8px;
+            `;
+            subtitle.textContent = '位置权限用于快速连接设备、识别定位以及发现附近的设备和Wi-Fi列表。';
+            
+            header.appendChild(title);
+            header.appendChild(subtitle);
+            
+            // 地图预览部分
+            const mapContainer = document.createElement('div');
+            mapContainer.style.cssText = `
+                height: 160px;
+                background: linear-gradient(to bottom, #e8f4f8, #d4e8ee);
+                position: relative;
+                overflow: hidden;
+            `;
+            
+            // 添加简单的地图元素
+            const mapContent = document.createElement('div');
+            mapContent.innerHTML = `
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    <div style="width: 20px; height: 20px; background: #007AFF; border-radius: 50%; box-shadow: 0 0 0 8px rgba(0, 122, 255, 0.2);"></div>
+                </div>
+                <div style="position: absolute; bottom: 10px; left: 10px; background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #666;">
+                    <span>📍 当前位置</span>
+                </div>
+            `;
+            mapContainer.appendChild(mapContent);
+            
+            // 按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                background: white;
+                padding: 0;
+            `;
+            
+            // 允许一次按钮
+            const allowOnceBtn = document.createElement('button');
+            allowOnceBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                border-bottom: 0.5px solid rgba(60, 60, 67, 0.13);
+                transition: background-color 0.2s;
+            `;
+            allowOnceBtn.textContent = '允许一次';
+            allowOnceBtn.onmouseover = () => allowOnceBtn.style.background = '#f9f9f9';
+            allowOnceBtn.onmouseout = () => allowOnceBtn.style.background = 'white';
+            allowOnceBtn.onclick = () => handleLocationPermission('once');
+            
+            // 使用App时允许按钮
+            const allowWhileUsingBtn = document.createElement('button');
+            allowWhileUsingBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                border-bottom: 0.5px solid rgba(60, 60, 67, 0.13);
+                transition: background-color 0.2s;
+            `;
+            allowWhileUsingBtn.textContent = '使用 App 时允许';
+            allowWhileUsingBtn.onmouseover = () => allowWhileUsingBtn.style.background = '#f9f9f9';
+            allowWhileUsingBtn.onmouseout = () => allowWhileUsingBtn.style.background = 'white';
+            allowWhileUsingBtn.onclick = () => handleLocationPermission('while-using');
+            
+            // 不允许按钮
+            const denyBtn = document.createElement('button');
+            denyBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            `;
+            denyBtn.textContent = '不允许';
+            denyBtn.onmouseover = () => denyBtn.style.background = '#f9f9f9';
+            denyBtn.onmouseout = () => denyBtn.style.background = 'white';
+            denyBtn.onclick = () => handleLocationPermission('denied');
+            
+            buttonContainer.appendChild(allowOnceBtn);
+            buttonContainer.appendChild(allowWhileUsingBtn);
+            buttonContainer.appendChild(denyBtn);
+            
+            content.appendChild(header);
+            content.appendChild(mapContainer);
+            content.appendChild(buttonContainer);
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+        }
+        
+        // 处理位置权限选择
+        function handleLocationPermission(permission) {
+            const dialog = document.getElementById('locationPermissionDialog');
+            if (dialog) {
+                document.body.removeChild(dialog);
+            }
+            
+            // 保存权限选择
+            localStorage.setItem('locationPermission', permission);
+            
+            switch(permission) {
+                case 'once':
+                    showToast('已允许使用位置（仅限本次）');
+                    // 显示蓝牙权限弹窗
+                    setTimeout(() => {
+                        showBluetoothPermissionDialog();
+                    }, 1000);
+                    // 本次使用后清除权限
+                    setTimeout(() => {
+                        localStorage.removeItem('locationPermission');
+                    }, 30000); // 30秒后清除
+                    break;
+                    
+                case 'while-using':
+                    showToast('已允许在使用App时访问位置');
+                    // 显示蓝牙权限弹窗
+                    setTimeout(() => {
+                        showBluetoothPermissionDialog();
+                    }, 1000);
+                    break;
+                    
+                case 'denied':
+                    showToast('已拒绝位置权限');
+                    // 不继续蓝牙连接
+                    break;
+            }
+        }
+        
+        // 显示蓝牙权限请求弹窗
+        function showBluetoothPermissionDialog() {
+            // 创建弹窗容器
+            const dialog = document.createElement('div');
+            dialog.id = 'bluetoothPermissionDialog';
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            `;
+            
+            // 创建弹窗内容
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 14px;
+                max-width: 320px;
+                width: 90%;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            `;
+            
+            // 内容部分
+            const body = document.createElement('div');
+            body.style.cssText = `
+                padding: 32px 20px 20px;
+                text-align: center;
+                background: white;
+            `;
+            
+            // 蓝牙图标
+            const iconContainer = document.createElement('div');
+            iconContainer.style.cssText = `
+                margin-bottom: 20px;
+            `;
+            iconContainer.innerHTML = `
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style="margin: 0 auto;">
+                    <rect width="56" height="56" rx="14" fill="#007AFF" fill-opacity="0.1"/>
+                    <path d="M28 16L35 23L30 28L35 33L28 40V28L23 33L21 31L26 26L21 21L23 19L28 24V16Z" 
+                          stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            `;
+            
+            const title = document.createElement('div');
+            title.style.cssText = `
+                font-size: 17px;
+                font-weight: 600;
+                color: #000;
+                margin-bottom: 12px;
+                line-height: 24px;
+            `;
+            title.innerHTML = '"北能BMS"想要使用蓝牙';
+            
+            const message = document.createElement('div');
+            message.style.cssText = `
+                font-size: 13px;
+                color: #3C3C43;
+                opacity: 0.6;
+                line-height: 18px;
+                margin-bottom: 4px;
+            `;
+            message.textContent = '连接逆变器时需要打开蓝牙。请允许"北能BMS"使用蓝牙来发现、连接附近的设备。';
+            
+            body.appendChild(iconContainer);
+            body.appendChild(title);
+            body.appendChild(message);
+            
+            // 按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                border-top: 0.5px solid rgba(60, 60, 67, 0.13);
+            `;
+            
+            // 不允许按钮
+            const denyBtn = document.createElement('button');
+            denyBtn.style.cssText = `
+                flex: 1;
+                padding: 17px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                cursor: pointer;
+                border-right: 0.5px solid rgba(60, 60, 67, 0.13);
+                transition: background-color 0.2s;
+            `;
+            denyBtn.textContent = '不允许';
+            denyBtn.onmouseover = () => denyBtn.style.background = '#f9f9f9';
+            denyBtn.onmouseout = () => denyBtn.style.background = 'white';
+            denyBtn.onclick = () => handleBluetoothPermission('denied');
+            
+            // 好按钮（允许）
+            const allowBtn = document.createElement('button');
+            allowBtn.style.cssText = `
+                flex: 1;
+                padding: 17px;
+                border: none;
+                background: white;
+                font-size: 17px;
+                color: #007AFF;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            `;
+            allowBtn.textContent = '好';
+            allowBtn.onmouseover = () => allowBtn.style.background = '#f9f9f9';
+            allowBtn.onmouseout = () => allowBtn.style.background = 'white';
+            allowBtn.onclick = () => handleBluetoothPermission('allowed');
+            
+            buttonContainer.appendChild(denyBtn);
+            buttonContainer.appendChild(allowBtn);
+            
+            content.appendChild(body);
+            content.appendChild(buttonContainer);
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+        }
+        
+        // 处理蓝牙权限选择
+        function handleBluetoothPermission(permission) {
+            const dialog = document.getElementById('bluetoothPermissionDialog');
+            if (dialog) {
+                document.body.removeChild(dialog);
+            }
+            
+            // 保存蓝牙权限选择
+            localStorage.setItem('bluetoothPermission', permission);
+            
+            if (permission === 'allowed') {
+                showToast('已允许使用蓝牙');
+                // 继续添加设备流程
+                setTimeout(() => {
+                    showAddDevicePageDirectly();
+                }, 500);
+            } else {
+                showToast('已拒绝蓝牙权限');
+            }
+        }
     </script>
 </body>
 </html>

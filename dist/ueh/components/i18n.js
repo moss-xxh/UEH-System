@@ -322,6 +322,23 @@ class I18n {
                 waitingExecution: "等待执行中",
                 charging: "充电中",
                 discharging: "放电中",
+                
+                // Progress dialog status
+                waiting: "等待中",
+                completed: "已完成",
+                reading: "读取中",
+                setting: "设置中",
+                
+                // Progress dialog content
+                chargingProgress: "充电进度",
+                dischargingProgress: "放电进度",
+                operationInProgress: "正在执行操作...",
+                sentDevices: "下发设备",
+                charge: "充电",
+                discharge: "放电",
+                readDeviceSettings: "1. 读取设备设置信息",
+                modifyDeviceSettings: "2. 修改设备设置信息",
+                dragToMoveClickToToggle: "拖拽移动，点击切换",
                 chargeStopSOC: "充电停止SOC",
                 dischargeStopSOC: "放电停止SOC",
                 pleaseStopCurrentMode: "请先停止当前模式",
@@ -2182,6 +2199,23 @@ class I18n {
                 waitingExecution: "Waiting for Execution",
                 charging: "Charging",
                 discharging: "Discharging",
+                
+                // Progress dialog status
+                waiting: "Waiting",
+                completed: "Completed",
+                reading: "Reading",
+                setting: "Setting",
+                
+                // Progress dialog content
+                chargingProgress: "Charging Progress",
+                dischargingProgress: "Discharging Progress",
+                operationInProgress: "Operation in progress...",
+                sentDevices: "Sent Devices",
+                charge: "Charge",
+                discharge: "Discharge",
+                readDeviceSettings: "1. Read Device Settings",
+                modifyDeviceSettings: "2. Modify Device Settings",
+                dragToMoveClickToToggle: "Drag to move, click to toggle",
                 chargeStopSOC: "Charge Stop SOC",
                 dischargeStopSOC: "Discharge Stop SOC",
                 pleaseStopCurrentMode: "Please stop current mode first",

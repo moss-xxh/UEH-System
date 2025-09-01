@@ -1,0 +1,4385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sidebar-width: 256px;
+            --sidebar-collapsed: 64px;
+            --header-height: 56px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
+            background: #ffffff;
+            color: #000000;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar - Tesla/Apple style minimal */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #ffffff;
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 100;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar.collapsed:hover {
+            width: var(--sidebar-width);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .logo-icon {
+            width: 120px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Logo text removed */
+
+        .nav {
+            flex: 1;
+            padding: 16px 0;
+        }
+
+        .nav-item {
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: rgba(0, 0, 0, 0.6);
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            color: #000;
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-item.active {
+            color: #000;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            background: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .nav-text {
+            margin-left: 16px;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+        }
+
+        .sidebar.collapsed:hover .nav-text {
+            opacity: 1;
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fafafa;
+            overflow: hidden;
+        }
+
+        /* Header - Ultra minimal */
+        .header {
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .header-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
+        }
+
+        .header-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .user-menu {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Metrics - Tesla style */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .metric {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .metric:hover {
+            border-color: rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 300;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-change.up {
+            color: #10b981;
+        }
+
+        .metric-change.down {
+            color: #ef4444;
+        }
+
+        /* Chart section */
+        .chart-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .chart-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 2px;
+            border-radius: 6px;
+        }
+
+        .chart-tab {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .chart-tab:hover {
+            color: #000;
+        }
+
+        .chart-tab.active {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+        }
+
+        /* Table - Google style clean */
+        .table-section {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+            border-color: #333;
+        }
+
+        .table {
+            width: 100%;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 16px 24px;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #fafafa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 14px;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .badge-default {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 13px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .action-btn:hover {
+            color: #000;
+        }
+
+        /* Grid layout for charts */
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        /* Help Center Styles */
+        .help-content {
+            display: none;
+        }
+
+        .help-content.active {
+            display: block;
+        }
+
+        .tabs-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .tabs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .tabs-list {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .tab-item {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab-item:hover {
+            color: #000;
+        }
+
+        .tab-item.active {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #000;
+        }
+
+        /* Tab close button removed - only in category management */
+
+        .add-tab-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-tab-btn:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Upload Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #categoryModal {
+            z-index: 1500;
+        }
+        
+        /* Language badges */
+        .language-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            min-width: 250px;
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-success {
+            border-left: 4px solid #10b981;
+        }
+        
+        .notification-warning {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .notification-error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .notification-info {
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .notification-message {
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .upload-dialog {
+            background: #fff;
+            width: 100%;
+            height: 100vh;
+            max-width: 100%;
+            max-height: 100vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .dialog-header {
+            margin-bottom: 24px;
+        }
+
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .dialog-subtitle {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .file-drop-zone {
+            width: 100%;
+            min-height: 120px;
+            border: 2px dashed rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 20px;
+        }
+
+        .file-drop-zone:hover {
+            border-color: rgba(0, 0, 0, 0.4);
+            background: #f5f5f5;
+        }
+
+        .file-drop-zone.dragover {
+            border-color: #000;
+            background: rgba(0, 0, 0, 0.02);
+            transform: scale(1.02);
+        }
+
+        .file-drop-zone.has-file {
+            background: #f0f9ff;
+            border-color: #2563eb;
+            border-style: solid;
+        }
+        
+        .language-file-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: #fff;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        
+        .language-select-small {
+            width: 150px;
+            padding: 8px 12px;
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .file-select-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-select-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 6px;
+            background: #fff;
+            font-size: 13px;
+            color: rgba(0,0,0,0.6);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .file-select-btn:hover {
+            border-color: #000;
+            color: #000;
+        }
+        
+        .file-select-btn.has-file {
+            color: #000;
+            background: #f0f9ff;
+            border-color: #2563eb;
+        }
+        
+        .remove-lang-btn {
+            padding: 6px;
+            background: transparent;
+            border: none;
+            color: rgba(0,0,0,0.4);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .remove-lang-btn:hover {
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+        }
+
+        .file-drop-icon {
+            width: 40px;
+            height: 40px;
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        .file-drop-text {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            font-weight: 500;
+        }
+
+        .file-drop-hint {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        .selected-file-info {
+            display: none;
+            width: 100%;
+            padding: 12px;
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        .selected-file-info.show {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .selected-file-details {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-file-icon {
+            width: 24px;
+            height: 24px;
+            color: #2563eb;
+        }
+
+        .selected-file-name {
+            font-size: 13px;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .selected-file-size {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.5);
+            margin-left: 8px;
+        }
+
+        .remove-file-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .remove-file-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .dialog-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 28px;
+        }
+
+        .dialog-btn {
+            padding: 10px 20px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dialog-btn:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .dialog-btn.primary {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .dialog-btn.primary:hover {
+            background: #333;
+            border-color: #333;
+        }
+
+        .dialog-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-button {
+            margin-bottom: 20px;
+        }
+
+        /* Category Management Dialog */
+        .category-dialog {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            width: 520px;
+            max-width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .category-list {
+            margin-top: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            cursor: move;
+        }
+
+        .category-item:hover {
+            background: #f0f0f0;
+        }
+
+        .category-item.dragging {
+            opacity: 0.5;
+            background: #e0e0e0;
+        }
+
+        .drag-handle {
+            color: rgba(0, 0, 0, 0.3);
+            cursor: move;
+            user-select: none;
+        }
+
+        .drag-handle:hover {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .category-name-input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .category-name-input:focus {
+            outline: none;
+            background: #fff;
+            border-color: #000;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .category-action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .category-action-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: #000;
+        }
+
+        .category-action-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .add-category-section {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .new-category-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .new-category-input:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        .add-category-btn {
+            padding: 8px 16px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-category-btn:hover {
+            background: #333;
+        }
+
+        .add-category-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Confirmation Dialog */
+        #confirmModal {
+            z-index: 2000;
+        }
+
+        .confirm-dialog {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+            z-index: 2001;
+        }
+
+        .confirm-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ef4444;
+        }
+
+        .confirm-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .confirm-file-name {
+            font-weight: 600;
+            color: #000;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            padding: 10px 24px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 100px;
+        }
+
+        .confirm-btn:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .confirm-btn.danger {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        .confirm-btn.danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .file-list {
+            margin-top: 24px;
+        }
+
+        .file-table {
+            width: 100%;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .file-table thead {
+            background: #fafafa;
+        }
+
+        .file-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .file-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .file-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .file-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .file-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .file-format {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+
+        .file-format.video {
+            background: rgba(147, 51, 234, 0.1);
+            color: #7c3aed;
+        }
+
+        .file-format.pdf {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .file-format.doc {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .file-format.text {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .file-format.archive {
+            background: rgba(251, 146, 60, 0.1);
+            color: #ea580c;
+        }
+
+        .file-format.executable {
+            background: rgba(168, 85, 247, 0.1);
+            color: #9333ea;
+        }
+
+        .file-table th.operations-header {
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .file-table td.operations-cell {
+            padding: 14px 8px;
+        }
+
+        .file-operations {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .operation-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+        }
+
+        .file-action-btn {
+            padding: 5px 10px;
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            text-decoration: none;
+            white-space: nowrap;
+            display: inline-block;
+            width: 100%;
+            max-width: 60px;
+        }
+
+        .file-action-btn.disabled {
+            color: rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .file-action-btn.disabled:hover {
+            background: rgba(0, 0, 0, 0.02);
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        .file-action-btn:hover {
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .file-action-btn.delete {
+            color: #dc2626;
+        }
+
+        .file-action-btn.delete:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 14px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -var(--sidebar-width);
+                width: var(--sidebar-width);
+                height: 100%;
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .metric, .chart-section, .table-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+        /* Preview Modal Styles */
+        #previewModal .modal-dialog {
+            width: 90vw;
+            max-width: 1200px;
+            height: 90vh;
+            max-height: 800px;
+        }
+
+        #previewContent {
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .preview-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .preview-loader svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* New clean preview styles */
+        .preview-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top: 3px solid #007AFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .preview-content {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .preview-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .preview-close-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .preview-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .file-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .file-info h3 {
+            margin: 0 0 4px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .file-meta {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .preview-body {
+            padding: 24px;
+        }
+
+        /* Radio button styles */
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-button {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 8px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-button {
+            border-color: #007AFF;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-button::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #007AFF;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .radio-option:hover .radio-button {
+            border-color: #007AFF;
+        }
+
+        /* Language file item styles */
+        .language-file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .language-file-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .language-select {
+            min-width: 150px;
+            max-width: 200px;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            height: 42px;
+        }
+
+        .file-upload-zone {
+            flex: 1;
+            min-height: 42px;
+            border: 1px dashed rgba(0,0,0,0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: #fafafa;
+            padding: 0 16px;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-zone:hover {
+            border-color: #007AFF;
+            background: #f0f8ff;
+        }
+
+        .file-upload-zone.has-file {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+            color: #2e7d2e;
+        }
+        
+        .file-upload-text {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        .file-upload-zone.has-file .file-upload-text {
+            color: #2e7d2e;
+            font-weight: 500;
+        }
+
+        .remove-language-btn {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border: none;
+            background: #ff4444;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .remove-language-btn:hover {
+            background: #cc0000;
+        }
+
+        /* Image preview */
+        .image-preview {
+            text-align: center;
+        }
+
+        .image-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            color: #666;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .image-placeholder p {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .image-placeholder small {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Video preview */
+        .video-preview {
+            text-align: center;
+        }
+
+        .video-placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 40px;
+            color: white;
+        }
+
+        .play-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .video-placeholder p {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .video-placeholder small {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        /* Document preview */
+        .document-preview {
+            text-align: center;
+        }
+
+        .doc-page {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .doc-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .doc-content {
+            margin-bottom: 20px;
+        }
+
+        .doc-line {
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .doc-line.short {
+            width: 60%;
+        }
+
+        .doc-footer {
+            color: #999;
+            font-size: 12px;
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* Text preview */
+        .text-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .text-content {
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .text-content p {
+            margin: 0 0 12px 0;
+        }
+
+        /* Unsupported preview */
+        .unsupported-preview {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .unsupported-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .unsupported-preview h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+
+        .unsupported-preview p {
+            margin: 0;
+            color: #999;
+        }
+
+        .preview-unsupported {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .preview-unsupported svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .preview-file-info {
+            text-align: center;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+        }
+
+        .preview-file-info h4 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .preview-file-info p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="logo.png" alt="Logo">
+                </div>
+            </div>
+            
+            <div class="nav">
+                <a href="#" class="nav-item active">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">概览</span>
+                </a>
+                
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">分析</span>
+                </a>
+                
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">内容</span>
+                </a>
+                
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M2 21v-2c0-2.5 3.5-4 7-4s7 1.5 7 4v2"/>
+                            <path d="M16 11h6m-3-3v6"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">用户</span>
+                </a>
+                
+                <a href="#" class="nav-item" id="helpCenterNav">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                            <circle cx="12" cy="17" r="0.5"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">帮助中心</span>
+                </a>
+                
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 1.54l4.24 4.24M12 1a11 11 0 100 22 11 11 0 000-22z"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">设置</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main -->
+        <main class="main">
+            <!-- Header -->
+            <header class="header">
+                <h1 class="header-title">仪表盘</h1>
+                <div class="header-actions">
+                    <button class="header-btn">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                    </button>
+                    <button class="header-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 01-3.46 0"/>
+                        </svg>
+                    </button>
+                    <div class="user-menu" id="userAvatar">A</div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Default Dashboard Content -->
+                <div id="dashboardContent" class="content-section">
+                    <!-- Metrics -->
+                    <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">总用户</div>
+                        <div class="metric-value">24,853</div>
+                        <div class="metric-change up">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 3L10 7H7V11H5V7H2L6 3Z"/>
+                            </svg>
+                            12.5%
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">收入</div>
+                        <div class="metric-value">¥158.6K</div>
+                        <div class="metric-change up">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 3L10 7H7V11H5V7H2L6 3Z"/>
+                            </svg>
+                            8.2%
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">转化率</div>
+                        <div class="metric-value">3.24%</div>
+                        <div class="metric-change down">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 9L2 5H5V1H7V5H10L6 9Z"/>
+                            </svg>
+                            2.1%
+                        </div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">活跃度</div>
+                        <div class="metric-value">89.6%</div>
+                        <div class="metric-change up">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 3L10 7H7V11H5V7H2L6 3Z"/>
+                            </svg>
+                            4.3%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid">
+                    <div class="chart-section">
+                        <div class="chart-header">
+                            <h2 class="chart-title">趋势分析</h2>
+                            <div class="chart-tabs">
+                                <button class="chart-tab active">周</button>
+                                <button class="chart-tab">月</button>
+                                <button class="chart-tab">年</button>
+                            </div>
+                        </div>
+                        <div class="chart-placeholder">
+                            图表区域
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <div class="chart-header">
+                            <h2 class="chart-title">分布</h2>
+                        </div>
+                        <div class="chart-placeholder">
+                            饼图区域
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-section">
+                    <div class="table-header">
+                        <h2 class="table-title">最近活动</h2>
+                        <button class="btn btn-primary">新建</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>状态</th>
+                                <th>日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>产品发布计划</td>
+                                <td><span class="badge badge-success">已完成</span></td>
+                                <td>2024-01-15</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="action-btn">查看</button>
+                                        <button class="action-btn">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Q1季度报告</td>
+                                <td><span class="badge badge-warning">进行中</span></td>
+                                <td>2024-01-14</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="action-btn">查看</button>
+                                        <button class="action-btn">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>用户反馈分析</td>
+                                <td><span class="badge badge-success">已完成</span></td>
+                                <td>2024-01-13</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="action-btn">查看</button>
+                                        <button class="action-btn">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>系统升级计划</td>
+                                <td><span class="badge badge-default">待定</span></td>
+                                <td>2024-01-12</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="action-btn">查看</button>
+                                        <button class="action-btn">编辑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+
+                <!-- Help Center Content -->
+                <div id="helpContent" class="help-content">
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <h2 class="chart-title">帮助文档管理</h2>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <select class="form-select" id="languageFilter" style="width: 120px; padding: 8px 12px; font-size: 13px;">
+                                    <option value="all">全部语言</option>
+                                    <option value="zh-CN">中文</option>
+                                    <option value="en-US">English</option>
+                                    <option value="ja-JP">日本語</option>
+                                    <option value="ko-KR">한국어</option>
+                                </select>
+                                <button class="btn btn-primary" id="uploadBtn">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M8 10V4m0 0L6 6m2-2l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M14 10v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    上传文件
+                                </button>
+                                <button class="add-tab-btn" id="categoryManageBtn">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M3 4h10M3 8h10M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <circle cx="13" cy="4" r="1" fill="currentColor"/>
+                                        <circle cx="13" cy="8" r="1" fill="currentColor"/>
+                                        <circle cx="13" cy="12" r="1" fill="currentColor"/>
+                                    </svg>
+                                    分类管理
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="tabs-list" id="tabsList">
+                            <button class="tab-item active" data-tab="tab1">
+                                工控桌面端
+                            </button>
+                            <button class="tab-item" data-tab="tab2">
+                                文档资料
+                            </button>
+                            <button class="tab-item" data-tab="tab3">
+                                EMS软件包
+                            </button>
+                        </div>
+
+                        <div id="tabContents">
+                            <div class="tab-content active" id="tab1">
+                                <div class="file-list" id="fileList-tab1"></div>
+                            </div>
+
+                            <div class="tab-content" id="tab2">
+                                <div class="file-list" id="fileList-tab2"></div>
+                            </div>
+
+                            <div class="tab-content" id="tab3">
+                                <div class="file-list" id="fileList-tab3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Content Section -->
+                <div id="uploadContent" class="content-section" style="display: none;">
+                    <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="display: flex; align-items: center; margin-bottom: 32px;">
+                            <button type="button" id="backToDashboard" style="width: 36px; height: 36px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-right: 8px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M15 18L9 12L15 6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <h2 style="font-size: 24px; color: #333; margin: 0;">上传新文件</h2>
+                        </div>
+                        
+                        <form id="uploadFormNew">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                                <div class="form-group">
+                                    <label class="form-label">选择分类 *</label>
+                                    <select class="form-select" id="categorySelectNew" required>
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">文件名称 *</label>
+                                    <input type="text" class="form-input" id="fileNameNew" placeholder="请输入文件名称" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 24px;">
+                                <label class="form-label">系统类型 *</label>
+                                <select class="form-select" id="systemTypeNew" required>
+                                    <option value="">请选择系统类型</option>
+                                    <option value="Windows x64">Windows x64</option>
+                                    <option value="Windows x86">Windows x86</option>
+                                    <option value="Windows ARM64">Windows ARM64</option>
+                                    <option value="mac(Intel)">mac(Intel)</option>
+                                    <option value="mac(M芯片)">mac(M芯片)</option>
+                                    <option value="Linux x64">Linux x64</option>
+                                    <option value="Linux ARM64">Linux ARM64</option>
+                                    <option value="Ubuntu">Ubuntu</option>
+                                    <option value="CentOS">CentOS</option>
+                                    <option value="Red Hat">Red Hat</option>
+                                    <option value="Android">Android</option>
+                                    <option value="iOS">iOS</option>
+                                    <option value="iPadOS">iPadOS</option>
+                                    <option value="Web浏览器">Web浏览器</option>
+                                    <option value="跨平台">跨平台</option>
+                                    <option value="通用">通用</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 语言文件上传 -->
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">语言版本文件</label>
+                                <div id="languageFileListNew" style="display: none; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 24px; background: #f8f9fa; min-height: 200px; max-height: 400px; overflow-y: auto; margin-bottom: 16px;">
+                                    <!-- Language file pairs will be added here -->
+                                </div>
+                                <button type="button" class="btn dialog-btn" id="addLanguageBtnNew" style="margin-top: 16px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
+                                        <path d="M8 4v8m-4-4h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    添加语言版本
+                                </button>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                                <button type="button" class="btn dialog-btn" id="cancelUploadNew" style="padding: 10px 20px;">取消</button>
+                                <button type="submit" class="btn dialog-btn primary" id="confirmUploadNew" style="padding: 10px 20px;">确定上传</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Edit Content Section -->
+                <div id="editContent" class="content-section" style="display: none;">
+                    <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="display: flex; align-items: center; margin-bottom: 32px;">
+                            <button type="button" id="backFromEdit" style="width: 36px; height: 36px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-right: 8px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M15 18L9 12L15 6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <h2 style="font-size: 24px; color: #333; margin: 0;">编辑文件信息</h2>
+                        </div>
+                        
+                        <form id="editFormNew">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                                <div class="form-group">
+                                    <label class="form-label">文件名称 *</label>
+                                    <input type="text" class="form-input" id="editFileNameNew" placeholder="请输入文件名称" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">所属分类 *</label>
+                                    <select class="form-select" id="editCategorySelectNew" required>
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 24px;">
+                                <label class="form-label">系统类型</label>
+                                <input type="text" class="form-input" id="editSystemTypeNew" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                            </div>
+                            
+                            <!-- File Information Display -->
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                                <h3 style="font-size: 16px; color: #666; margin-bottom: 16px;">文件信息</h3>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                    <div>
+                                        <label style="font-size: 13px; color: #999; display: block; margin-bottom: 4px;">文件类型</label>
+                                        <span id="editFileTypeNew" style="font-size: 14px; color: #333; font-weight: 500;">-</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 13px; color: #999; display: block; margin-bottom: 4px;">文件大小</label>
+                                        <span id="editFileSizeNew" style="font-size: 14px; color: #333; font-weight: 500;">-</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 13px; color: #999; display: block; margin-bottom: 4px;">上传时间</label>
+                                        <span id="editUploadTimeNew" style="font-size: 14px; color: #333; font-weight: 500;">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                                <button type="button" class="btn dialog-btn" id="cancelEditNew">取消</button>
+                                <button type="submit" class="btn dialog-btn primary" id="confirmEditNew">保存修改</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="confirm-dialog">
+            <div class="confirm-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 9v4m0 4h.01M5 19h14a2 2 0 001.84-2.75L13.84 4a2 2 0 00-3.68 0L3.16 16.25A2 2 0 005 19z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h3 class="confirm-title" id="confirmTitle">确认删除</h3>
+            <p class="confirm-message" id="confirmMessage">
+                确定要删除 <span class="confirm-file-name" id="confirmItemName"></span> 吗？
+            </p>
+            <div class="confirm-actions">
+                <button class="confirm-btn" id="confirmCancel">取消</button>
+                <button class="confirm-btn danger" id="confirmDelete">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Management Dialog -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="category-dialog">
+            <div class="dialog-header">
+                <h3 class="dialog-title">分类管理</h3>
+                <p class="dialog-subtitle">拖拽排序、编辑名称或删除分类</p>
+            </div>
+            
+            <div class="category-list" id="categoryList">
+                <!-- Categories will be populated here -->
+            </div>
+            
+            <div class="add-category-section">
+                <input type="text" class="new-category-input" id="newCategoryInput" placeholder="输入新分类名称">
+                <button class="add-category-btn" id="addNewCategoryBtn">添加</button>
+            </div>
+            
+            <div class="dialog-actions">
+                <button type="button" class="dialog-btn" id="cancelCategory">取消</button>
+                <button type="button" class="dialog-btn primary" id="saveCategory">保存更改</button>
+            </div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.08); font-size: 12px; color: rgba(0,0,0,0.5); text-align: center;">
+                注：删除操作将立即生效，新增和编辑需要点击保存
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit File Dialog -->
+    <div class="modal-overlay" id="editModal">
+        <div class="upload-dialog">
+            <div class="dialog-header">
+                <h3 class="dialog-title">编辑文件信息</h3>
+                <p class="dialog-subtitle">修改文件名称或移动到其他分类</p>
+            </div>
+            
+            <form id="editForm">
+                <div class="form-group">
+                    <label class="form-label">文件名称</label>
+                    <input type="text" class="form-input" id="editFileName" placeholder="请输入文件名称" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">所属分类</label>
+                    <select class="form-select" id="editCategorySelect" required>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">文件信息</label>
+                    <div style="padding: 10px; background: #f5f5f5; border-radius: 6px; font-size: 13px; color: rgba(0,0,0,0.6);">
+                        <div style="margin-bottom: 4px;">文件类型: <span id="editFileType" style="font-weight: 500; color: #000;"></span></div>
+                        <div style="margin-bottom: 4px;">文件大小: <span id="editFileSize" style="font-weight: 500; color: #000;"></span></div>
+                        <div>上传时间: <span id="editUploadTime" style="font-weight: 500; color: #000;"></span></div>
+                    </div>
+                </div>
+                
+                <div class="dialog-actions">
+                    <button type="button" class="dialog-btn" id="cancelEdit">取消</button>
+                    <button type="submit" class="dialog-btn primary" id="confirmEdit">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Dialog -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="upload-dialog">
+            <div class="dialog-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; margin: -32px -32px 32px -32px; border-radius: 0;">
+                <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 class="dialog-title" style="color: white; font-size: 28px; margin-bottom: 8px;">上传文件</h3>
+                        <p class="dialog-subtitle" style="color: rgba(255,255,255,0.9);">为不同语言版本上传对应的文件</p>
+                    </div>
+                    <button type="button" class="close-btn" id="closeUploadModal" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;">✕ 关闭</button>
+                </div>
+            </div>
+            
+            <div style="max-width: 1200px; margin: 0 auto; padding: 32px;">
+                <form id="uploadForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+                        <div class="form-group">
+                            <label class="form-label">选择分类</label>
+                            <select class="form-select" id="categorySelect" required>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">文件名称</label>
+                            <input type="text" class="form-input" id="fileName" placeholder="请输入文件名称" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 32px;">
+                        <label class="form-label">系统类型</label>
+                        <select class="form-select" id="systemType" required>
+                            <option value="">请选择系统类型</option>
+                            <option value="Windows x64">Windows x64</option>
+                            <option value="Windows x86">Windows x86</option>
+                            <option value="Windows ARM64">Windows ARM64</option>
+                            <option value="mac(Intel)">mac(Intel)</option>
+                            <option value="mac(M芯片)">mac(M芯片)</option>
+                            <option value="Linux x64">Linux x64</option>
+                            <option value="Linux ARM64">Linux ARM64</option>
+                            <option value="Ubuntu">Ubuntu</option>
+                            <option value="CentOS">CentOS</option>
+                            <option value="Red Hat">Red Hat</option>
+                            <option value="Android">Android</option>
+                            <option value="iOS">iOS</option>
+                            <option value="iPadOS">iPadOS</option>
+                            <option value="Web浏览器">Web浏览器</option>
+                            <option value="跨平台">跨平台</option>
+                            <option value="通用">通用</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 语言文件上传 -->
+                    <div class="form-group">
+                        <label class="form-label">语言版本文件</label>
+                        <div id="languageFileList" style="border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; padding: 20px; background: #fafafa; min-height: 200px; max-height: 400px; overflow-y: auto;">
+                            <!-- Language file pairs will be added here -->
+                            <div class="empty-state" style="text-align: center; color: rgba(0,0,0,0.5); padding: 40px;">
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="currentColor" style="margin-bottom: 12px;">
+                                    <path d="M24 4C12.96 4 4 12.96 4 24s8.96 20 20 20 20-8.96 20-20S35.04 4 24 4zm1 30h-2v-2h2v2zm0-6h-2V14h2v14z"/>
+                                </svg>
+                                <p style="margin: 0; font-size: 16px;">点击下方按钮添加不同语言版本的文件</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn" id="addLanguageBtn" style="margin-top: 16px; width: 100%; padding: 14px; background: #f8f9fa; border: 2px dashed rgba(0,0,0,0.2); color: #666; font-size: 15px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right: 8px;">
+                                <path d="M10 5v10m-5-5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            添加语言版本
+                        </button>
+                    </div>
+                    
+                    <div class="dialog-actions" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
+                        <button type="button" class="dialog-btn" id="cancelUpload">取消</button>
+                        <button type="submit" class="dialog-btn primary" id="confirmUpload">确定上传</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-dialog" style="max-width: 90vw; max-height: 90vh;">
+            <div class="modal-body" style="padding: 0; height: 90vh; overflow: hidden;">
+                <div id="previewContent" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <!-- Preview content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // No authentication required - direct access
+        const userName = 'Admin'; // 默认用户名
+
+        // Set avatar
+        document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // 防止默认行为
+                e.preventDefault();
+                
+                // Remove active from all nav items
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                // Add active to clicked item
+                this.classList.add('active');
+                
+                const textElement = this.querySelector('.nav-text');
+                if (!textElement) return;
+                
+                const title = textElement.textContent.trim();
+                document.querySelector('.header-title').textContent = title;
+                
+                // Toggle content sections
+                const dashboardContent = document.getElementById('dashboardContent');
+                const helpContent = document.getElementById('helpContent');
+                
+                console.log('Navigation clicked:', title); // Debug log
+                
+                if (title === '帮助中心') {
+                    console.log('Switching to Help Center'); // Debug log
+                    if (dashboardContent) dashboardContent.style.display = 'none';
+                    if (helpContent) {
+                        helpContent.style.display = 'block';
+                        helpContent.classList.add('active');
+                        // Initialize help center functionality when shown
+                        initializeHelpCenter();
+                    } else {
+                        console.error('Help content element not found!');
+                    }
+                } else {
+                    console.log('Switching to:', title); // Debug log
+                    if (dashboardContent) dashboardContent.style.display = 'block';
+                    if (helpContent) {
+                        helpContent.style.display = 'none';
+                        helpContent.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // Test if help content exists
+        const testHelpContent = document.getElementById('helpContent');
+        const testDashboardContent = document.getElementById('dashboardContent');
+        console.log('Help Content Element:', testHelpContent);
+        console.log('Dashboard Content Element:', testDashboardContent);
+        console.log('Nav items found:', document.querySelectorAll('.nav-item').length);
+        
+        // Chart tabs
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Mobile menu
+        let sidebarOpen = false;
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (e.target.closest('.header-title')) {
+                    sidebarOpen = !sidebarOpen;
+                    sidebar.classList.toggle('open', sidebarOpen);
+                } else if (!e.target.closest('.sidebar') && sidebarOpen) {
+                    sidebarOpen = false;
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // Help Center Tab Management
+        let tabCounter = 3;
+        const tabsData = {};
+
+        // Initialize tab functionality
+        function initTabs() {
+            // Tab switching
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.tab-item') && !e.target.closest('.tab-close')) {
+                    const tabItem = e.target.closest('.tab-item');
+                    const tabId = tabItem.dataset.tab;
+                    switchTab(tabId);
+                }
+            });
+
+            // Tab closing removed - only available in category management
+
+            // Category management button is handled separately
+        }
+
+        // Switch tab
+        function switchTab(tabId) {
+            // Update tab items
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        // Add new tab
+        function addNewTab(tabName) {
+            tabCounter++;
+            const tabId = `tab${tabCounter}`;
+            
+            // Create tab button
+            const tabButton = document.createElement('button');
+            tabButton.className = 'tab-item';
+            tabButton.dataset.tab = tabId;
+            tabButton.innerHTML = tabName;
+            document.getElementById('tabsList').appendChild(tabButton);
+
+            // Create tab content
+            const tabContent = document.createElement('div');
+            tabContent.className = 'tab-content';
+            tabContent.id = tabId;
+            tabContent.innerHTML = `
+                <div class="file-list" id="fileList-${tabId}"></div>
+            `;
+            document.getElementById('tabContents').appendChild(tabContent);
+
+            // Initialize empty file list for new tab
+            if (!tabsData[tabId]) {
+                tabsData[tabId] = [];
+            }
+            renderFileList(tabId);
+            
+            // Switch to new tab
+            switchTab(tabId);
+        }
+
+        // Remove tab - only used internally, not from UI
+        function removeTab(tabId) {
+            // This function is now only called from category management
+            // Remove tab button
+            const tabButton = document.querySelector(`.tab-item[data-tab="${tabId}"]`);
+            if (tabButton) {
+                tabButton.remove();
+            }
+
+            // Remove tab content
+            const tabContent = document.getElementById(tabId);
+            if (tabContent) {
+                tabContent.remove();
+            }
+
+            // Remove data
+            delete tabsData[tabId];
+        }
+
+        // Upload Dialog Management
+        let languageFiles = [];
+        let languageCounter = 0;
+        
+        // Variables for new upload form
+        let languageFilesNew = [];
+        let languageCounterNew = 0;
+        
+        // Initialize upload button
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadModal = document.getElementById('uploadModal');
+        const uploadForm = document.getElementById('uploadForm');
+        const categorySelect = document.getElementById('categorySelect');
+        const fileNameInput = document.getElementById('fileName');
+        const cancelUpload = document.getElementById('cancelUpload');
+        
+        // Open upload dialog
+        function openUploadDialog() {
+            // Populate category options
+            updateCategoryOptions();
+            
+            // Reset form
+            uploadForm.reset();
+            languageFiles = [];
+            languageCounter = 0;
+            
+            // Clear language file list
+            const languageFileList = document.getElementById('languageFileList');
+            languageFileList.innerHTML = `
+                <div class="empty-state" style="text-align: center; color: rgba(0,0,0,0.5); padding: 24px;">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor" style="margin-bottom: 8px;">
+                        <path d="M16 3C8.82 3 3 8.82 3 16s5.82 13 13 13 13-5.82 13-13S23.18 3 16 3zm1 20h-2v-2h2v2zm0-4h-2V9h2v10z"/>
+                    </svg>
+                    <p style="margin: 0; font-size: 14px;">点击下方按钮添加不同语言版本的文件</p>
+                </div>
+            `;
+            
+            // Show modal
+            uploadModal.classList.add('active');
+        }
+        
+        // Upload mode switching
+        
+        // Add language file input
+        function addLanguageFileInput() {
+            // Remove empty state if it exists
+            const emptyState = document.querySelector('#languageFileList .empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            languageCounter++;
+            const itemId = `lang-file-${languageCounter}`;
+            
+            const languageFileItem = document.createElement('div');
+            languageFileItem.className = 'language-file-item';
+            languageFileItem.id = itemId;
+            languageFileItem.innerHTML = `
+                <select class="form-select language-select" data-id="${itemId}">
+                    <option value="">选择语言</option>
+                    <option value="zh-CN">简体中文</option>
+                    <option value="zh-TW">繁体中文</option>
+                    <option value="en-US">English</option>
+                    <option value="ja-JP">日本語</option>
+                    <option value="ko-KR">한국어</option>
+                    <option value="fr-FR">Français</option>
+                    <option value="de-DE">Deutsch</option>
+                    <option value="es-ES">Español</option>
+                </select>
+                <div class="file-upload-zone" data-id="${itemId}">
+                    <input type="file" id="file-${itemId}" style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.mp4,.avi,.mov,.wmv,.mkv,.zip,.rar,.exe">
+                    <span class="file-upload-text">点击选择文件或拖拽到此处</span>
+                </div>
+                <button type="button" class="remove-language-btn" data-id="${itemId}">×</button>
+            `;
+            
+            document.getElementById('languageFileList').appendChild(languageFileItem);
+            
+            // Add event listeners
+            const fileInput = document.getElementById(`file-${itemId}`);
+            const fileZone = languageFileItem.querySelector('.file-upload-zone');
+            const fileText = languageFileItem.querySelector('.file-upload-text');
+            const removeBtn = languageFileItem.querySelector('.remove-language-btn');
+            const langSelect = languageFileItem.querySelector('.language-select');
+            
+            // File zone click
+            fileZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // File zone drag and drop
+            fileZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileZone.style.borderColor = '#007AFF';
+                fileZone.style.background = '#f0f8ff';
+            });
+            
+            fileZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                if (!fileZone.classList.contains('has-file')) {
+                    fileZone.style.borderColor = 'rgba(0,0,0,0.2)';
+                    fileZone.style.background = '#fafafa';
+                }
+            });
+            
+            fileZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelection(files[0], fileZone, fileText, itemId, langSelect.value);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    handleFileSelection(file, fileZone, fileText, itemId, langSelect.value);
+                }
+            });
+            
+            langSelect.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (file) {
+                    updateLanguageFile(itemId, langSelect.value, file);
+                }
+            });
+            
+            removeBtn.addEventListener('click', () => {
+                removeLanguageFileInput(itemId);
+            });
+        }
+        
+        // Handle file selection for language files
+        function handleFileSelection(file, fileZone, fileText, itemId, language) {
+            fileText.textContent = file.name;
+            fileZone.classList.add('has-file');
+            updateLanguageFile(itemId, language, file);
+        }
+        
+        // Update language file in array
+        function updateLanguageFile(itemId, language, file) {
+            const index = languageFiles.findIndex(lf => lf.id === itemId);
+            if (index >= 0) {
+                languageFiles[index] = { id: itemId, language, file };
+            } else {
+                languageFiles.push({ id: itemId, language, file });
+            }
+        }
+        
+        // Remove language file input
+        function removeLanguageFileInput(itemId) {
+            const item = document.getElementById(itemId);
+            if (item) {
+                item.remove();
+                languageFiles = languageFiles.filter(lf => lf.id !== itemId);
+                
+                // If no language files left, show empty state
+                const languageFileList = document.getElementById('languageFileList');
+                if (languageFileList.children.length === 0) {
+                    languageFileList.innerHTML = `
+                        <div class="empty-state" style="text-align: center; color: rgba(0,0,0,0.5); padding: 24px;">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor" style="margin-bottom: 8px;">
+                                <path d="M16 3C8.82 3 3 8.82 3 16s5.82 13 13 13 13-5.82 13-13S23.18 3 16 3zm1 20h-2v-2h2v2zm0-4h-2V9h2v10z"/>
+                            </svg>
+                            <p style="margin: 0; font-size: 14px;">点击下方按钮添加不同语言版本的文件</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Add language button
+        const addLanguageBtn = document.getElementById('addLanguageBtn');
+        if (addLanguageBtn) {
+            addLanguageBtn.addEventListener('click', () => {
+                addLanguageFileInput();
+            });
+        }
+        
+        // Update category options
+        function updateCategoryOptions() {
+            categorySelect.innerHTML = '';
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                const option = document.createElement('option');
+                option.value = tab.dataset.tab;
+                option.textContent = tab.textContent.trim();
+                categorySelect.appendChild(option);
+            });
+            
+            // Select current active tab by default
+            const activeTab = document.querySelector('.tab-item.active');
+            if (activeTab) {
+                categorySelect.value = activeTab.dataset.tab;
+            }
+        }
+        
+        
+        // Close modal
+        if (cancelUpload && uploadModal) {
+            cancelUpload.addEventListener('click', () => {
+                uploadModal.classList.remove('active');
+            });
+        }
+        
+        // Close modal with close button
+        const closeUploadModal = document.getElementById('closeUploadModal');
+        if (closeUploadModal && uploadModal) {
+            closeUploadModal.addEventListener('click', () => {
+                uploadModal.classList.remove('active');
+            });
+        }
+        
+        // Close modal when clicking outside
+        if (uploadModal) {
+            uploadModal.addEventListener('click', (e) => {
+                if (e.target === uploadModal) {
+                    uploadModal.classList.remove('active');
+                }
+            });
+        }
+        
+        // Handle form submission
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Check if any language files have been added
+            if (languageFiles.length === 0) {
+                showNotification('请至少添加一个语言版本文件', 'warning');
+                return;
+            }
+            
+            // Validate all language files
+            let hasError = false;
+            languageFiles.forEach(lf => {
+                if (!lf.language) {
+                    showNotification(`请选择语言版本`, 'warning');
+                    hasError = true;
+                    return;
+                }
+                if (!lf.file) {
+                    showNotification(`请选择${lf.language}的文件`, 'warning');
+                    hasError = true;
+                    return;
+                }
+            });
+            
+            if (hasError) return;
+            
+            const fileName = document.getElementById('fileName').value.trim();
+            const systemType = document.getElementById('systemType').value;
+            
+            if (!fileName) {
+                showNotification('请输入文件名称', 'warning');
+                return;
+            }
+            
+            if (!systemType) {
+                showNotification('请选择系统类型', 'warning');
+                return;
+            }
+            
+            const tabId = categorySelect.value;
+            
+            // Add files to list
+            if (!tabsData[tabId]) {
+                tabsData[tabId] = [];
+            }
+            
+            // Add each language version as a separate entry
+            languageFiles.forEach(lf => {
+                const fileExt = lf.file.name.substring(lf.file.name.lastIndexOf('.')).toLowerCase();
+                const fileData = {
+                    id: Date.now() + Math.random(),
+                    name: `${fileName} (${lf.language})`,
+                    systemType: systemType,
+                    size: formatFileSize(lf.file.size),
+                    type: fileExt,
+                    language: lf.language,
+                    uploadTime: new Date().toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    })
+                };
+                
+                tabsData[tabId].push(fileData);
+            });
+            
+            renderFileList(tabId);
+            
+            // Switch to the uploaded category tab
+            switchTab(tabId);
+            
+            // Close modal
+            uploadModal.classList.remove('active');
+            
+            // Reset form for next use
+            document.getElementById('fileName').value = '';
+            document.getElementById('systemType').selectedIndex = 0;
+            
+            showNotification(`文件 "${fileName}" 已成功上传`, 'success');
+            });
+        }
+
+        // Check if file type supports preview
+        function canPreview(fileType) {
+            const previewableTypes = ['.pdf', '.txt', '.md', '.mp4', '.avi', '.mov', '.jpg', '.jpeg', '.png', '.gif', '.svg'];
+            return previewableTypes.includes(fileType.toLowerCase());
+        }
+
+        // Render file list as table
+        function renderFileList(tabId) {
+            const fileList = document.getElementById(`fileList-${tabId}`);
+            const files = tabsData[tabId] || [];
+            
+            if (files.length === 0) {
+                fileList.innerHTML = '<div class="empty-state">暂无文件</div>';
+                return;
+            }
+            
+            // Determine if we should show system type column (not for tab2 - 文档资料)
+            const showSystemType = tabId !== 'tab2';
+            
+            let tableHTML = `
+                <table class="file-table">
+                    <thead>
+                        <tr>
+                            <th>文件名称</th>
+                            ${showSystemType ? '<th>系统类型</th>' : ''}
+                            <th>文件格式</th>
+                            <th>上传日期</th>
+                            <th class="operations-header">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            files.forEach(file => {
+                // Handle new document structure with languages
+                if (file.languages) {
+                    // New structure with multiple language versions
+                    const languageNames = {
+                        'zh-CN': '简体中文',
+                        'zh-TW': '繁体中文',
+                        'en-US': 'English',
+                        'ja-JP': '日本語',
+                        'ko-KR': '한국어',
+                        'fr-FR': 'Français',
+                        'de-DE': 'Deutsch',
+                        'es-ES': 'Español'
+                    };
+                    
+                    const languageBadges = Object.keys(file.languages).map(lang => 
+                        `<span class="language-badge">${languageNames[lang] || lang}</span>`
+                    ).join(' ');
+                    
+                    // Get the first file type for format display
+                    const firstLang = Object.keys(file.languages)[0];
+                    const firstFile = file.languages[firstLang];
+                    const formatClass = getFormatClass(firstFile.type);
+                    
+                    tableHTML += `
+                        <tr data-file-id="${file.id}">
+                            <td>${file.name}</td>
+                            ${showSystemType ? `<td>${languageBadges}</td>` : ''}
+                            <td><span class="file-format ${formatClass}">${firstFile.type.toUpperCase()}</span></td>
+                            <td>${file.uploadTime}</td>
+                            <td class="operations-cell">
+                                <button class="operation-btn" onclick="downloadDocument('${file.id}', '${tabId}')" title="下载">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M8 2v8m0 0l3-3m-3 3L5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <button class="operation-btn" onclick="viewDocument('${file.id}', '${tabId}')" title="查看">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M15 8c-1.5-3-4-5-7-5S2.5 5 1 8c1.5 3 4 5 7 5s5.5-2 7-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="operation-btn" onclick="editDocument('${file.id}', '${tabId}')" title="编辑">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M11.5 2.5a1.414 1.414 0 112 2L5 13l-3 1 1-3 8.5-8.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="operation-btn" onclick="deleteDocument('${file.id}', '${tabId}')" title="删除">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M2 4h12M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1m2 0v9a1 1 0 01-1 1H4a1 1 0 01-1-1V4h10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    // Old structure (for backward compatibility)
+                    const formatClass = getFormatClass(file.type);
+                    const showPreview = canPreview(file.type);
+                    
+                    tableHTML += `
+                        <tr data-file-id="${file.id}">
+                            <td>${file.name}</td>
+                            ${showSystemType ? `<td>${file.systemType || '未设置'}</td>` : ''}
+                            <td><span class="file-format ${formatClass}">${file.type.toUpperCase()}</span></td>
+                            <td>${file.uploadTime}</td>
+                        <td class="operations-cell">
+                            <div class="file-operations">
+                                <div class="operation-group">
+                                    <button class="file-action-btn" onclick="downloadFile('${file.id}', '${tabId}')" title="下载文件">下载</button>
+                                </div>
+                                <div class="operation-group">
+                                    ${showPreview ? 
+                                        `<button class="file-action-btn" onclick="viewFile('${file.id}', '${tabId}')" title="预览文件">查看</button>` : 
+                                        `<button class="file-action-btn disabled" title="该文件类型不支持预览" disabled>查看</button>`
+                                    }
+                                </div>
+                                <div class="operation-group">
+                                    <button class="file-action-btn" onclick="editFile('${file.id}', '${tabId}')" title="编辑文件信息">编辑</button>
+                                </div>
+                                <div class="operation-group">
+                                    <button class="file-action-btn delete" onclick="deleteFile('${file.id}', '${tabId}')" title="删除文件">删除</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                }
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            fileList.innerHTML = tableHTML;
+        }
+
+        // Get format class for styling
+        function getFormatClass(type) {
+            const videoFormats = ['.mp4', '.avi', '.mov', '.wmv', '.mkv'];
+            const docFormats = ['.doc', '.docx'];
+            const textFormats = ['.txt', '.md'];
+            const archiveFormats = ['.zip', '.rar', '.7z', '.tar', '.gz'];
+            const executableFormats = ['.exe', '.dmg', '.pkg', '.deb', '.rpm'];
+            
+            if (videoFormats.includes(type)) return 'video';
+            if (type === '.pdf') return 'pdf';
+            if (docFormats.includes(type)) return 'doc';
+            if (textFormats.includes(type)) return 'text';
+            if (archiveFormats.includes(type)) return 'archive';
+            if (executableFormats.includes(type)) return 'executable';
+            return '';
+        }
+
+        // View file (preview)
+        function viewFile(fileId, tabId) {
+            const file = tabsData[tabId].find(f => f.id == fileId);
+            if (!file) {
+                showNotification('文件未找到', 'error');
+                return;
+            }
+
+            // Check if preview is supported
+            if (!canPreview(file.type)) {
+                showNotification('该文件类型不支持预览', 'warning');
+                return;
+            }
+
+            // Set preview title
+            document.getElementById('previewTitle').textContent = `${file.name}${file.type}`;
+            
+
+            // Show preview modal
+            document.getElementById('previewModal').classList.add('active');
+            
+            // Load preview content
+            loadPreviewContent(file);
+        }
+
+        // Load preview content based on file type
+        function loadPreviewContent(file) {
+            const previewContent = document.getElementById('previewContent');
+            const fileType = file.type.toLowerCase();
+            
+            // Show loading animation
+            previewContent.innerHTML = `
+                <div class="preview-loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在加载预览...</p>
+                </div>
+            `;
+
+            // Load content after short delay
+            setTimeout(() => {
+                let content = '';
+                
+                if (['.jpg', '.jpeg', '.png', '.gif', '.svg'].includes(fileType)) {
+                    // Simple image preview
+                    content = `
+                        <div class="preview-content">
+                            <button class="preview-close-btn" onclick="closePreviewModal()">&times;</button>
+                            <div class="preview-header">
+                                <div class="file-icon image-icon">🖼️</div>
+                                <div class="file-info">
+                                    <h3>${file.name}${file.type}</h3>
+                                    <p class="file-meta">图片文件 • ${file.uploadTime}</p>
+                                </div>
+                            </div>
+                            <div class="preview-body">
+                                <div class="image-preview">
+                                    <div class="image-placeholder">
+                                        <div class="placeholder-icon">📷</div>
+                                        <p>图片预览</p>
+                                        <small>文件名: ${file.name}${file.type}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (['.mp4', '.avi', '.mov', '.wmv', '.mkv'].includes(fileType)) {
+                    // Simple video preview
+                    content = `
+                        <div class="preview-content">
+                            <button class="preview-close-btn" onclick="closePreviewModal()">&times;</button>
+                            <div class="preview-header">
+                                <div class="file-icon video-icon">🎥</div>
+                                <div class="file-info">
+                                    <h3>${file.name}${file.type}</h3>
+                                    <p class="file-meta">视频文件 • ${file.uploadTime}</p>
+                                </div>
+                            </div>
+                            <div class="preview-body">
+                                <div class="video-preview">
+                                    <div class="video-placeholder">
+                                        <div class="play-icon">▶️</div>
+                                        <p>视频预览</p>
+                                        <small>时长: 02:34 • 格式: ${fileType.toUpperCase().substring(1)}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (fileType === '.pdf') {
+                    // Simple PDF preview
+                    content = `
+                        <div class="preview-content">
+                            <button class="preview-close-btn" onclick="closePreviewModal()">&times;</button>
+                            <div class="preview-header">
+                                <div class="file-icon pdf-icon">📄</div>
+                                <div class="file-info">
+                                    <h3>${file.name}${file.type}</h3>
+                                    <p class="file-meta">PDF 文档 • ${file.uploadTime}</p>
+                                </div>
+                            </div>
+                            <div class="preview-body">
+                                <div class="document-preview">
+                                    <div class="doc-page">
+                                        <div class="doc-header">${file.name.replace(/\.[^/.]+$/, "")}</div>
+                                        <div class="doc-content">
+                                            <div class="doc-line"></div>
+                                            <div class="doc-line"></div>
+                                            <div class="doc-line short"></div>
+                                            <div class="doc-line"></div>
+                                            <div class="doc-line"></div>
+                                            <div class="doc-line short"></div>
+                                        </div>
+                                        <div class="doc-footer">第 1 页，共 5 页</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (['.txt', '.md'].includes(fileType)) {
+                    // Simple text preview
+                    content = `
+                        <div class="preview-content">
+                            <button class="preview-close-btn" onclick="closePreviewModal()">&times;</button>
+                            <div class="preview-header">
+                                <div class="file-icon text-icon">📝</div>
+                                <div class="file-info">
+                                    <h3>${file.name}${file.type}</h3>
+                                    <p class="file-meta">文本文件 • ${file.uploadTime}</p>
+                                </div>
+                            </div>
+                            <div class="preview-body">
+                                <div class="text-preview">
+                                    <div class="text-content">
+                                        <p>这是一个${fileType === '.md' ? 'Markdown' : '文本'}文件的预览示例。</p>
+                                        <p>在实际应用中，这里会显示文件的真实内容。</p>
+                                        <p>文件名: ${file.name}${file.type}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Unsupported file type
+                    content = `
+                        <div class="preview-content">
+                            <button class="preview-close-btn" onclick="closePreviewModal()">&times;</button>
+                            <div class="preview-header">
+                                <div class="file-icon default-icon">📁</div>
+                                <div class="file-info">
+                                    <h3>${file.name}${file.type}</h3>
+                                    <p class="file-meta">文件 • ${file.uploadTime}</p>
+                                </div>
+                            </div>
+                            <div class="preview-body">
+                                <div class="unsupported-preview">
+                                    <div class="unsupported-icon">📄</div>
+                                    <h4>无法预览此文件类型</h4>
+                                    <p>请下载文件查看完整内容</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                previewContent.innerHTML = content;
+                
+                // Add entrance animation
+                const previewContentEl = previewContent.querySelector('.preview-content');
+                if (previewContentEl) {
+                    previewContentEl.style.opacity = '0';
+                    previewContentEl.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        previewContentEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        previewContentEl.style.opacity = '1';
+                        previewContentEl.style.transform = 'translateY(0)';
+                    }, 50);
+                }
+            }, 800);
+        }
+
+        // Close preview modal
+        function closePreviewModal() {
+            const modal = document.getElementById('previewModal');
+            modal.classList.remove('active');
+            
+            // Clear content after animation
+            setTimeout(() => {
+                document.getElementById('previewContent').innerHTML = '';
+            }, 300);
+        }
+
+        // Edit file
+        function editFile(fileId, tabId) {
+            const file = tabsData[tabId].find(f => f.id == fileId);
+            if (file) {
+                // Hide other content and show edit content
+                document.getElementById('dashboardContent').style.display = 'none';
+                document.getElementById('helpContent').style.display = 'none';
+                document.getElementById('uploadContent').style.display = 'none';
+                document.getElementById('editContent').style.display = 'block';
+                
+                // Update header
+                document.querySelector('.header-title').textContent = '编辑文件';
+                
+                // Populate form fields
+                document.getElementById('editFileNameNew').value = file.name.replace(/ \([^)]+\)$/, ''); // Remove language suffix
+                document.getElementById('editSystemTypeNew').value = file.systemType || '-';
+                document.getElementById('editFileTypeNew').textContent = file.type || '-';
+                document.getElementById('editFileSizeNew').textContent = file.size || '-';
+                document.getElementById('editUploadTimeNew').textContent = file.uploadTime || '-';
+                
+                // Populate category options
+                const editCategorySelectNew = document.getElementById('editCategorySelectNew');
+                editCategorySelectNew.innerHTML = '';
+                document.querySelectorAll('.tab-item').forEach(tab => {
+                    const option = document.createElement('option');
+                    option.value = tab.dataset.tab;
+                    option.textContent = tab.textContent.trim();
+                    if (tab.dataset.tab === tabId) {
+                        option.selected = true;
+                    }
+                    editCategorySelectNew.appendChild(option);
+                });
+                
+                // Store editing info
+                window.editingFileId = fileId;
+                window.editingTabId = tabId;
+            }
+        }
+
+        // Make functions globally accessible for onclick handlers
+        window.editFile = editFile;
+        window.deleteFile = deleteFile;
+        window.viewFile = viewFile;
+        
+        // Show notification (simple implementation)
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                </div>
+            `;
+            
+            // Add to body
+            document.body.appendChild(notification);
+            
+            // Trigger animation
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Download file (placeholder)
+        function downloadFile(fileId, tabId) {
+            const file = tabsData[tabId].find(f => f.id == fileId);
+            if (file) {
+                alert(`下载文件: ${file.name}${file.type}`);
+                // Implement actual download logic here
+            }
+        }
+
+        // Custom Confirmation Dialog
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmItemName = document.getElementById('confirmItemName');
+        const confirmCancel = document.getElementById('confirmCancel');
+        const confirmDelete = document.getElementById('confirmDelete');
+        let confirmCallback = null;
+
+        // Show confirmation dialog
+        function showConfirmDialog(title, itemName, message, callback) {
+            confirmTitle.textContent = title;
+            confirmItemName.textContent = itemName;
+            if (message) {
+                confirmMessage.innerHTML = message;
+            } else {
+                confirmMessage.innerHTML = `确定要删除 <span class="confirm-file-name">${itemName}</span> 吗？`;
+            }
+            confirmCallback = callback;
+            confirmModal.classList.add('active');
+        }
+
+        // Hide confirmation dialog
+        function hideConfirmDialog() {
+            confirmModal.classList.remove('active');
+            confirmCallback = null;
+        }
+
+        // Confirm delete button
+        confirmDelete.addEventListener('click', () => {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            hideConfirmDialog();
+        });
+
+        // Cancel button
+        confirmCancel.addEventListener('click', hideConfirmDialog);
+
+        // Click outside to close
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                hideConfirmDialog();
+            }
+        });
+
+        // Delete file
+        function deleteFile(fileId, tabId) {
+            const file = tabsData[tabId].find(f => f.id == fileId);
+            if (file) {
+                showConfirmDialog('确认删除文件', `${file.name}${file.type}`, null, () => {
+                    // Remove from data
+                    tabsData[tabId] = tabsData[tabId].filter(f => f.id != fileId);
+                    // Re-render the list
+                    renderFileList(tabId);
+                });
+            }
+        }
+        
+        // Document operations for multi-language structure
+        function downloadDocument(documentId, tabId) {
+            const document = tabsData[tabId].find(f => f.id == documentId);
+            if (document && document.languages) {
+                // Show language selection dialog
+                const languages = Object.keys(document.languages);
+                if (languages.length === 1) {
+                    // Only one language, download directly
+                    const lang = languages[0];
+                    const file = document.languages[lang];
+                    showNotification(`下载文件: ${file.fileName}`, 'info');
+                } else {
+                    // Multiple languages, show selection
+                    showLanguageSelectionDialog(document, 'download');
+                }
+            } else {
+                // Fallback to old method
+                downloadFile(documentId, tabId);
+            }
+        }
+        
+        function viewDocument(documentId, tabId) {
+            const document = tabsData[tabId].find(f => f.id == documentId);
+            if (document && document.languages) {
+                // Show language selection dialog for multi-language documents
+                const languages = Object.keys(document.languages);
+                if (languages.length === 1) {
+                    // Only one language, view directly
+                    const lang = languages[0];
+                    const file = document.languages[lang];
+                    if (!canPreview(file.type)) {
+                        showNotification('该文件类型不支持预览', 'warning');
+                        return;
+                    }
+                    // Create a file object that works with our preview system
+                    const previewFile = {
+                        id: documentId,
+                        name: file.fileName.replace(/\.[^/.]+$/, ""), // Remove extension
+                        type: file.type,
+                        systemType: lang, // Use language as system type for display
+                        uploadTime: document.uploadTime || new Date().toLocaleString()
+                    };
+                    
+                    // Set preview title
+                    document.getElementById('previewTitle').textContent = `${previewFile.name}${previewFile.type} (${lang})`;
+                    
+                    
+                    // Show preview modal
+                    document.getElementById('previewModal').classList.add('active');
+                    
+                    // Load preview content
+                    loadPreviewContent(previewFile);
+                } else {
+                    // Multiple languages, show selection
+                    showLanguageSelectionDialog(document, 'view');
+                }
+            } else {
+                // Fallback to old method for single files
+                viewFile(documentId, tabId);
+            }
+        }
+        
+        function editDocument(documentId, tabId) {
+            const document = tabsData[tabId].find(f => f.id == documentId);
+            if (document && document.languages) {
+                // Open multi-language edit dialog
+                openMultiLanguageEditDialog(document, tabId);
+            } else {
+                // Fallback to old method
+                editFile(documentId, tabId);
+            }
+        }
+        
+        function deleteDocument(documentId, tabId) {
+            const document = tabsData[tabId].find(f => f.id == documentId);
+            if (document) {
+                const confirmText = document.languages ? 
+                    `${document.name} (包含 ${Object.keys(document.languages).length} 个语言版本)` : 
+                    `${document.name}${document.type}`;
+                
+                showConfirmDialog('确认删除文档', confirmText, null, () => {
+                    // Remove from data
+                    tabsData[tabId] = tabsData[tabId].filter(f => f.id != documentId);
+                    // Re-render the list
+                    renderFileList(tabId);
+                    showNotification('文档已删除', 'success');
+                });
+            }
+        }
+        
+        function showLanguageSelectionDialog(document, action) {
+            // Create a simple language selection dialog
+            const languageNames = {
+                'zh-CN': '简体中文',
+                'zh-TW': '繁体中文',
+                'en-US': 'English',
+                'ja-JP': '日本語',
+                'ko-KR': '한국어',
+                'fr-FR': 'Français',
+                'de-DE': 'Deutsch',
+                'es-ES': 'Español'
+            };
+            
+            const languages = Object.keys(document.languages);
+            const message = languages.map(lang => languageNames[lang] || lang).join(', ');
+            
+            // For now, just show notification with available languages
+            showNotification(`可用语言版本: ${message}`, 'info');
+            
+            // In a real implementation, you would show a selection dialog
+            // and perform the action on the selected language version
+        }
+        
+        function openMultiLanguageEditDialog(document, tabId) {
+            // TODO: Implement multi-language edit dialog
+            showNotification('多语言编辑功能开发中', 'info');
+        }
+
+        // Initialize Help Center functionality
+        let helpCenterInitialized = false;
+        
+        function initializeHelpCenter() {
+            if (helpCenterInitialized) return;
+            console.log('Initializing Help Center functionality');
+            
+            // Tab click handling for help center tabs
+            const tabsList = document.getElementById('tabsList');
+            if (tabsList) {
+                console.log('Setting up tab click listeners');
+                tabsList.addEventListener('click', (e) => {
+                    const tabItem = e.target.closest('.tab-item');
+                    if (tabItem) {
+                        const tabId = tabItem.dataset.tab;
+                        console.log('Tab clicked:', tabId);
+                        switchTab(tabId);
+                    }
+                });
+            }
+            
+            // Upload button
+            const uploadBtn = document.getElementById('uploadBtn');
+            if (uploadBtn) {
+                console.log('Setting up upload button');
+                uploadBtn.addEventListener('click', () => {
+                    console.log('Upload button clicked');
+                    // Hide all content sections
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'none';
+                    document.getElementById('uploadContent').style.display = 'block';
+                    
+                    // Update header title
+                    document.querySelector('.header-title').textContent = '上传文件';
+                    
+                    // Populate category options
+                    const categorySelectNew = document.getElementById('categorySelectNew');
+                    categorySelectNew.innerHTML = '<option value="">请选择分类</option>';
+                    
+                    // Get all tab items and populate options
+                    document.querySelectorAll('.tab-item').forEach(tab => {
+                        const option = document.createElement('option');
+                        option.value = tab.dataset.tab;
+                        option.textContent = tab.textContent.trim();
+                        
+                        // Select the active tab by default
+                        if (tab.classList.contains('active')) {
+                            option.selected = true;
+                        }
+                        
+                        categorySelectNew.appendChild(option);
+                    });
+                });
+            }
+            
+            // Back to dashboard button
+            const backToDashboard = document.getElementById('backToDashboard');
+            if (backToDashboard) {
+                backToDashboard.addEventListener('click', () => {
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'block';
+                    document.querySelector('.header-title').textContent = '帮助中心';
+                });
+            }
+            
+            // Cancel upload button
+            const cancelUploadNew = document.getElementById('cancelUploadNew');
+            if (cancelUploadNew) {
+                cancelUploadNew.addEventListener('click', () => {
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'block';
+                    document.querySelector('.header-title').textContent = '帮助中心';
+                });
+            }
+            
+            // Function to add language file input for new form
+            function addLanguageFileInputNew() {
+                // Show the file list container when adding first item
+                const fileListContainer = document.getElementById('languageFileListNew');
+                if (fileListContainer.style.display === 'none') {
+                    fileListContainer.style.display = 'block';
+                }
+                
+                languageCounterNew++;
+                const itemId = `lang-file-new-${languageCounterNew}`;
+                
+                const languageFileItem = document.createElement('div');
+                languageFileItem.className = 'language-file-item';
+                languageFileItem.id = itemId;
+                languageFileItem.innerHTML = `
+                    <select class="language-select" data-id="${itemId}" style="min-width: 180px; max-width: 220px; padding: 10px 12px; font-size: 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; background: white; cursor: pointer; height: 44px;">
+                        <option value="">选择语言</option>
+                        <option value="zh-CN">简体中文</option>
+                        <option value="zh-TW">繁体中文</option>
+                        <option value="en-US">English</option>
+                        <option value="ja-JP">日本語</option>
+                        <option value="ko-KR">한국어</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="de-DE">Deutsch</option>
+                        <option value="es-ES">Español</option>
+                    </select>
+                    <div class="file-upload-zone" data-id="${itemId}" style="flex: 1; min-height: 44px; border: 2px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fafafa; padding: 0 20px; transition: all 0.3s ease;">
+                        <input type="file" id="file-new-${itemId}" style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.mp4,.avi,.mov,.wmv,.mkv,.zip,.rar,.exe">
+                        <span class="file-upload-text" style="font-size: 14px; color: #666;">点击选择文件或拖拽到此处</span>
+                    </div>
+                    <button type="button" class="remove-language-btn" data-id="${itemId}" style="width: 36px; height: 36px; min-width: 36px; border: none; background: #000; color: white; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; flex-shrink: 0;">×</button>
+                `;
+                
+                document.getElementById('languageFileListNew').appendChild(languageFileItem);
+                
+                // Add event listeners
+                const fileInput = document.getElementById(`file-new-${itemId}`);
+                const fileZone = languageFileItem.querySelector('.file-upload-zone');
+                const fileText = languageFileItem.querySelector('.file-upload-text');
+                const removeBtn = languageFileItem.querySelector('.remove-language-btn');
+                const langSelect = languageFileItem.querySelector('.language-select');
+                
+                // File zone click
+                fileZone.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                // File input change
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        fileText.textContent = file.name;
+                        fileZone.style.background = '#e8f5e8';
+                        fileZone.style.borderColor = '#4CAF50';
+                        fileZone.style.borderStyle = 'solid';
+                        fileText.style.color = '#2e7d2e';
+                        
+                        // Update language files array
+                        const existingIndex = languageFilesNew.findIndex(lf => lf.id === itemId);
+                        if (existingIndex > -1) {
+                            languageFilesNew[existingIndex].file = file;
+                        } else {
+                            languageFilesNew.push({ id: itemId, language: langSelect.value, file: file });
+                        }
+                    }
+                });
+                
+                // Language select change
+                langSelect.addEventListener('change', () => {
+                    const file = fileInput.files[0];
+                    if (file) {
+                        const existingIndex = languageFilesNew.findIndex(lf => lf.id === itemId);
+                        if (existingIndex > -1) {
+                            languageFilesNew[existingIndex].language = langSelect.value;
+                        }
+                    }
+                });
+                
+                // Remove button
+                removeBtn.addEventListener('click', () => {
+                    document.getElementById(itemId).remove();
+                    languageFilesNew = languageFilesNew.filter(lf => lf.id !== itemId);
+                    
+                    // Hide the container if no items left
+                    const fileListContainer = document.getElementById('languageFileListNew');
+                    if (fileListContainer.children.length === 0) {
+                        fileListContainer.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Add language button for new upload form
+            const addLanguageBtnNew = document.getElementById('addLanguageBtnNew');
+            if (addLanguageBtnNew) {
+                addLanguageBtnNew.addEventListener('click', () => {
+                    addLanguageFileInputNew();
+                });
+            }
+            
+            // Handle new upload form submission
+            const uploadFormNew = document.getElementById('uploadFormNew');
+            if (uploadFormNew) {
+                uploadFormNew.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Get form values
+                    const fileName = document.getElementById('fileNameNew').value.trim();
+                    const category = document.getElementById('categorySelectNew').value;
+                    const systemType = document.getElementById('systemTypeNew').value;
+                    
+                    if (!fileName || !category || !systemType) {
+                        showNotification('请填写所有必填字段', 'warning');
+                        return;
+                    }
+                    
+                    if (languageFilesNew.length === 0) {
+                        showNotification('请至少添加一个语言版本文件', 'warning');
+                        return;
+                    }
+                    
+                    // Validate all language files
+                    let hasError = false;
+                    languageFilesNew.forEach(lf => {
+                        if (!lf.language || !lf.file) {
+                            hasError = true;
+                        }
+                    });
+                    
+                    if (hasError) {
+                        showNotification('请完成所有语言文件的选择', 'warning');
+                        return;
+                    }
+                    
+                    // Add files to the appropriate category
+                    const tabId = category;
+                    if (!tabsData[tabId]) {
+                        tabsData[tabId] = [];
+                    }
+                    
+                    languageFilesNew.forEach(lf => {
+                        const fileExt = lf.file.name.substring(lf.file.name.lastIndexOf('.')).toLowerCase();
+                        const fileData = {
+                            id: Date.now() + Math.random(),
+                            name: `${fileName} (${lf.language})`,
+                            systemType: systemType,
+                            size: formatFileSize(lf.file.size),
+                            type: fileExt,
+                            language: lf.language,
+                            uploadTime: new Date().toLocaleString('zh-CN')
+                        };
+                        tabsData[tabId].push(fileData);
+                    });
+                    
+                    // Render file list and switch back to help content
+                    renderFileList(tabId);
+                    switchTab(tabId);
+                    
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'block';
+                    document.querySelector('.header-title').textContent = '帮助中心';
+                    
+                    // Reset form
+                    uploadFormNew.reset();
+                    languageFilesNew = [];
+                    languageCounterNew = 0;
+                    const listContainer = document.getElementById('languageFileListNew');
+                    listContainer.innerHTML = '';
+                    listContainer.style.display = 'none';
+                    
+                    showNotification('文件上传成功！', 'success');
+                });
+            }
+            
+            // Edit form handlers
+            const backFromEdit = document.getElementById('backFromEdit');
+            if (backFromEdit) {
+                backFromEdit.addEventListener('click', () => {
+                    document.getElementById('editContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'block';
+                    document.querySelector('.header-title').textContent = '帮助中心';
+                });
+            }
+            
+            const cancelEditNew = document.getElementById('cancelEditNew');
+            if (cancelEditNew) {
+                cancelEditNew.addEventListener('click', () => {
+                    document.getElementById('editContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'block';
+                    document.querySelector('.header-title').textContent = '帮助中心';
+                });
+            }
+            
+            const editFormNew = document.getElementById('editFormNew');
+            if (editFormNew) {
+                editFormNew.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const newFileName = document.getElementById('editFileNameNew').value.trim();
+                    const newCategory = document.getElementById('editCategorySelectNew').value;
+                    
+                    if (!newFileName || !newCategory) {
+                        showNotification('请填写所有必填字段', 'warning');
+                        return;
+                    }
+                    
+                    // Find and update the file
+                    const file = tabsData[window.editingTabId].find(f => f.id == window.editingFileId);
+                    if (file) {
+                        // Update file name (preserve language suffix if exists)
+                        const langMatch = file.name.match(/ \([^)]+\)$/);
+                        file.name = newFileName + (langMatch ? langMatch[0] : '');
+                        
+                        // If category changed, move file
+                        if (newCategory !== window.editingTabId) {
+                            // Remove from old category
+                            tabsData[window.editingTabId] = tabsData[window.editingTabId].filter(f => f.id !== file.id);
+                            
+                            // Add to new category
+                            if (!tabsData[newCategory]) {
+                                tabsData[newCategory] = [];
+                            }
+                            tabsData[newCategory].push(file);
+                            
+                            // Re-render both categories
+                            renderFileList(window.editingTabId);
+                            renderFileList(newCategory);
+                            
+                            // Switch to new category
+                            switchTab(newCategory);
+                        } else {
+                            // Just re-render current category
+                            renderFileList(window.editingTabId);
+                        }
+                        
+                        showNotification('文件信息已更新', 'success');
+                    }
+                    
+                    // Return to file list
+                    document.getElementById('editContent').style.display = 'none';
+                    document.getElementById('helpContent').style.display = 'block';
+                    document.querySelector('.header-title').textContent = '帮助中心';
+                });
+            }
+            
+            // Category management button
+            const categoryManageBtn = document.getElementById('categoryManageBtn');
+            if (categoryManageBtn) {
+                console.log('Setting up category management button');
+                categoryManageBtn.addEventListener('click', () => {
+                    console.log('Category management button clicked');
+                    openCategoryManagement();
+                });
+            }
+            
+            helpCenterInitialized = true;
+        }
+        
+        // Initialize all tabs and render empty lists
+        document.querySelectorAll('.tab-content').forEach(content => {
+            const tabId = content.id;
+            // Initialize empty file list
+            if (!tabsData[tabId]) {
+                tabsData[tabId] = [];
+            }
+            
+            // Add sample data for demonstration (remove this in production)
+            if (tabId === 'tab1') {
+                tabsData[tabId] = [
+                    {
+                        id: Date.now(),
+                        name: 'IndustrialControl-Setup-1.0.21',
+                        systemType: 'Windows x64',
+                        type: '.exe',
+                        size: '125.6 MB',
+                        uploadTime: '2025/08/15 20:26:27'
+                    },
+                    {
+                        id: Date.now() + 1,
+                        name: 'IndustrialControl-1.0.21-arm64',
+                        systemType: 'mac(M芯片)',
+                        type: '.dmg',
+                        size: '142.3 MB',
+                        uploadTime: '2025/08/15 21:26:27'
+                    }
+                ];
+            } else if (tabId === 'tab2') {
+                tabsData[tabId] = [
+                    {
+                        id: Date.now() + 2,
+                        name: '旭衡EMS介绍',
+                        systemType: '通用',
+                        type: '.mp4',
+                        size: '125.3 MB',
+                        uploadTime: '2024/12/10 10:28:27'
+                    },
+                    {
+                        id: Date.now() + 3,
+                        name: 'Neuron Gateway Introduction',
+                        systemType: '通用',
+                        type: '.mp4',
+                        size: '98.7 MB',
+                        uploadTime: '2025/05/22 17:14:27'
+                    }
+                ];
+            } else if (tabId === 'tab3') {
+                tabsData[tabId] = [
+                    {
+                        id: Date.now() + 4,
+                        name: 'EMS_N2 Firmware Upgrade Package-1.2.3',
+                        systemType: '通用',
+                        type: '.zip',
+                        size: '28.4 MB',
+                        uploadTime: '2025/07/28 10:28:27'
+                    },
+                    {
+                        id: Date.now() + 5,
+                        name: 'EMS系统演示视频',
+                        systemType: '通用',
+                        type: '.mp4',
+                        size: '156.8 MB',
+                        uploadTime: '2024/12/10 10:28:27'
+                    },
+                    {
+                        id: Date.now() + 6,
+                        name: 'EMS安装包',
+                        systemType: 'Windows x64',
+                        type: '.exe',
+                        size: '89.5 MB',
+                        uploadTime: '2024/12/07 16:45:20'
+                    }
+                ];
+            }
+            
+            renderFileList(tabId);
+        });
+
+        // Initialize tabs
+        initTabs();
+
+        // Edit File Dialog Management
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const editFileName = document.getElementById('editFileName');
+        const editCategorySelect = document.getElementById('editCategorySelect');
+        const editFileType = document.getElementById('editFileType');
+        const editFileSize = document.getElementById('editFileSize');
+        const editUploadTime = document.getElementById('editUploadTime');
+        const cancelEdit = document.getElementById('cancelEdit');
+        let editingFile = null;
+        let editingTabId = null;
+
+        // Open edit dialog
+        function openEditDialog(file, tabId) {
+            editingFile = file;
+            editingTabId = tabId;
+            
+            // Populate form
+            editFileName.value = file.name;
+            editFileType.textContent = file.type.toUpperCase();
+            editFileSize.textContent = file.size;
+            editUploadTime.textContent = file.uploadTime;
+            
+            // Populate category options
+            editCategorySelect.innerHTML = '';
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                const option = document.createElement('option');
+                option.value = tab.dataset.tab;
+                option.textContent = tab.textContent.trim();
+                if (tab.dataset.tab === tabId) {
+                    option.selected = true;
+                }
+                editCategorySelect.appendChild(option);
+            });
+            
+            // Show modal
+            editModal.classList.add('active');
+        }
+
+        // Handle edit form submission
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!editingFile) return;
+            
+            const newName = editFileName.value.trim();
+            const newTabId = editCategorySelect.value;
+            
+            // Update file name
+            editingFile.name = newName;
+            
+            // If category changed, move file
+            if (newTabId !== editingTabId) {
+                // Remove from old category
+                tabsData[editingTabId] = tabsData[editingTabId].filter(f => f.id !== editingFile.id);
+                
+                // Add to new category
+                if (!tabsData[newTabId]) {
+                    tabsData[newTabId] = [];
+                }
+                tabsData[newTabId].push(editingFile);
+                
+                // Re-render both lists
+                renderFileList(editingTabId);
+                renderFileList(newTabId);
+                
+                // Switch to new category
+                switchTab(newTabId);
+            } else {
+                // Just re-render current list
+                renderFileList(editingTabId);
+            }
+            
+            // Close modal
+            editModal.classList.remove('active');
+            editingFile = null;
+            editingTabId = null;
+        });
+
+        // Cancel edit
+        cancelEdit.addEventListener('click', () => {
+            editModal.classList.remove('active');
+            editingFile = null;
+            editingTabId = null;
+        });
+
+        // Close modal when clicking outside
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                editModal.classList.remove('active');
+                editingFile = null;
+                editingTabId = null;
+            }
+        });
+
+        // Preview Modal Event Listeners
+        const previewModal = document.getElementById('previewModal');
+        if (previewModal) {
+            // Close modal when clicking outside
+            previewModal.addEventListener('click', (e) => {
+                if (e.target === previewModal) {
+                    closePreviewModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && previewModal.classList.contains('active')) {
+                    closePreviewModal();
+                }
+            });
+        }
+
+        // Category Management
+        const categoryManageBtn = document.getElementById('categoryManageBtn');
+        const categoryModal = document.getElementById('categoryModal');
+        const categoryList = document.getElementById('categoryList');
+        const newCategoryInput = document.getElementById('newCategoryInput');
+        const addNewCategoryBtn = document.getElementById('addNewCategoryBtn');
+        const cancelCategory = document.getElementById('cancelCategory');
+        const saveCategory = document.getElementById('saveCategory');
+        let tempCategories = [];
+        let originalCategories = [];
+        let draggedItem = null;
+        let hasChanges = false;
+
+
+        // Open category management
+        function openCategoryManagement() {
+            // Copy current categories
+            tempCategories = [];
+            originalCategories = [];
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                const cat = {
+                    id: tab.dataset.tab,
+                    name: tab.textContent.trim(),
+                    element: tab,
+                    isNew: false,
+                    isDeleted: false
+                };
+                tempCategories.push(cat);
+                originalCategories.push({...cat});
+            });
+            
+            hasChanges = false;
+            updateSaveButton();
+            renderCategoryList();
+            categoryModal.classList.add('active');
+        }
+
+        // Render category list
+        function renderCategoryList() {
+            categoryList.innerHTML = '';
+            
+            tempCategories.forEach((cat, index) => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.draggable = true;
+                item.dataset.index = index;
+                item.dataset.id = cat.id;
+                
+                item.innerHTML = `
+                    <span class="drag-handle">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M3 4h10M3 8h10M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <input type="text" class="category-name-input" value="${cat.name}" data-id="${cat.id}">
+                    <div class="category-actions">
+                        <button class="category-action-btn delete" data-id="${cat.id}" title="删除">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M6 2l1-1h2l1 1m-7 2h10M5 5v8a1 1 0 001 1h4a1 1 0 001-1V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                // Drag events
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                
+                // Delete button
+                const deleteBtn = item.querySelector('.delete');
+                deleteBtn.addEventListener('click', () => {
+                    // Count non-deleted categories
+                    const activeCategories = tempCategories.filter(c => !c.isDeleted);
+                    if (activeCategories.length <= 1) {
+                        alert('至少需要保留一个分类');
+                        return;
+                    }
+                    
+                    // If it's a new category (not yet saved), just remove it
+                    if (cat.isNew) {
+                        tempCategories.splice(index, 1);
+                        renderCategoryList();
+                        checkForChanges();
+                        return;
+                    }
+                    
+                    // For existing categories, confirm and delete immediately
+                    showConfirmDialog('确认删除分类', cat.name, 
+                        `删除分类 <span class="confirm-file-name">${cat.name}</span> 后，该分类下的所有文件也将被删除。此操作将立即生效。`, 
+                        () => {
+                            // Delete immediately
+                            deleteCategoryImmediately(cat.id);
+                            
+                            // Remove from temp list
+                            tempCategories.splice(index, 1);
+                            
+                            // Also remove from original list since it's deleted
+                            originalCategories = originalCategories.filter(c => c.id !== cat.id);
+                            
+                            renderCategoryList();
+                            checkForChanges();
+                        });
+                });
+                
+                // Add input change listener
+                const nameInput = item.querySelector('.category-name-input');
+                nameInput.addEventListener('input', () => {
+                    checkForChanges();
+                });
+                
+                categoryList.appendChild(item);
+            });
+        }
+
+        // Drag and drop handlers
+        function handleDragStart(e) {
+            draggedItem = e.currentTarget;
+            e.currentTarget.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(categoryList, e.clientY);
+            if (afterElement == null) {
+                categoryList.appendChild(draggedItem);
+            } else {
+                categoryList.insertBefore(draggedItem, afterElement);
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            // Update tempCategories order
+            const newOrder = [];
+            categoryList.querySelectorAll('.category-item').forEach(item => {
+                const id = item.dataset.id;
+                const cat = tempCategories.find(c => c.id === id);
+                if (cat) {
+                    const newName = item.querySelector('.category-name-input').value;
+                    if (cat.name !== newName) {
+                        cat.name = newName;
+                    }
+                    newOrder.push(cat);
+                }
+            });
+            tempCategories = newOrder;
+            checkForChanges();
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.category-item:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Add new category
+        addNewCategoryBtn.addEventListener('click', () => {
+            const name = newCategoryInput.value.trim();
+            if (name) {
+                tabCounter++;
+                tempCategories.push({
+                    id: `tab${tabCounter}`,
+                    name: name,
+                    element: null,
+                    isNew: true,
+                    isDeleted: false
+                });
+                newCategoryInput.value = '';
+                renderCategoryList();
+                checkForChanges();
+            }
+        });
+
+        // Check for changes
+        function checkForChanges() {
+            hasChanges = false;
+            
+            // Check for new categories
+            const newCats = tempCategories.filter(c => c.isNew);
+            if (newCats.length > 0) {
+                hasChanges = true;
+            }
+            
+            // Check for name changes or order changes
+            const currentNonNew = tempCategories.filter(c => !c.isNew);
+            const originalNonDeleted = originalCategories.filter(c => !c.isDeleted);
+            
+            if (currentNonNew.length !== originalNonDeleted.length) {
+                hasChanges = true;
+            } else {
+                for (let i = 0; i < currentNonNew.length; i++) {
+                    if (currentNonNew[i].id !== originalNonDeleted[i].id || 
+                        currentNonNew[i].name !== originalNonDeleted[i].name) {
+                        hasChanges = true;
+                        break;
+                    }
+                }
+            }
+            
+            updateSaveButton();
+        }
+
+        // Update save button state
+        function updateSaveButton() {
+            if (hasChanges) {
+                saveCategory.textContent = '保存更改';
+                saveCategory.classList.add('primary');
+            } else {
+                saveCategory.textContent = '关闭';
+                saveCategory.classList.remove('primary');
+            }
+        }
+
+        // Delete category immediately
+        function deleteCategoryImmediately(catId) {
+            // Remove tab button
+            const tabButton = document.querySelector(`.tab-item[data-tab="${catId}"]`);
+            const wasActive = tabButton && tabButton.classList.contains('active');
+            if (tabButton) {
+                tabButton.remove();
+            }
+            
+            // Remove tab content
+            const tabContent = document.getElementById(catId);
+            if (tabContent) {
+                tabContent.remove();
+            }
+            
+            // Delete data
+            delete tabsData[catId];
+            
+            // If deleted tab was active, switch to first available tab
+            if (wasActive) {
+                const firstTab = document.querySelector('.tab-item');
+                if (firstTab) {
+                    switchTab(firstTab.dataset.tab);
+                }
+            }
+        }
+
+        // Enter key to add category
+        newCategoryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addNewCategoryBtn.click();
+            }
+        });
+
+        // Cancel button
+        cancelCategory.addEventListener('click', () => {
+            categoryModal.classList.remove('active');
+        });
+
+        // Save changes or close
+        saveCategory.addEventListener('click', () => {
+            if (hasChanges) {
+                // Update category names from inputs
+                categoryList.querySelectorAll('.category-item').forEach(item => {
+                    const id = item.dataset.id;
+                    const name = item.querySelector('.category-name-input').value;
+                    const cat = tempCategories.find(c => c.id === id);
+                    if (cat) {
+                        cat.name = name;
+                    }
+                });
+
+                // Apply changes (only for new categories and edits, not deletes)
+                applyCategories();
+            }
+            categoryModal.classList.remove('active');
+        });
+
+        // Apply category changes
+        function applyCategories() {
+            const tabsList = document.getElementById('tabsList');
+            const tabContents = document.getElementById('tabContents');
+            const currentActive = document.querySelector('.tab-item.active')?.dataset.tab;
+            
+            // Clear current tabs
+            tabsList.innerHTML = '';
+            
+            // Remove deleted tab contents
+            const newTabIds = tempCategories.map(c => c.id);
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (!newTabIds.includes(content.id)) {
+                    content.remove();
+                    delete tabsData[content.id];
+                }
+            });
+            
+            // Recreate tabs in new order
+            tempCategories.forEach(cat => {
+                // Create tab button
+                const tabButton = document.createElement('button');
+                tabButton.className = 'tab-item';
+                tabButton.dataset.tab = cat.id;
+                tabButton.textContent = cat.name;
+                tabsList.appendChild(tabButton);
+                
+                // Create content if doesn't exist (for new categories)
+                if (!document.getElementById(cat.id)) {
+                    const tabContent = document.createElement('div');
+                    tabContent.className = 'tab-content';
+                    tabContent.id = cat.id;
+                    tabContent.innerHTML = `<div class="file-list" id="fileList-${cat.id}"></div>`;
+                    tabContents.appendChild(tabContent);
+                    
+                    // Initialize data for new tab
+                    if (!tabsData[cat.id]) {
+                        tabsData[cat.id] = [];
+                    }
+                    renderFileList(cat.id);
+                }
+            });
+            
+            // Restore active tab or activate first
+            if (currentActive && document.querySelector(`.tab-item[data-tab="${currentActive}"]`)) {
+                switchTab(currentActive);
+            } else if (tempCategories.length > 0) {
+                switchTab(tempCategories[0].id);
+            }
+        }
+
+        // Close modal when clicking outside
+        categoryModal.addEventListener('click', (e) => {
+            if (e.target === categoryModal) {
+                categoryModal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

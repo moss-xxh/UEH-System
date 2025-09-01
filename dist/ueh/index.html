@@ -2947,6 +2947,16 @@
             align-items: center;
         }
         
+        /* 设备响应统计弹窗最高优先级 */
+        #operationModal {
+            z-index: 2147483650 !important;
+        }
+        
+        #operationModal .modal-content {
+            z-index: 2147483650 !important;
+            position: relative !important;
+        }
+        
         .modal.show {
             display: flex !important;
         }
@@ -4856,8 +4866,94 @@
         </div>
     </div>
 
+    <!-- Progress Dialog Modal -->
+    <div class="progress-dialog" id="progressDialog" style="display: none; position: fixed; top: calc(50% + 60px); left: 50%; transform: translate(-50%, -50%); width: 450px; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); cursor: move; z-index: 100; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            
+            <!-- Header -->
+            <div class="progress-header" style="padding: 24px 32px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); border-radius: 16px 16px 0 0;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(145deg, rgba(0, 255, 136, 0.15), rgba(0, 255, 136, 0.05)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0, 255, 136, 0.15);">
+                        <span id="progressIcon" style="font-size: 24px;">⚡</span>
+                    </div>
+                    <div>
+                        <h3 id="progressTitle" style="margin: 0; font-size: 20px; font-weight: 700; color: #fff;" data-i18n="chargingProgress">充电进度</h3>
+                        <p id="progressSubtitle" style="margin: 4px 0 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.6);" data-i18n="operationInProgress">正在执行操作...</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="progressMinimizeBtn" onclick="minimizeProgressDialog()" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255, 255, 255, 0.7); transition: all 0.3s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.15)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                        <span style="font-size: 14px;">−</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="progress-body" style="padding: 32px;">
+                <!-- Progress Info -->
+                <div style="display: flex; justify-content: space-between; margin-bottom: 32px;">
+                    <div style="text-align: center;">
+                        <div id="progressCommandsSent" style="font-size: 32px; font-weight: 700; color: #00ff88; margin-bottom: 4px;">500</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);" data-i18n="sentDevices">下发设备</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div id="progressOperationType" style="font-size: 32px; font-weight: 700; color: #00ff88; margin-bottom: 4px;" data-i18n="discharge">放电</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);" data-i18n="type">类型</div>
+                    </div>
+                </div>
+                
+                <!-- Steps -->
+                <div class="progress-steps">
+                    <!-- Step 1 -->
+                    <div class="progress-step" id="progressStep1" style="padding: 20px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="font-size: 16px; font-weight: 600; color: #fff;" data-i18n="readDeviceSettings">1. 读取设备设置信息</div>
+                                <div id="step1Status" style="padding: 4px 12px; background: rgba(255, 193, 7, 0.2); color: #ffc107; border-radius: 12px; font-size: 12px; font-weight: 600;" data-i18n="reading">读取中</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div id="step1Progress" style="font-size: 14px; color: rgba(255, 255, 255, 0.7);">1/100</div>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden;">
+                            <div id="step1ProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ff88, #00cc6a); border-radius: 2px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="progress-step" id="progressStep2" style="padding: 20px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="font-size: 16px; font-weight: 600; color: #fff;" data-i18n="modifyDeviceSettings">2. 修改设备设置信息</div>
+                                <div id="step2Status" style="padding: 4px 12px; background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); border-radius: 12px; font-size: 12px; font-weight: 600;" data-i18n="waiting">等待中</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div id="step2Progress" style="font-size: 14px; color: rgba(255, 255, 255, 0.7);">1/100</div>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden;">
+                            <div id="step2ProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ff88, #00cc6a); border-radius: 2px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <!-- Floating Ball Container -->
+    <div id="progressFloatingContainer" class="progress-floating-container" style="display: none; position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 1000;">
+        <!-- Toggle button -->
+        <div id="progressToggleBtn" onclick="toggleProgressBalls(event)" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(145deg, #1e1e2e, #2a2a3a); border: 2px solid #00ff88; display: flex; align-items: center; justify-content: center; cursor: move; margin-bottom: 12px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n-title="dragToMoveClickToToggle">
+            <span id="progressToggleIcon" style="font-size: 16px; color: #00ff88; font-weight: bold;">▼</span>
+        </div>
+        <!-- Balls container -->
+        <div id="progressBallsContainer" style="transition: all 0.3s ease;">
+            <!-- Floating balls will be generated here -->
+        </div>
+    </div>
+
     <!-- Modal for operation result -->
-    <div id="operationModal" class="modal" style="display: none;">
+    <div id="operationModal" class="modal" style="display: none; z-index: 2147483650; position: fixed;">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             
@@ -4889,15 +4985,7 @@
                     <div class="status-stats">
                         <div class="status-stat">
                             <div class="status-stat-value" id="devicesDispatched">500</div>
-                            <div class="status-stat-label" data-i18n="commandsSent">指令下发</div>
-                        </div>
-                        <div class="status-stat">
-                            <div class="status-stat-value" id="devicesReceived">477</div>
-                            <div class="status-stat-label" data-i18n="commandsReceived">指令接收</div>
-                        </div>
-                        <div class="status-stat">
-                            <div class="status-stat-value" id="devicesActivated">445</div>
-                            <div class="status-stat-label" data-i18n="devicesActivated">成功激活</div>
+                            <div class="status-stat-label" data-i18n="commandsSent">下发设备</div>
                         </div>
                         <div class="status-stat">
                             <div class="status-stat-value" id="successRate">89%</div>
@@ -4951,14 +5039,6 @@
                     <div class="status-item">
                         <div class="status-number" id="detailsDispatched">500</div>
                         <div class="status-label" data-i18n="devicesDispatched">Commands Sent</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-number" id="detailsReceived">477</div>
-                        <div class="status-label" data-i18n="devicesReceived">Commands Received</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-number" id="detailsActivated">445</div>
-                        <div class="status-label" data-i18n="devicesActivated">Devices Activated</div>
                     </div>
                 </div>
             </div>
@@ -9183,8 +9263,14 @@
                 // Execute stop operation
                 executeStopOperation();
             } else {
+                // Show progress dialog first
+                showProgressDialog(operationType);
+                
                 // Execute start operation
                 startOperation(operationType);
+                
+                // Start progress animation
+                startProgressAnimation(operationType);
                 
                 // 确保价格圆圈颜色立即更新
                 setTimeout(() => {
@@ -11781,12 +11867,8 @@
             stats.successRate = Math.floor((stats.activated / 500) * 100);
             
             // 更新统计显示
-            const commandsReceivedStat = document.getElementById('commandsReceivedStat');
-            const devicesActivatedStat = document.getElementById('devicesActivatedStat');
             const successRateStat = document.getElementById('successRateStat');
             
-            if (commandsReceivedStat) commandsReceivedStat.textContent = stats.received;
-            if (devicesActivatedStat) devicesActivatedStat.textContent = stats.activated;
             if (successRateStat) successRateStat.textContent = stats.successRate + '%';
             
             // 显示模态框 - 使用flex居中
@@ -12340,7 +12422,8 @@
 
             // 构造操作记录格式的数据
             const dispatched = parseInt(document.getElementById('devicesDispatched')?.textContent || '500');
-            const activated = parseInt(document.getElementById('devicesActivated')?.textContent || '452');
+            const successRate = parseInt(document.getElementById('successRate')?.textContent || '89');
+            const activated = Math.floor(dispatched * (successRate / 100));
             const operation = {
                 id: Date.now() % 100000000,
                 time: new Date().toLocaleString('zh-CN'),
@@ -12446,8 +12529,6 @@
             
             // Update execution status numbers
             document.getElementById('detailsDispatched').textContent = document.getElementById('devicesDispatched').textContent;
-            document.getElementById('detailsReceived').textContent = document.getElementById('devicesReceived').textContent;
-            document.getElementById('detailsActivated').textContent = document.getElementById('devicesActivated').textContent;
             
             // Show the details panel
             detailsPanel.style.display = 'block';
@@ -12697,8 +12778,8 @@
                 command: currentOperation || 'discharge',
                 operator: 'admin',
                 stations: parseInt(document.getElementById('devicesDispatched')?.textContent || '500'),
-                success: parseInt(document.getElementById('devicesActivated')?.textContent || '445'),
-                failed: parseInt(document.getElementById('devicesDispatched')?.textContent || '500') - parseInt(document.getElementById('devicesActivated')?.textContent || '445')
+                success: Math.floor(parseInt(document.getElementById('devicesDispatched')?.textContent || '500') * (parseInt(document.getElementById('successRate')?.textContent || '89') / 100)),
+                failed: parseInt(document.getElementById('devicesDispatched')?.textContent || '500') - Math.floor(parseInt(document.getElementById('devicesDispatched')?.textContent || '500') * (parseInt(document.getElementById('successRate')?.textContent || '89') / 100))
             };
             
             // Generate initial content for the basic tab
@@ -13296,15 +13377,7 @@
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                         <div style="text-align: center;">
                             <div style="font-size: 36px; font-weight: 700; color: #00ff88;">500</div>
-                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;" data-i18n="commandsSent">Commands Sent</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div id="commandsReceived" style="font-size: 36px; font-weight: 700; color: #00ff88;">498</div>
-                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;" data-i18n="commandsReceived">Commands Received</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div id="devicesActivated" style="font-size: 36px; font-weight: 700; color: #00ff88;">448</div>
-                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;" data-i18n="devicesActivated">Devices Activated</div>
+                            <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px;" data-i18n="commandsSent">下发设备</div>
                         </div>
                         <div style="text-align: center;">
                             <div id="successRate" style="font-size: 36px; font-weight: 700; color: #00ff88;">89%</div>
@@ -13352,15 +13425,7 @@
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
                         <div style="text-align: center;">
                             <div style="font-size: 28px; font-weight: 700; color: #00ff88; line-height: 1;">500</div>
-                            <div style="color: rgba(255, 255, 255, 0.6); font-size: 13px; margin-top: 6px;" data-i18n="commandsIssued">指令下发</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div id="commandsReceivedStat" style="font-size: 28px; font-weight: 700; color: #00ff88; line-height: 1;">492</div>
-                            <div style="color: rgba(255, 255, 255, 0.6); font-size: 13px; margin-top: 6px;" data-i18n="commandsReceived">指令接收</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div id="devicesActivatedStat" style="font-size: 28px; font-weight: 700; color: #00ff88; line-height: 1;">486</div>
-                            <div style="color: rgba(255, 255, 255, 0.6); font-size: 13px; margin-top: 6px;" data-i18n="devicesExecuted">已下发</div>
+                            <div style="color: rgba(255, 255, 255, 0.6); font-size: 13px; margin-top: 6px;" data-i18n="commandsIssued">下发设备</div>
                         </div>
                         <div style="text-align: center;">
                             <div id="successRateStat" style="font-size: 28px; font-weight: 700; color: #00ff88; line-height: 1;">97%</div>
@@ -19729,6 +19794,432 @@
             setTimeout(() => {
                 element.style.transition = '';
             }, 500);
+        }
+
+        // Progress Dialog Variables
+        let currentProgressData = {
+            operationType: null,
+            step1: { progress: 0, status: 'pending' },
+            step2: { progress: 0, status: 'pending' },
+            commandsSent: 0,
+            successRate: 0
+        };
+        let progressAnimationInterval = null;
+
+        // Show Progress Dialog
+        function showProgressDialog(operationType) {
+            console.log('Showing progress dialog for:', operationType);
+            
+            // Reset progress data
+            currentProgressData.operationType = operationType;
+            currentProgressData.step1 = { progress: 0, status: 'pending' };
+            currentProgressData.step2 = { progress: 0, status: 'pending' };
+            currentProgressData.commandsSent = 500;
+            currentProgressData.successRate = 0;
+            
+            // Update dialog content
+            const progressTitle = document.getElementById('progressTitle');
+            const progressIcon = document.getElementById('progressIcon');
+            const progressSubtitle = document.getElementById('progressSubtitle');
+            
+            if (operationType === 'charge') {
+                progressTitle.textContent = window.i18n ? window.i18n.getText('chargingProgress') : '充电进度';
+                progressIcon.textContent = '⚡';
+                progressSubtitle.textContent = window.i18n ? window.i18n.getText('operationInProgress') : '正在执行操作...';
+            } else if (operationType === 'discharge') {
+                progressTitle.textContent = window.i18n ? window.i18n.getText('dischargingProgress') : '放电进度';
+                progressIcon.textContent = '🔋';
+                progressSubtitle.textContent = window.i18n ? window.i18n.getText('operationInProgress') : '正在执行操作...';
+            }
+            
+            // Update progress info
+            document.getElementById('progressCommandsSent').textContent = currentProgressData.commandsSent;
+            const operationTypeElement = document.getElementById('progressOperationType');
+            if (operationType === 'charge') {
+                operationTypeElement.textContent = window.i18n ? window.i18n.getText('charge') : '充电';
+                operationTypeElement.style.color = '#00ff88';
+            } else if (operationType === 'discharge') {
+                operationTypeElement.textContent = window.i18n ? window.i18n.getText('discharge') : '放电';
+                operationTypeElement.style.color = '#ffc107';
+            }
+            
+            // Reset step status and progress bars
+            document.getElementById('step1Status').textContent = window.i18n ? window.i18n.getText('waiting') : '等待中';
+            document.getElementById('step1Status').style.background = 'rgba(255, 255, 255, 0.1)';
+            document.getElementById('step1Status').style.color = 'rgba(255, 255, 255, 0.5)';
+            document.getElementById('step1Progress').textContent = '0/100';
+            document.getElementById('step1ProgressBar').style.width = '0%';
+            
+            document.getElementById('step2Status').textContent = window.i18n ? window.i18n.getText('waiting') : '等待中';
+            document.getElementById('step2Status').style.background = 'rgba(255, 255, 255, 0.1)';
+            document.getElementById('step2Status').style.color = 'rgba(255, 255, 255, 0.5)';
+            document.getElementById('step2Progress').textContent = '0/100';
+            document.getElementById('step2ProgressBar').style.width = '0%';
+            
+            // Show modal
+            const progressDialog = document.getElementById('progressDialog');
+            progressDialog.style.display = 'block';
+            
+            // Make dialog draggable
+            makeProgressDialogDraggable();
+            
+            // Generate floating balls for all regions
+            generateFloatingBalls(operationType);
+        }
+
+        // Make Progress Dialog Draggable
+        function makeProgressDialogDraggable() {
+            const dialog = document.getElementById('progressDialog');
+            const header = dialog.querySelector('.progress-header');
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+
+            function dragStart(e) {
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - dialog.offsetLeft;
+                    initialY = e.touches[0].clientY - dialog.offsetTop;
+                } else {
+                    initialX = e.clientX - dialog.offsetLeft;
+                    initialY = e.clientY - dialog.offsetTop;
+                }
+
+                if (e.target === header || header.contains(e.target)) {
+                    isDragging = true;
+                    dialog.style.transition = 'none';
+                }
+            }
+
+            function dragEnd() {
+                isDragging = false;
+                dialog.style.transition = '';
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    
+                    if (e.type === "touchmove") {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
+
+                    dialog.style.left = currentX + "px";
+                    dialog.style.top = currentY + "px";
+                    dialog.style.transform = "none";
+                }
+            }
+
+            // Mouse events
+            header.addEventListener("mousedown", dragStart);
+            document.addEventListener("mousemove", drag);
+            document.addEventListener("mouseup", dragEnd);
+
+            // Touch events
+            header.addEventListener("touchstart", dragStart, { passive: false });
+            document.addEventListener("touchmove", drag, { passive: false });
+            document.addEventListener("touchend", dragEnd);
+        }
+
+        // Make Floating Container Draggable
+        function makeFloatingContainerDraggable() {
+            const container = document.getElementById('progressFloatingContainer');
+            const toggleBtn = document.getElementById('progressToggleBtn');
+            let isDragging = false;
+            let hasDragged = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            let startX;
+            let startY;
+
+            function dragStart(e) {
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - container.offsetLeft;
+                    initialY = e.touches[0].clientY - container.offsetTop;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                } else {
+                    initialX = e.clientX - container.offsetLeft;
+                    initialY = e.clientY - container.offsetTop;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                }
+
+                if (e.target === toggleBtn || toggleBtn.contains(e.target)) {
+                    isDragging = true;
+                    hasDragged = false;
+                    container.style.transition = 'none';
+                }
+            }
+
+            function dragEnd(e) {
+                if (isDragging) {
+                    isDragging = false;
+                    container.style.transition = '';
+                    
+                    // If we have dragged, set flag to prevent toggle
+                    if (hasDragged) {
+                        isDragOperation = true;
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    
+                    // Reset drag state after a short delay
+                    setTimeout(() => {
+                        hasDragged = false;
+                    }, 100);
+                }
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    let currentMouseX, currentMouseY;
+                    
+                    if (e.type === "touchmove") {
+                        currentMouseX = e.touches[0].clientX;
+                        currentMouseY = e.touches[0].clientY;
+                        currentX = currentMouseX - initialX;
+                        currentY = currentMouseY - initialY;
+                    } else {
+                        currentMouseX = e.clientX;
+                        currentMouseY = e.clientY;
+                        currentX = currentMouseX - initialX;
+                        currentY = currentMouseY - initialY;
+                    }
+
+                    // Check if we've moved enough to consider it a drag
+                    const dragDistance = Math.sqrt(
+                        Math.pow(currentMouseX - startX, 2) + Math.pow(currentMouseY - startY, 2)
+                    );
+                    
+                    if (dragDistance > 5) {
+                        hasDragged = true;
+                        e.preventDefault();
+                        
+                        container.style.left = currentX + "px";
+                        container.style.top = currentY + "px";
+                        container.style.right = "auto";
+                        container.style.transform = "none";
+                    }
+                }
+            }
+
+            // Mouse events
+            toggleBtn.addEventListener("mousedown", dragStart);
+            document.addEventListener("mousemove", drag);
+            document.addEventListener("mouseup", dragEnd);
+
+            // Touch events
+            toggleBtn.addEventListener("touchstart", dragStart, { passive: false });
+            document.addEventListener("touchmove", drag, { passive: false });
+            document.addEventListener("touchend", dragEnd);
+        }
+
+        // Minimize Progress Dialog to Floating Ball
+        function minimizeProgressDialog() {
+            const progressDialog = document.getElementById('progressDialog');
+            const floatingContainer = document.getElementById('progressFloatingContainer');
+            
+            progressDialog.style.display = 'none';
+            floatingContainer.style.display = 'block';
+            
+            // Make floating container draggable
+            makeFloatingContainerDraggable();
+        }
+
+        // Toggle Progress Balls Expand/Collapse
+        let isDragOperation = false;
+        
+        function toggleProgressBalls(e) {
+            // Don't toggle if this was triggered after a drag operation
+            if (isDragOperation) {
+                isDragOperation = false;
+                return;
+            }
+            
+            const ballsContainer = document.getElementById('progressBallsContainer');
+            const toggleIcon = document.getElementById('progressToggleIcon');
+            
+            if (ballsContainer.style.display === 'none') {
+                // Expand
+                ballsContainer.style.display = 'block';
+                toggleIcon.textContent = '▼';
+                toggleIcon.style.color = '#00ff88';
+            } else {
+                // Collapse
+                ballsContainer.style.display = 'none';
+                toggleIcon.textContent = '▲';
+                toggleIcon.style.color = '#ffc107';
+            }
+        }
+
+        // Generate Floating Balls for All Regions
+        function generateFloatingBalls(operationType) {
+            const container = document.getElementById('progressFloatingContainer');
+            const regions = ['NSW', 'QLD', 'VIC', 'SA', 'TAS'];
+            
+            // Clear existing balls container content
+            let ballsContainer = document.getElementById('progressBallsContainer');
+            if (ballsContainer) {
+                ballsContainer.innerHTML = '';
+            } else {
+                // Create balls container if it doesn't exist
+                ballsContainer = document.createElement('div');
+                ballsContainer.id = 'progressBallsContainer';
+                ballsContainer.style.cssText = `
+                    display: block;
+                    transition: all 0.3s ease;
+                `;
+                container.appendChild(ballsContainer);
+            }
+            
+            regions.forEach((region, index) => {
+                const ball = document.createElement('div');
+                ball.className = `progress-floating-ball progress-ball-${region.toLowerCase()}`;
+                ball.setAttribute('data-region', region);
+                
+                // For discharge, only show progress for selected region
+                const isSelectedRegion = region === selectedMainRegion;
+                const shouldShowProgress = operationType === 'charge' || isSelectedRegion;
+                
+                ball.style.cssText = `
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    background: linear-gradient(145deg, #1e1e2e, #2a2a3a);
+                    border: 2px solid ${shouldShowProgress ? (operationType === 'charge' ? '#00ff88' : '#ffc107') : 'rgba(255, 255, 255, 0.3)'};
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    position: relative;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                    opacity: ${shouldShowProgress ? '1' : '0.5'};
+                `;
+                
+                ball.innerHTML = `
+                    <div style="font-size: 10px; font-weight: 600; color: #fff; margin-bottom: 2px;">${region}</div>
+                    <div style="font-size: 12px; font-weight: 700; color: ${shouldShowProgress ? (operationType === 'charge' ? '#00ff88' : '#ffc107') : 'rgba(255, 255, 255, 0.5)'};">0%</div>
+                `;
+                
+                ball.onclick = () => expandProgressDialog();
+                ballsContainer.appendChild(ball);
+            });
+        }
+
+        // Expand Progress Dialog from Floating Ball
+        function expandProgressDialog() {
+            const progressDialog = document.getElementById('progressDialog');
+            const floatingContainer = document.getElementById('progressFloatingContainer');
+            
+            floatingContainer.style.display = 'none';
+            progressDialog.style.display = 'block';
+        }
+
+        // Start Progress Animation
+        function startProgressAnimation(operationType) {
+            console.log('Starting progress animation for:', operationType);
+            
+            let step1Complete = false;
+            let step2Complete = false;
+            
+            // Clear any existing interval
+            if (progressAnimationInterval) {
+                clearInterval(progressAnimationInterval);
+            }
+            
+            progressAnimationInterval = setInterval(() => {
+                // Step 1: Read device settings
+                if (!step1Complete) {
+                    currentProgressData.step1.progress += Math.random() * 5;
+                    if (currentProgressData.step1.progress >= 100) {
+                        currentProgressData.step1.progress = 100;
+                        currentProgressData.step1.status = 'completed';
+                        step1Complete = true;
+                        
+                        // Update step 1 status
+                        document.getElementById('step1Status').textContent = window.i18n ? window.i18n.getText('completed') : '已完成';
+                        document.getElementById('step1Status').style.background = 'rgba(0, 255, 136, 0.2)';
+                        document.getElementById('step1Status').style.color = '#00ff88';
+                    } else {
+                        currentProgressData.step1.status = 'in_progress';
+                        document.getElementById('step1Status').textContent = window.i18n ? window.i18n.getText('reading') : '读取中';
+                        document.getElementById('step1Status').style.background = 'rgba(255, 193, 7, 0.2)';
+                        document.getElementById('step1Status').style.color = '#ffc107';
+                    }
+                    document.getElementById('step1Progress').textContent = `${Math.floor(currentProgressData.step1.progress)}/100`;
+                    document.getElementById('step1ProgressBar').style.width = `${currentProgressData.step1.progress}%`;
+                }
+                
+                // Step 2: Modify device settings (starts only when step 1 is completed)
+                // Sync with map page execution progress
+                if (step1Complete && !step2Complete) {
+                    // Get map execution progress
+                    const mapProgressText = document.getElementById('progressPercent')?.textContent || '0%';
+                    const mapProgressValue = parseInt(mapProgressText.replace('%', ''));
+                    
+                    // Sync step2 progress with map progress
+                    currentProgressData.step2.progress = mapProgressValue;
+                    
+                    if (currentProgressData.step2.progress >= 100) {
+                        currentProgressData.step2.progress = 100;
+                        currentProgressData.step2.status = 'completed';
+                        step2Complete = true;
+                        
+                        // Update step 2 status
+                        document.getElementById('step2Status').textContent = window.i18n ? window.i18n.getText('completed') : '已完成';
+                        document.getElementById('step2Status').style.background = 'rgba(0, 255, 136, 0.2)';
+                        document.getElementById('step2Status').style.color = '#00ff88';
+                        
+                        // All steps complete, stop animation
+                        clearInterval(progressAnimationInterval);
+                        console.log('Progress animation completed');
+                    } else {
+                        currentProgressData.step2.status = 'in_progress';
+                        document.getElementById('step2Status').textContent = window.i18n ? window.i18n.getText('setting') : '设置中';
+                        document.getElementById('step2Status').style.background = 'rgba(255, 193, 7, 0.2)';
+                        document.getElementById('step2Status').style.color = '#ffc107';
+                    }
+                    document.getElementById('step2Progress').textContent = `${Math.floor(currentProgressData.step2.progress)}/100`;
+                    document.getElementById('step2ProgressBar').style.width = `${currentProgressData.step2.progress}%`;
+                }
+                
+                // Calculate total progress for floating balls
+                const totalProgress = (currentProgressData.step1.progress + currentProgressData.step2.progress) / 2;
+                
+                // Update floating balls
+                updateFloatingBalls(totalProgress);
+                
+            }, 100); // Update every 100ms
+        }
+
+        // Update Floating Balls Progress
+        function updateFloatingBalls(progress) {
+            const balls = document.querySelectorAll('.progress-floating-ball');
+            balls.forEach(ball => {
+                const region = ball.getAttribute('data-region');
+                const progressElement = ball.querySelector('div:last-child');
+                
+                if (progressElement) {
+                    // Only update the selected region, regardless of charge or discharge
+                    if (region === selectedMainRegion) {
+                        progressElement.textContent = `${Math.floor(progress)}%`;
+                    } else {
+                        // Keep other regions at 0% 
+                        progressElement.textContent = '0%';
+                    }
+                }
+            });
         }
 
     </script>

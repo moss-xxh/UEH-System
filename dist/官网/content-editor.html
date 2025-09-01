@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容编辑器 - 管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .editor-header {
+            background: white;
+            border-bottom: 1px solid #d2d2d7;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #d2d2d7;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #1d1d1f;
+        }
+
+        .back-btn:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+        }
+
+        .editor-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1d1d1f;
+            border: 1px solid #d2d2d7;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Editor Container */
+        .editor-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+
+        /* Main Editor */
+        .editor-main {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #d2d2d7;
+            overflow: hidden;
+        }
+
+        .editor-content {
+            padding: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #86868b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .title-input {
+            font-size: 24px;
+            font-weight: 600;
+            border: none;
+            padding: 0;
+            margin-bottom: 16px;
+        }
+
+        .title-input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Rich Text Editor */
+        .editor-toolbar {
+            border-bottom: 1px solid #d2d2d7;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: #f5f5f7;
+        }
+
+        .toolbar-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d2d2d7;
+            border-radius: 6px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .toolbar-btn:hover {
+            background: #f5f5f7;
+            border-color: #86868b;
+        }
+
+        .toolbar-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 32px;
+            background: #d2d2d7;
+            margin: 0 4px;
+        }
+
+        .content-editor {
+            min-height: 400px;
+            padding: 24px;
+            font-size: 16px;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        .content-editor:focus {
+            background: #fafafa;
+        }
+
+        /* Sidebar */
+        .editor-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #d2d2d7;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .select-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Media Upload */
+        .media-upload {
+            border: 2px dashed #d2d2d7;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .media-upload:hover {
+            border-color: #667eea;
+            background: #f5f5f7;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #86868b;
+        }
+
+        .media-preview {
+            margin-top: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .media-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .remove-media {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .remove-media:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Tags Input */
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            min-height: 44px;
+            cursor: text;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #f5f5f7;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            color: #86868b;
+            transition: color 0.2s;
+        }
+
+        .tag-remove:hover {
+            color: #ff3b30;
+        }
+
+        .tag-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+            font-size: 14px;
+        }
+
+        /* SEO Section */
+        .seo-preview {
+            padding: 16px;
+            background: #f5f5f7;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .seo-title {
+            color: #1a0dab;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .seo-url {
+            color: #006621;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .seo-description {
+            color: #545454;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-sidebar {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .editor-header {
+                padding: 12px 16px;
+            }
+
+            .editor-container {
+                padding: 16px;
+            }
+
+            .editor-content {
+                padding: 20px;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Auto-save indicator */
+        .auto-save {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #86868b;
+            padding: 4px 8px;
+            background: #f5f5f7;
+            border-radius: 6px;
+        }
+
+        .auto-save.saving {
+            color: #ff9500;
+        }
+
+        .auto-save.saved {
+            color: #34c759;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="editor-header">
+        <div class="header-left">
+            <a href="admin-dashboard.html" class="back-btn">←</a>
+            <h1 class="editor-title">新建文章</h1>
+            <span class="auto-save" id="autoSave">
+                <span class="save-icon">●</span>
+                <span class="save-text">已保存</span>
+            </span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" id="previewBtn">预览</button>
+            <button class="btn btn-secondary" id="saveDraftBtn">保存草稿</button>
+            <button class="btn btn-primary" id="publishBtn">发布</button>
+        </div>
+    </header>
+
+    <!-- Editor Container -->
+    <div class="editor-container">
+        <!-- Main Editor -->
+        <div class="editor-main">
+            <div class="editor-content">
+                <input type="text" class="form-input title-input" placeholder="输入标题..." id="titleInput">
+                
+                <!-- Rich Text Editor Toolbar -->
+                <div class="editor-toolbar">
+                    <button class="toolbar-btn" data-command="bold" title="粗体">B</button>
+                    <button class="toolbar-btn" data-command="italic" title="斜体">I</button>
+                    <button class="toolbar-btn" data-command="underline" title="下划线">U</button>
+                    <div class="toolbar-separator"></div>
+                    <button class="toolbar-btn" data-command="formatBlock" data-value="h1" title="标题1">H1</button>
+                    <button class="toolbar-btn" data-command="formatBlock" data-value="h2" title="标题2">H2</button>
+                    <button class="toolbar-btn" data-command="formatBlock" data-value="h3" title="标题3">H3</button>
+                    <div class="toolbar-separator"></div>
+                    <button class="toolbar-btn" data-command="insertUnorderedList" title="无序列表">●</button>
+                    <button class="toolbar-btn" data-command="insertOrderedList" title="有序列表">1.</button>
+                    <div class="toolbar-separator"></div>
+                    <button class="toolbar-btn" data-command="justifyLeft" title="左对齐">⬅</button>
+                    <button class="toolbar-btn" data-command="justifyCenter" title="居中">⬌</button>
+                    <button class="toolbar-btn" data-command="justifyRight" title="右对齐">➡</button>
+                    <div class="toolbar-separator"></div>
+                    <button class="toolbar-btn" data-command="createLink" title="插入链接">🔗</button>
+                    <button class="toolbar-btn" data-command="insertImage" title="插入图片">🖼</button>
+                    <button class="toolbar-btn" data-command="removeFormat" title="清除格式">✕</button>
+                </div>
+
+                <!-- Content Editor -->
+                <div class="content-editor" contenteditable="true" id="contentEditor">
+                    <p>开始编写你的内容...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="editor-sidebar">
+            <!-- Publishing Settings -->
+            <div class="sidebar-card">
+                <h3 class="card-title">发布设置</h3>
+                <div class="form-group">
+                    <label class="form-label">状态</label>
+                    <select class="select-input" id="statusSelect">
+                        <option value="draft">草稿</option>
+                        <option value="published">已发布</option>
+                        <option value="scheduled">定时发布</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">发布时间</label>
+                    <input type="datetime-local" class="form-input" id="publishTime">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL 别名</label>
+                    <input type="text" class="form-input" placeholder="article-url-slug" id="urlSlug">
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="sidebar-card">
+                <h3 class="card-title">分类</h3>
+                <div class="form-group">
+                    <select class="select-input" id="categorySelect">
+                        <option value="">选择分类</option>
+                        <option value="news">新闻动态</option>
+                        <option value="product">产品发布</option>
+                        <option value="tech">技术文章</option>
+                        <option value="company">公司动态</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tags-input" id="tagsInput">
+                        <input type="text" class="tag-input" placeholder="输入标签后按回车">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Image -->
+            <div class="sidebar-card">
+                <h3 class="card-title">特色图片</h3>
+                <div class="media-upload" id="mediaUpload">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">点击上传图片</div>
+                    <input type="file" accept="image/*" style="display: none;" id="imageInput">
+                </div>
+                <div class="media-preview" id="mediaPreview" style="display: none;">
+                    <img src="" alt="预览" id="previewImage">
+                    <span class="remove-media" id="removeMedia">✕</span>
+                </div>
+            </div>
+
+            <!-- SEO -->
+            <div class="sidebar-card">
+                <h3 class="card-title">SEO 设置</h3>
+                <div class="form-group">
+                    <label class="form-label">SEO 标题</label>
+                    <input type="text" class="form-input" placeholder="页面标题" id="seoTitle">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">SEO 描述</label>
+                    <textarea class="form-input" rows="3" placeholder="页面描述" id="seoDescription"></textarea>
+                </div>
+                <div class="seo-preview">
+                    <div class="seo-title" id="seoPreviewTitle">文章标题 - 网站名称</div>
+                    <div class="seo-url" id="seoPreviewUrl">www.example.com/article-url</div>
+                    <div class="seo-description" id="seoPreviewDesc">这是文章的描述内容...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+        }
+
+        // Rich text editor commands
+        const toolbarButtons = document.querySelectorAll('.toolbar-btn');
+        toolbarButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const command = button.dataset.command;
+                const value = button.dataset.value || null;
+                
+                if (command === 'createLink') {
+                    const url = prompt('输入链接地址:');
+                    if (url) document.execCommand(command, false, url);
+                } else if (command === 'insertImage') {
+                    const url = prompt('输入图片地址:');
+                    if (url) document.execCommand(command, false, url);
+                } else {
+                    document.execCommand(command, false, value);
+                }
+                
+                // Update button state
+                if (['bold', 'italic', 'underline'].includes(command)) {
+                    button.classList.toggle('active');
+                }
+            });
+        });
+
+        // Auto-save functionality
+        let autoSaveTimer;
+        const autoSaveIndicator = document.getElementById('autoSave');
+        const saveIcon = autoSaveIndicator.querySelector('.save-icon');
+        const saveText = autoSaveIndicator.querySelector('.save-text');
+
+        function autoSave() {
+            clearTimeout(autoSaveTimer);
+            
+            // Show saving state
+            autoSaveIndicator.classList.remove('saved');
+            autoSaveIndicator.classList.add('saving');
+            saveText.textContent = '保存中...';
+            
+            autoSaveTimer = setTimeout(() => {
+                // Simulate save (replace with actual save logic)
+                const content = {
+                    title: document.getElementById('titleInput').value,
+                    content: document.getElementById('contentEditor').innerHTML,
+                    status: document.getElementById('statusSelect').value,
+                    category: document.getElementById('categorySelect').value,
+                    tags: getTags(),
+                    seoTitle: document.getElementById('seoTitle').value,
+                    seoDescription: document.getElementById('seoDescription').value
+                };
+                
+                localStorage.setItem('draftContent', JSON.stringify(content));
+                
+                // Show saved state
+                autoSaveIndicator.classList.remove('saving');
+                autoSaveIndicator.classList.add('saved');
+                saveText.textContent = '已保存';
+            }, 1000);
+        }
+
+        // Trigger auto-save on content change
+        document.getElementById('titleInput').addEventListener('input', autoSave);
+        document.getElementById('contentEditor').addEventListener('input', autoSave);
+
+        // Tags functionality
+        const tagsInput = document.getElementById('tagsInput');
+        const tagInput = tagsInput.querySelector('.tag-input');
+        let tags = [];
+
+        tagInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const tagText = tagInput.value.trim();
+                if (tagText && !tags.includes(tagText)) {
+                    addTag(tagText);
+                    tagInput.value = '';
+                    autoSave();
+                }
+            }
+        });
+
+        function addTag(text) {
+            tags.push(text);
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.innerHTML = `${text} <span class="tag-remove">✕</span>`;
+            tag.querySelector('.tag-remove').addEventListener('click', () => {
+                tags = tags.filter(t => t !== text);
+                tag.remove();
+                autoSave();
+            });
+            tagsInput.insertBefore(tag, tagInput);
+        }
+
+        function getTags() {
+            return tags;
+        }
+
+        // Image upload
+        const mediaUpload = document.getElementById('mediaUpload');
+        const imageInput = document.getElementById('imageInput');
+        const mediaPreview = document.getElementById('mediaPreview');
+        const previewImage = document.getElementById('previewImage');
+        const removeMedia = document.getElementById('removeMedia');
+
+        mediaUpload.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    mediaUpload.style.display = 'none';
+                    mediaPreview.style.display = 'block';
+                    autoSave();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeMedia.addEventListener('click', () => {
+            previewImage.src = '';
+            mediaPreview.style.display = 'none';
+            mediaUpload.style.display = 'block';
+            imageInput.value = '';
+            autoSave();
+        });
+
+        // SEO Preview
+        const seoTitle = document.getElementById('seoTitle');
+        const seoDescription = document.getElementById('seoDescription');
+        const titleInput = document.getElementById('titleInput');
+
+        function updateSeoPreview() {
+            const title = seoTitle.value || titleInput.value || '文章标题';
+            const desc = seoDescription.value || '这是文章的描述内容...';
+            const slug = document.getElementById('urlSlug').value || 'article-url';
+            
+            document.getElementById('seoPreviewTitle').textContent = `${title} - 网站名称`;
+            document.getElementById('seoPreviewUrl').textContent = `www.example.com/${slug}`;
+            document.getElementById('seoPreviewDesc').textContent = desc;
+        }
+
+        seoTitle.addEventListener('input', updateSeoPreview);
+        seoDescription.addEventListener('input', updateSeoPreview);
+        titleInput.addEventListener('input', updateSeoPreview);
+        document.getElementById('urlSlug').addEventListener('input', updateSeoPreview);
+
+        // Action buttons
+        document.getElementById('previewBtn').addEventListener('click', () => {
+            alert('预览功能开发中...');
+        });
+
+        document.getElementById('saveDraftBtn').addEventListener('click', () => {
+            autoSave();
+            alert('草稿已保存');
+        });
+
+        document.getElementById('publishBtn').addEventListener('click', () => {
+            if (confirm('确定要发布这篇文章吗？')) {
+                // Save and publish logic here
+                alert('文章已发布');
+                window.location.href = 'admin-dashboard.html';
+            }
+        });
+
+        // Load draft if exists
+        const draftContent = localStorage.getItem('draftContent');
+        if (draftContent) {
+            const draft = JSON.parse(draftContent);
+            document.getElementById('titleInput').value = draft.title || '';
+            document.getElementById('contentEditor').innerHTML = draft.content || '<p>开始编写你的内容...</p>';
+            document.getElementById('statusSelect').value = draft.status || 'draft';
+            document.getElementById('categorySelect').value = draft.category || '';
+            document.getElementById('seoTitle').value = draft.seoTitle || '';
+            document.getElementById('seoDescription').value = draft.seoDescription || '';
+            
+            // Restore tags
+            if (draft.tags) {
+                draft.tags.forEach(tag => addTag(tag));
+            }
+            
+            updateSeoPreview();
+        }
+    </script>
+</body>
+</html>
