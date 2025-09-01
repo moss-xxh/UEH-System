@@ -132,140 +132,6 @@
             box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
         }
         
-        /* Language Files Section */
-        .language-files-container {
-            background: #f8f9fa;
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 200px;
-        }
-        
-        .language-file-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: white;
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-        
-        .language-file-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .language-select {
-            min-width: 180px;
-            max-width: 220px;
-            padding: 10px 12px;
-            font-size: 14px;
-            border: 1px solid rgba(0,0,0,0.12);
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            height: 44px;
-        }
-        
-        .file-upload-zone {
-            flex: 1;
-            min-height: 44px;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background: #fafafa;
-            padding: 0 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .file-upload-zone:hover {
-            border-color: #007AFF;
-            background: #f0f8ff;
-        }
-        
-        .file-upload-zone.has-file {
-            background: #e8f5e8;
-            border-color: #4CAF50;
-            border-style: solid;
-        }
-        
-        .file-upload-text {
-            font-size: 14px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .file-upload-zone.has-file .file-upload-text {
-            color: #2e7d2e;
-            font-weight: 500;
-        }
-        
-        .remove-language-btn {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            border: none;
-            background: #ff4444;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            line-height: 1;
-            flex-shrink: 0;
-            transition: all 0.2s ease;
-        }
-        
-        .remove-language-btn:hover {
-            background: #cc0000;
-            transform: scale(1.05);
-        }
-        
-        .empty-state {
-            text-align: center;
-            color: rgba(0,0,0,0.5);
-            padding: 40px;
-        }
-        
-        .empty-state svg {
-            margin-bottom: 12px;
-        }
-        
-        .empty-state p {
-            margin: 0;
-            font-size: 14px;
-        }
-        
-        .add-language-btn {
-            width: 100%;
-            margin-top: 16px;
-            padding: 12px;
-            background: #f8f9fa;
-            border: 2px dashed rgba(0,0,0,0.2);
-            border-radius: 8px;
-            color: #666;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .add-language-btn:hover {
-            background: #007AFF;
-            color: white;
-            border-color: #007AFF;
-        }
         
         /* Form Actions */
         .form-actions {
@@ -423,26 +289,6 @@
                     </div>
                 </div>
                 
-                <!-- Language Files Section -->
-                <div class="form-section">
-                    <h2>语言版本文件</h2>
-                    <div class="language-files-container">
-                        <div id="languageFileList">
-                            <div class="empty-state">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="currentColor">
-                                    <path d="M24 4C12.96 4 4 12.96 4 24s8.96 20 20 20 20-8.96 20-20S35.04 4 24 4zm1 30h-2v-2h2v2zm0-6h-2V14h2v14z"/>
-                                </svg>
-                                <p>点击下方按钮添加不同语言版本的文件</p>
-                            </div>
-                        </div>
-                        <button type="button" class="add-language-btn" id="addLanguageBtn">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M10 5v10m-5-5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            添加语言版本
-                        </button>
-                    </div>
-                </div>
                 
                 <!-- Form Actions -->
                 <div class="form-actions">
@@ -460,8 +306,6 @@
     
     <script>
         // Variables
-        let languageFiles = [];
-        let languageCounter = 0;
         
         // Show notification
         function showNotification(message, type = 'success') {
@@ -477,150 +321,6 @@
             }, 3000);
         }
         
-        // Add language file input
-        function addLanguageFileInput() {
-            // Remove empty state if it exists
-            const emptyState = document.querySelector('#languageFileList .empty-state');
-            if (emptyState) {
-                emptyState.remove();
-            }
-            
-            languageCounter++;
-            const itemId = `lang-file-${languageCounter}`;
-            
-            const languageFileItem = document.createElement('div');
-            languageFileItem.className = 'language-file-item';
-            languageFileItem.id = itemId;
-            languageFileItem.innerHTML = `
-                <select class="language-select" data-id="${itemId}">
-                    <option value="">选择语言</option>
-                    <option value="zh-CN">简体中文</option>
-                    <option value="zh-TW">繁体中文</option>
-                    <option value="en-US">English</option>
-                    <option value="ja-JP">日本語</option>
-                    <option value="ko-KR">한국어</option>
-                    <option value="fr-FR">Français</option>
-                    <option value="de-DE">Deutsch</option>
-                    <option value="es-ES">Español</option>
-                    <option value="ru-RU">Русский</option>
-                    <option value="ar-SA">العربية</option>
-                </select>
-                <div class="file-upload-zone" data-id="${itemId}">
-                    <input type="file" id="file-${itemId}" style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.mp4,.avi,.mov,.wmv,.mkv,.zip,.rar,.exe,.dmg,.pkg">
-                    <span class="file-upload-text">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 4v8m0 0l-3-3m3 3l3-3m4 3v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        点击选择文件或拖拽到此处
-                    </span>
-                </div>
-                <button type="button" class="remove-language-btn" data-id="${itemId}">×</button>
-            `;
-            
-            document.getElementById('languageFileList').appendChild(languageFileItem);
-            
-            // Add event listeners
-            const fileInput = document.getElementById(`file-${itemId}`);
-            const fileZone = languageFileItem.querySelector('.file-upload-zone');
-            const fileText = languageFileItem.querySelector('.file-upload-text');
-            const removeBtn = languageFileItem.querySelector('.remove-language-btn');
-            const langSelect = languageFileItem.querySelector('.language-select');
-            
-            // File zone click
-            fileZone.addEventListener('click', () => {
-                fileInput.click();
-            });
-            
-            // File zone drag and drop
-            fileZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                fileZone.style.borderColor = '#007AFF';
-                fileZone.style.background = '#f0f8ff';
-            });
-            
-            fileZone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                if (!fileZone.classList.contains('has-file')) {
-                    fileZone.style.borderColor = '#ddd';
-                    fileZone.style.background = '#fafafa';
-                }
-            });
-            
-            fileZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                fileZone.style.borderColor = '#ddd';
-                fileZone.style.background = '#fafafa';
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    fileInput.files = files;
-                    handleFileSelection(files[0], fileZone, fileText, itemId, langSelect.value);
-                }
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    handleFileSelection(file, fileZone, fileText, itemId, langSelect.value);
-                }
-            });
-            
-            langSelect.addEventListener('change', () => {
-                const file = fileInput.files[0];
-                if (file) {
-                    updateLanguageFile(itemId, langSelect.value, file);
-                }
-            });
-            
-            removeBtn.addEventListener('click', () => {
-                removeLanguageFile(itemId);
-            });
-        }
-        
-        // Handle file selection
-        function handleFileSelection(file, fileZone, fileText, itemId, language) {
-            const fileName = file.name.length > 30 ? file.name.substring(0, 27) + '...' : file.name;
-            fileText.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9 2a1 1 0 011 1v6h6a1 1 0 110 2h-6v6a1 1 0 11-2 0v-6H2a1 1 0 110-2h6V3a1 1 0 011-1z"/>
-                </svg>
-                ${fileName}
-            `;
-            fileZone.classList.add('has-file');
-            updateLanguageFile(itemId, language, file);
-        }
-        
-        // Update language file
-        function updateLanguageFile(itemId, language, file) {
-            const existingIndex = languageFiles.findIndex(lf => lf.id === itemId);
-            if (existingIndex > -1) {
-                languageFiles[existingIndex] = { id: itemId, language, file };
-            } else {
-                languageFiles.push({ id: itemId, language, file });
-            }
-        }
-        
-        // Remove language file
-        function removeLanguageFile(itemId) {
-            const item = document.getElementById(itemId);
-            if (item) {
-                item.remove();
-                languageFiles = languageFiles.filter(lf => lf.id !== itemId);
-                
-                // If no language files left, show empty state
-                const languageFileList = document.getElementById('languageFileList');
-                if (languageFileList.children.length === 0) {
-                    languageFileList.innerHTML = `
-                        <div class="empty-state">
-                            <svg width="48" height="48" viewBox="0 0 48 48" fill="currentColor">
-                                <path d="M24 4C12.96 4 4 12.96 4 24s8.96 20 20 20 20-8.96 20-20S35.04 4 24 4zm1 30h-2v-2h2v2zm0-6h-2V14h2v14z"/>
-                            </svg>
-                            <p>点击下方按钮添加不同语言版本的文件</p>
-                        </div>
-                    `;
-                }
-            }
-        }
         
         // Format file size
         function formatFileSize(bytes) {
@@ -633,10 +333,6 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Add language button
-            document.getElementById('addLanguageBtn').addEventListener('click', () => {
-                addLanguageFileInput();
-            });
             
             // Handle form submission
             document.getElementById('uploadForm').addEventListener('submit', (e) => {
@@ -662,27 +358,6 @@
                     return;
                 }
                 
-                if (languageFiles.length === 0) {
-                    showNotification('请至少添加一个语言版本文件', 'warning');
-                    return;
-                }
-                
-                // Validate all language files
-                let hasError = false;
-                languageFiles.forEach(lf => {
-                    if (!lf.language) {
-                        showNotification('请选择所有文件的语言版本', 'warning');
-                        hasError = true;
-                        return;
-                    }
-                    if (!lf.file) {
-                        showNotification(`请为${lf.language}选择文件`, 'warning');
-                        hasError = true;
-                        return;
-                    }
-                });
-                
-                if (hasError) return;
                 
                 // Success - in real app, would upload files here
                 showNotification('文件上传成功！', 'success');
