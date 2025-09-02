@@ -103,6 +103,62 @@
             background: rgba(0, 0, 0, 0.05);
         }
 
+        /* 二级菜单样式 */
+        .nav-group {
+            position: relative;
+        }
+
+        .nav-arrow {
+            margin-left: auto;
+            transition: transform 0.2s;
+        }
+
+        .nav-group.expanded .nav-arrow {
+            transform: rotate(90deg);
+        }
+
+        .nav-submenu {
+            display: none;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .nav-group.expanded .nav-submenu {
+            display: block;
+        }
+
+        .nav-subitem {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px 0 40px;
+            color: rgba(0, 0, 0, 0.5);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .nav-subitem:hover {
+            color: #000;
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-subitem.active {
+            color: #000;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-subitem.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 3px;
+            height: 100%;
+            background: #000;
+        }
+
         .nav-item.active::before {
             content: '';
             position: absolute;
@@ -660,6 +716,143 @@
             font-size: 14px;
         }
 
+        /* File Details Drawer Styles */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.active {
+            opacity: 1;
+        }
+        .drawer-content {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100%;
+            background: white;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        .drawer-overlay.active .drawer-content {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            padding: 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .drawer-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: #333;
+        }
+        .drawer-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .drawer-close:hover {
+            background: #f5f5f5;
+        }
+        .drawer-body {
+            padding: 24px;
+        }
+        .detail-section {
+            margin-bottom: 32px;
+        }
+        .detail-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            color: #333;
+        }
+        .detail-item {
+            display: flex;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .detail-label {
+            font-weight: 500;
+            color: #666;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            color: #333;
+            word-break: break-word;
+        }
+        .download-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .download-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .download-item-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .download-language {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .download-size {
+            font-size: 12px;
+            color: #666;
+        }
+        .language-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .file-size {
+            font-size: 12px;
+            color: #666;
+        }
+        .download-btn {
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        .download-btn:hover {
+            background: #1d4ed8;
+        }
+
         .modal-overlay.active {
             display: flex;
         }
@@ -910,6 +1103,27 @@
         }
 
         .remove-file-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .system-type-clear-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .system-type-clear-btn:hover {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
         }
@@ -1186,6 +1400,7 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid rgba(0, 0, 0, 0.06);
+            table-layout: fixed;
         }
 
         .file-table thead {
@@ -1202,12 +1417,43 @@
             letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
+        .file-table th:nth-child(1) { width: 23%; }
+        .file-table th:nth-child(2) { width: 14%; }
+        .file-table th:nth-child(3) { width: 18%; }
+        .file-table th:nth-child(4) { width: 12%; }
+        .file-table th:nth-child(5) { width: 13%; }
+        .file-table th:nth-child(6) { width: 15%; min-width: 140px; }
+        
+        /* 文件名列样式 */
+        .file-table td:nth-child(1) {
+            max-width: 0;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        
+        /* 语言列样式 - 支持换行 */
+        .file-table td:nth-child(3) {
+            white-space: normal;
+            word-break: break-word;
+        }
+        
+        /* 系统类型列样式 */
+        .file-table td:nth-child(2) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         .file-table td {
-            padding: 14px 16px;
+            padding: 16px 12px;
             font-size: 14px;
             color: #000;
             border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            word-wrap: break-word;
+            word-break: break-word;
+            line-height: 1.4;
+            vertical-align: top;
         }
 
         .file-table tbody tr:last-child td {
@@ -1274,9 +1520,14 @@
 
         .file-operations {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             justify-content: center;
             align-items: center;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        .operation-group {
+            min-width: 40px;
         }
 
         .operation-group {
@@ -1287,7 +1538,7 @@
         }
 
         .file-action-btn {
-            padding: 5px 10px;
+            padding: 6px 8px;
             border: none;
             background: transparent;
             color: #2563eb;
@@ -1298,8 +1549,8 @@
             text-decoration: none;
             white-space: nowrap;
             display: inline-block;
-            width: 100%;
-            max-width: 60px;
+            min-width: 36px;
+            text-align: center;
         }
 
         .file-action-btn.disabled {
@@ -1836,12 +2087,14 @@
 
         .file-count-badge {
             display: inline-block;
-            padding: 2px 6px;
+            padding: 3px 8px;
             background: #e3f2fd;
             color: #1976d2;
             font-size: 11px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .language-tag {
@@ -1923,16 +2176,31 @@
                     <span class="nav-text">用户</span>
                 </a>
                 
-                <a href="#" class="nav-item" id="helpCenterNav">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
-                            <circle cx="12" cy="17" r="0.5"/>
-                        </svg>
-                    </span>
-                    <span class="nav-text">帮助中心</span>
-                </a>
+                <div class="nav-group">
+                    <a href="#" class="nav-item" id="helpCenterNav">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                                <circle cx="12" cy="17" r="0.5"/>
+                            </svg>
+                        </span>
+                        <span class="nav-text">帮助中心</span>
+                        <span class="nav-arrow">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M6 4l4 4-4 4"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <div class="nav-submenu" id="helpSubmenu">
+                        <a href="#" class="nav-subitem" data-section="documents">
+                            <span class="nav-text">文档资料</span>
+                        </a>
+                        <a href="#" class="nav-subitem" data-section="online-help">
+                            <span class="nav-text">在线帮助</span>
+                        </a>
+                    </div>
+                </div>
                 
                 <a href="#" class="nav-item">
                     <span class="nav-icon">
@@ -2170,6 +2438,133 @@
                     </div>
                 </div>
                 
+                <!-- Simple Online Help Content -->
+                <div id="simpleOnlineHelp" class="content-section" style="display: none;">
+                    <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h2 style="font-size: 24px; color: #333; margin: 0;">在线帮助 - 问题跟踪</h2>
+                            <button class="btn dialog-btn primary" onclick="exportToExcel()" style="padding: 10px 20px;">
+                                导出Excel
+                            </button>
+                        </div>
+                        
+                        <div class="table-container" style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; background: white;">
+                                <thead>
+                                    <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                                        <th style="padding: 16px 12px; text-align: left; font-weight: 600; color: #495057; border-right: 1px solid #dee2e6;">姓名</th>
+                                        <th style="padding: 16px 12px; text-align: left; font-weight: 600; color: #495057; border-right: 1px solid #dee2e6;">电话</th>
+                                        <th style="padding: 16px 12px; text-align: left; font-weight: 600; color: #495057; border-right: 1px solid #dee2e6;">邮箱</th>
+                                        <th style="padding: 16px 12px; text-align: left; font-weight: 600; color: #495057; border-right: 1px solid #dee2e6;">问题</th>
+                                        <th style="padding: 16px 12px; text-align: left; font-weight: 600; color: #495057; border-right: 1px solid #dee2e6; cursor: pointer; position: relative;" onclick="sortByTime()">
+                                            提交时间
+                                            <span id="timeSortIcon" style="margin-left: 4px; font-size: 10px; color: #999;">▼</span>
+                                        </th>
+                                        <th style="padding: 16px 12px; text-align: left; font-weight: 600; color: #495057; border-right: 1px solid #dee2e6;">状态</th>
+                                        <th style="padding: 16px 12px; text-align: center; font-weight: 600; color: #495057; width: 120px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="helpRequestsList">
+                                    <tr style="border-bottom: 1px solid #e9ecef;">
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">张三</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">138****5678</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">zhangsan@email.com</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef; max-width: 300px; word-wrap: break-word;">系统登录时出现"连接超时"错误，已尝试清除缓存但问题依然存在。具体表现为：1. 登录页面加载正常 2. 输入用户名密码后点击登录按钮 3. 页面显示"正在登录..."状态约30秒 4. 随后弹出"连接超时，请稍后重试"错误提示 5. 已尝试清除浏览器缓存、更换网络环境、使用不同浏览器，问题依然存在</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">2024-01-15 14:32</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">
+                                            <span class="status-display" data-request-id="1" data-status="处理中" style="background: #fff3cd; color: #856404; padding: 4px 12px; border-radius: 16px; font-size: 12px; display: inline-block;">处理中</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center;">
+                                            <button class="btn dialog-btn" onclick="viewRequestDetail(1)" style="padding: 6px 12px; font-size: 12px;">查看详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #e9ecef;">
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">李四</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">156****9012</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">lisi@company.com</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef; max-width: 300px; word-wrap: break-word;">文件上传功能无法正常工作，选择文件后点击上传没有反应</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">2024-01-15 09:15</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">
+                                            <span class="status-display" data-request-id="2" data-status="已解决" style="background: #d4edda; color: #155724; padding: 4px 12px; border-radius: 16px; font-size: 12px; display: inline-block;">已解决</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center;">
+                                            <button class="btn dialog-btn" onclick="viewRequestDetail(2)" style="padding: 6px 12px; font-size: 12px;">查看详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #e9ecef;">
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">王五</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">186****3456</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">wangwu@test.org</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef; max-width: 300px; word-wrap: break-word;">希望能增加批量删除文件的功能，目前只能一个一个删除很麻烦</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">2024-01-14 16:28</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">
+                                            <span class="status-display" data-request-id="3" data-status="新提交" style="background: #f8d7da; color: #721c24; padding: 4px 12px; border-radius: 16px; font-size: 12px; display: inline-block;">新提交</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center;">
+                                            <button class="btn dialog-btn" onclick="viewRequestDetail(3)" style="padding: 6px 12px; font-size: 12px;">查看详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #e9ecef;">
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">赵六</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">139****7890</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">zhaoliu@example.net</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef; max-width: 300px; word-wrap: break-word;">系统界面在移动端显示异常，按钮重叠无法正常操作</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">2024-01-14 11:45</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">
+                                            <span class="status-display" data-request-id="4" data-status="处理中" style="background: #fff3cd; color: #856404; padding: 4px 12px; border-radius: 16px; font-size: 12px; display: inline-block;">处理中</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center;">
+                                            <button class="btn dialog-btn" onclick="viewRequestDetail(4)" style="padding: 6px 12px; font-size: 12px;">查看详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #e9ecef;">
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">孙七</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">152****2468</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">sunqi@domain.com</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef; max-width: 300px; word-wrap: break-word;">账户权限问题，无法访问某些功能模块，提示权限不足</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">2024-01-13 15:20</td>
+                                        <td style="padding: 12px; border-right: 1px solid #e9ecef;">
+                                            <span class="status-display" data-request-id="5" data-status="已解决" style="background: #d4edda; color: #155724; padding: 4px 12px; border-radius: 16px; font-size: 12px; display: inline-block;">已解决</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center;">
+                                            <button class="btn dialog-btn" onclick="viewRequestDetail(5)" style="padding: 6px 12px; font-size: 12px;">查看详情</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 翻页控件 -->
+                        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #dee2e6; display: flex; justify-content: center; align-items: center;">
+                            <div class="pagination-container" style="display: flex; align-items: center; gap: 8px;">
+                                <button class="pagination-btn" id="prevPageBtn" onclick="changePage('prev')" style="padding: 8px 12px; border: 1px solid #dee2e6; background: white; color: #495057; border-radius: 4px; cursor: pointer; font-size: 14px;" disabled>
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M11 2L5 8l6 6"/>
+                                    </svg>
+                                    上一页
+                                </button>
+                                
+                                <div class="pagination-info" style="display: flex; align-items: center; gap: 12px; margin: 0 16px;">
+                                    <span style="color: #6c757d; font-size: 14px;">第 <span id="currentPage">1</span> 页</span>
+                                    <span style="color: #dee2e6;">|</span>
+                                    <span style="color: #6c757d; font-size: 14px;">共 <span id="totalPages">1</span> 页</span>
+                                    <span style="color: #dee2e6;">|</span>
+                                    <span style="color: #6c757d; font-size: 14px;">每页 <span id="pageSize">10</span> 条</span>
+                                    <span style="color: #dee2e6;">|</span>
+                                    <span style="color: #6c757d; font-size: 14px;">共 <span id="totalRecords">5</span> 条记录</span>
+                                </div>
+                                
+                                <button class="pagination-btn" id="nextPageBtn" onclick="changePage('next')" style="padding: 8px 12px; border: 1px solid #dee2e6; background: white; color: #495057; border-radius: 4px; cursor: pointer; font-size: 14px;" disabled>
+                                    下一页
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M5 2l6 6-6 6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Upload Content Section -->
                 <div id="uploadContent" class="content-section" style="display: none;">
                     <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
@@ -2198,8 +2593,9 @@
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 24px;">
-                                <label class="form-label">系统类型 *</label>
-                                <select class="form-select" id="systemTypeNew" required>
+                                <label class="form-label">系统类型</label>
+                                <div style="position: relative;">
+                                    <select class="form-select" id="systemTypeNew">
                                     <option value="">请选择系统类型</option>
                                     <option value="Windows x64">Windows x64</option>
                                     <option value="Windows x86">Windows x86</option>
@@ -2218,11 +2614,12 @@
                                     <option value="跨平台">跨平台</option>
                                     <option value="通用">通用</option>
                                 </select>
-                            </div>
+                                <button type="button" class="system-type-clear-btn" id="clearSystemTypeNew" style="display: none; position: absolute; right: 30px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #999; cursor: pointer; font-size: 16px; width: 20px; height: 20px;" title="清除选择">✕</button>
+                                </div>
                             
                             <!-- 语言文件上传 -->
-                            <div class="form-group">
-                                <label class="form-label" style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">语言版本文件</label>
+                            <div class="form-group" style="margin-top: 24px;">
+                                <label class="form-label">语言版本文件</label>
                                 <div id="languageFileListNew" style="display: none; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 24px; background: #f8f9fa; min-height: 200px; max-height: 400px; overflow-y: auto; margin-bottom: 16px;">
                                     <!-- Language file pairs will be added here -->
                                 </div>
@@ -2243,7 +2640,7 @@
                 </div>
                 
                 <!-- Edit Content Section -->
-                <div id="editContent" class="content-section" style="display: none;">
+                <div id="editContent" class="content-section" style="display: none; min-height: 500px; width: 100%;">
                     <div style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                         <div style="display: flex; align-items: center; margin-bottom: 32px;">
                             <button type="button" id="backFromEdit" style="width: 36px; height: 36px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-right: 8px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
@@ -2270,31 +2667,34 @@
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 24px;">
-                                <label class="form-label">系统类型 *</label>
-                                <select class="form-select" id="editSystemTypeNew" required>
-                                    <option value="">请选择系统类型</option>
-                                    <option value="Windows x64">Windows x64</option>
-                                    <option value="Windows x86">Windows x86</option>
-                                    <option value="Windows ARM64">Windows ARM64</option>
-                                    <option value="mac(Intel)">mac(Intel)</option>
-                                    <option value="mac(M芯片)">mac(M芯片)</option>
-                                    <option value="Linux x64">Linux x64</option>
-                                    <option value="Linux ARM64">Linux ARM64</option>
-                                    <option value="Ubuntu">Ubuntu</option>
-                                    <option value="CentOS">CentOS</option>
-                                    <option value="Red Hat">Red Hat</option>
-                                    <option value="Android">Android</option>
-                                    <option value="iOS">iOS</option>
-                                    <option value="iPadOS">iPadOS</option>
-                                    <option value="Web浏览器">Web浏览器</option>
-                                    <option value="跨平台">跨平台</option>
-                                    <option value="通用">通用</option>
-                                </select>
+                                <label class="form-label">系统类型</label>
+                                <div style="position: relative;">
+                                    <select class="form-select" id="editSystemTypeNew">
+                                        <option value="">请选择系统类型</option>
+                                        <option value="Windows x64">Windows x64</option>
+                                        <option value="Windows x86">Windows x86</option>
+                                        <option value="Windows ARM64">Windows ARM64</option>
+                                        <option value="mac(Intel)">mac(Intel)</option>
+                                        <option value="mac(M芯片)">mac(M芯片)</option>
+                                        <option value="Linux x64">Linux x64</option>
+                                        <option value="Linux ARM64">Linux ARM64</option>
+                                        <option value="Ubuntu">Ubuntu</option>
+                                        <option value="CentOS">CentOS</option>
+                                        <option value="Red Hat">Red Hat</option>
+                                        <option value="Android">Android</option>
+                                        <option value="iOS">iOS</option>
+                                        <option value="iPadOS">iPadOS</option>
+                                        <option value="Web浏览器">Web浏览器</option>
+                                        <option value="跨平台">跨平台</option>
+                                        <option value="通用">通用</option>
+                                    </select>
+                                    <button type="button" class="system-type-clear-btn" id="clearEditSystemTypeNew" style="display: none; position: absolute; right: 30px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #999; cursor: pointer; font-size: 16px; width: 20px; height: 20px;" title="清除选择">✕</button>
+                                </div>
                             </div>
                             
                             <!-- 语言文件上传 -->
-                            <div class="form-group">
-                                <label class="form-label" style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">语言版本文件</label>
+                            <div class="form-group" style="margin-top: 24px;">
+                                <label class="form-label">语言版本文件</label>
                                 <div id="editLanguageFileListNew" style="display: none; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 24px; background: #f8f9fa; min-height: 200px; max-height: 400px; overflow-y: auto; margin-bottom: 16px;">
                                     <!-- Language file pairs will be added here -->
                                 </div>
@@ -2308,7 +2708,7 @@
                             
                             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee;">
                                 <button type="button" class="btn dialog-btn" id="cancelEditNew" style="padding: 10px 20px;">取消</button>
-                                <button type="submit" class="btn dialog-btn primary" id="confirmEditNew" style="padding: 10px 20px;">保存修改</button>
+                                <button type="submit" class="btn dialog-btn primary" id="confirmEditNew" style="padding: 10px 20px;">确定保存</button>
                             </div>
                         </form>
                     </div>
@@ -2432,7 +2832,7 @@
                     
                     <div class="form-group" style="margin-bottom: 32px;">
                         <label class="form-label">系统类型</label>
-                        <select class="form-select" id="systemType" required>
+                        <select class="form-select" id="systemType">
                             <option value="">请选择系统类型</option>
                             <option value="Windows x64">Windows x64</option>
                             <option value="Windows x86">Windows x86</option>
@@ -2493,6 +2893,51 @@
         </div>
     </div>
 
+    <!-- File Details Drawer -->
+    <div class="drawer-overlay" id="fileDetailsDrawer" style="display: none;">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3 class="drawer-title">文件详情</h3>
+                <button type="button" class="drawer-close" id="closeDrawer">✕</button>
+            </div>
+            
+            <div class="drawer-body">
+                <!-- 基础信息 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">基础信息</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">文件名称：</span>
+                        <span class="detail-value" id="detailFileName"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">系统类型：</span>
+                        <span class="detail-value" id="detailSystemType"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">文件格式：</span>
+                        <span class="detail-value" id="detailFileFormat"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">文件大小：</span>
+                        <span class="detail-value" id="detailFileSize"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">上传日期：</span>
+                        <span class="detail-value" id="detailUploadDate"></span>
+                    </div>
+                </div>
+                
+                <!-- 语言版本下载 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">语言版本下载</h4>
+                    <div class="download-list" id="downloadList">
+                        <!-- 语言版本下载链接将在这里生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // No authentication required - direct access
         const userName = 'Admin'; // 默认用户名
@@ -2500,50 +2945,94 @@
         // Set avatar
         document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
 
-        // Navigation
+        // Navigation - 支持二级菜单
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function(e) {
-                // 防止默认行为
                 e.preventDefault();
-                
-                // Remove active from all nav items
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                // Add active to clicked item
-                this.classList.add('active');
                 
                 const textElement = this.querySelector('.nav-text');
                 if (!textElement) return;
                 
                 const title = textElement.textContent.trim();
-                document.querySelector('.header-title').textContent = title;
-                
-                // Toggle content sections
-                const dashboardContent = document.getElementById('dashboardContent');
-                const helpContent = document.getElementById('helpContent');
-                
-                console.log('Navigation clicked:', title); // Debug log
                 
                 if (title === '帮助中心') {
-                    console.log('Switching to Help Center'); // Debug log
-                    if (dashboardContent) dashboardContent.style.display = 'none';
-                    if (helpContent) {
-                        helpContent.style.display = 'block';
-                        helpContent.classList.add('active');
-                        // Initialize help center functionality when shown
-                        initializeHelpCenter();
-                    } else {
-                        console.error('Help content element not found!');
+                    // 切换二级菜单展开状态
+                    const navGroup = this.closest('.nav-group');
+                    navGroup.classList.toggle('expanded');
+                    
+                    // 如果菜单展开，默认激活文档资料
+                    if (navGroup.classList.contains('expanded')) {
+                        // 清除其他导航项的活跃状态
+                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 默认激活文档资料子项
+                        setTimeout(() => {
+                            const documentsSubitem = document.querySelector('.nav-subitem[data-section="documents"]');
+                            if (documentsSubitem) {
+                                documentsSubitem.click();
+                            }
+                        }, 100);
                     }
                 } else {
-                    console.log('Switching to:', title); // Debug log
-                    if (dashboardContent) dashboardContent.style.display = 'block';
-                    if (helpContent) {
-                        helpContent.style.display = 'none';
-                        helpContent.classList.remove('active');
-                    }
+                    // 其他导航项的处理
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    document.querySelectorAll('.nav-subitem').forEach(i => i.classList.remove('active'));
+                    document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('expanded'));
+                    this.classList.add('active');
+                    
+                    document.querySelector('.header-title').textContent = title;
+                    
+                    // 显示对应内容
+                    document.getElementById('dashboardContent').style.display = title === '仪表盘' ? 'block' : 'none';
+                    document.getElementById('helpContent').style.display = 'none';
+                    document.getElementById('simpleOnlineHelp').style.display = 'none';
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('editContent').style.display = 'none';
                 }
             });
         });
+        
+        // 初始化二级菜单事件（确保DOM加载完成后执行）
+        function initSubmenuEvents() {
+            document.querySelectorAll('.nav-subitem').forEach(subitem => {
+                subitem.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    console.log('Subitem clicked:', this);
+                    
+                    // 更新子项激活状态
+                    document.querySelectorAll('.nav-subitem').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const section = this.dataset.section;
+                    const sectionName = this.querySelector('.nav-text').textContent.trim();
+                    
+                    console.log('Section:', section, 'Name:', sectionName);
+                    
+                    // 更新标题
+                    document.querySelector('.header-title').textContent = sectionName;
+                    
+                    // 隐藏所有内容区域
+                    document.getElementById('dashboardContent').style.display = 'none';
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('editContent').style.display = 'none';
+                    
+                    // 显示对应的内容区域
+                    if (section === 'documents') {
+                        document.getElementById('helpContent').style.display = 'block';
+                        document.getElementById('simpleOnlineHelp').style.display = 'none';
+                        // 初始化文档资料功能
+                        initializeHelpCenter();
+                    } else if (section === 'online-help') {
+                        document.getElementById('helpContent').style.display = 'none';
+                        document.getElementById('simpleOnlineHelp').style.display = 'block';
+                        // 初始化翻页功能
+                        initializePagination();
+                    }
+                });
+            });
+        }
 
         // Test if help content exists
         const testHelpContent = document.getElementById('helpContent');
@@ -2551,6 +3040,53 @@
         console.log('Help Content Element:', testHelpContent);
         console.log('Dashboard Content Element:', testDashboardContent);
         console.log('Nav items found:', document.querySelectorAll('.nav-item').length);
+        
+        // System type clear buttons
+        function initSystemTypeClearButtons() {
+            const systemTypeNew = document.getElementById('systemTypeNew');
+            const clearSystemTypeNew = document.getElementById('clearSystemTypeNew');
+            const editSystemTypeNew = document.getElementById('editSystemTypeNew');
+            const clearEditSystemTypeNew = document.getElementById('clearEditSystemTypeNew');
+            
+            // Handle systemTypeNew
+            if (systemTypeNew && clearSystemTypeNew) {
+                systemTypeNew.addEventListener('change', function() {
+                    if (this.value) {
+                        clearSystemTypeNew.style.display = 'flex';
+                        clearSystemTypeNew.style.alignItems = 'center';
+                        clearSystemTypeNew.style.justifyContent = 'center';
+                    } else {
+                        clearSystemTypeNew.style.display = 'none';
+                    }
+                });
+                
+                clearSystemTypeNew.addEventListener('click', function() {
+                    systemTypeNew.value = '';
+                    this.style.display = 'none';
+                });
+            }
+            
+            // Handle editSystemTypeNew
+            if (editSystemTypeNew && clearEditSystemTypeNew) {
+                editSystemTypeNew.addEventListener('change', function() {
+                    if (this.value) {
+                        clearEditSystemTypeNew.style.display = 'flex';
+                        clearEditSystemTypeNew.style.alignItems = 'center';
+                        clearEditSystemTypeNew.style.justifyContent = 'center';
+                    } else {
+                        clearEditSystemTypeNew.style.display = 'none';
+                    }
+                });
+                
+                clearEditSystemTypeNew.addEventListener('click', function() {
+                    editSystemTypeNew.value = '';
+                    this.style.display = 'none';
+                });
+            }
+        }
+        
+        // Initialize system type clear buttons
+        initSystemTypeClearButtons();
         
         // Chart tabs
         document.querySelectorAll('.chart-tab').forEach(tab => {
@@ -2922,10 +3458,6 @@
                 return;
             }
             
-            if (!systemType) {
-                showNotification('请选择系统类型', 'warning');
-                return;
-            }
             
             const tabId = categorySelect.value;
             
@@ -3008,7 +3540,8 @@
                     <thead>
                         <tr>
                             <th>文件名称</th>
-                            ${showSystemType ? '<th>系统类型</th>' : ''}
+                            <th>系统类型</th>
+                            <th>语言</th>
                             <th>文件格式</th>
                             <th>上传日期</th>
                             <th class="operations-header">操作</th>
@@ -3041,23 +3574,20 @@
                                         </svg>
                                     </button>
                                 ` : ''}
-                                <span>${baseName}</span>
-                                ${isMultiLanguage ? `<span class="file-count-badge">${fileGroup.length}个版本</span>` : ''}
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span title="${baseName}" style="min-width: 0; flex: 1;">${baseName}</span>
+                                    ${Array.isArray(mainFile.language) && mainFile.language.length > 1 ? `<span class="file-count-badge">${mainFile.language.length} 个版本</span>` : ''}
+                                </div>
                             </div>
                         </td>
-                        ${showSystemType ? `<td>${mainFile.systemType || '未设置'}</td>` : ''}
+                        <td>${tabId === 'tab2' ? '--' : (mainFile.systemType || '未设置')}</td>
+                        <td>${Array.isArray(mainFile.language) ? mainFile.language.join(', ') : (mainFile.language || '简体中文')}</td>
                         <td><span class="file-format ${formatClass}">${mainFile.type.toUpperCase()}</span></td>
                         <td>${mainFile.uploadTime}</td>
                         <td class="operations-cell">
                             <div class="file-operations">
                                 <div class="operation-group">
-                                    <button class="file-action-btn" onclick="downloadFile('${mainFile.id}', '${tabId}')" title="下载文件">下载</button>
-                                </div>
-                                <div class="operation-group">
-                                    ${showPreview ? 
-                                        `<button class="file-action-btn" onclick="viewFile('${mainFile.id}', '${tabId}')" title="预览文件">查看</button>` : 
-                                        `<button class="file-action-btn disabled" title="该文件类型不支持预览" disabled>查看</button>`
-                                    }
+                                    <button class="file-action-btn" onclick="viewFile('${mainFile.id}', '${tabId}')" title="查看文件">查看</button>
                                 </div>
                                 <div class="operation-group">
                                     <button class="file-action-btn" onclick="editFile('${mainFile.id}', '${tabId}')" title="编辑文件信息">编辑</button>
@@ -3085,19 +3615,14 @@
                                         <span class="language-tag">${languageName}</span>
                                     </div>
                                 </td>
-                                ${showSystemType ? `<td>${file.systemType || '未设置'}</td>` : ''}
+                                <td>${tabId === 'tab2' ? '--' : (file.systemType || '未设置')}</td>
+                                <td>${Array.isArray(file.language) ? file.language.join(', ') : (file.language || '简体中文')}</td>
                                 <td><span class="file-format ${fileFormatClass}">${file.type.toUpperCase()}</span></td>
                                 <td>${file.uploadTime}</td>
                                 <td class="operations-cell">
                                     <div class="file-operations">
                                         <div class="operation-group">
-                                            <button class="file-action-btn" onclick="downloadFile('${file.id}', '${tabId}')" title="下载文件">下载</button>
-                                        </div>
-                                        <div class="operation-group">
-                                            ${fileShowPreview ? 
-                                                `<button class="file-action-btn" onclick="viewFile('${file.id}', '${tabId}')" title="预览文件">查看</button>` : 
-                                                `<button class="file-action-btn disabled" title="该文件类型不支持预览" disabled>查看</button>`
-                                            }
+                                            <button class="file-action-btn" onclick="viewFile('${file.id}', '${tabId}')" title="查看文件">查看</button>
                                         </div>
                                         <div class="operation-group">
                                             <button class="file-action-btn" onclick="editFile('${file.id}', '${tabId}')" title="编辑文件信息">编辑</button>
@@ -3158,7 +3683,7 @@
             return '';
         }
 
-        // View file (preview)
+        // View file (drawer)
         function viewFile(fileId, tabId) {
             const file = tabsData[tabId].find(f => f.id == fileId);
             if (!file) {
@@ -3166,21 +3691,56 @@
                 return;
             }
 
-            // Check if preview is supported
-            if (!canPreview(file.type)) {
-                showNotification('该文件类型不支持预览', 'warning');
-                return;
+            // Fill file details in drawer
+            document.getElementById('detailFileName').textContent = file.name + file.type;
+            document.getElementById('detailSystemType').textContent = file.systemType || '通用';
+            document.getElementById('detailFileFormat').textContent = file.type.toUpperCase();
+            document.getElementById('detailFileSize').textContent = file.size;
+            document.getElementById('detailUploadDate').textContent = file.uploadTime;
+
+            // Generate language version download list
+            const downloadList = document.getElementById('downloadList');
+            downloadList.innerHTML = '';
+
+            if (file.language && Array.isArray(file.language)) {
+                // Multiple language versions
+                file.language.forEach(lang => {
+                    const downloadItem = document.createElement('div');
+                    downloadItem.className = 'download-item';
+                    downloadItem.innerHTML = `
+                        <div class="download-item-info">
+                            <div class="language-name">${lang}</div>
+                            <div class="file-size">${file.size}</div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="downloadLanguageFile('${fileId}', '${tabId}', '${lang}')">
+                            下载
+                        </button>
+                    `;
+                    downloadList.appendChild(downloadItem);
+                });
+            } else {
+                // Single language version
+                const lang = file.language || '简体中文';
+                const downloadItem = document.createElement('div');
+                downloadItem.className = 'download-item';
+                downloadItem.innerHTML = `
+                    <div class="download-item-info">
+                        <div class="language-name">${lang}</div>
+                        <div class="file-size">${file.size}</div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="downloadLanguageFile('${fileId}', '${tabId}', '${lang}')">
+                        下载
+                    </button>
+                `;
+                downloadList.appendChild(downloadItem);
             }
 
-            // Set preview title
-            document.getElementById('previewTitle').textContent = `${file.name}${file.type}`;
-            
-
-            // Show preview modal
-            document.getElementById('previewModal').classList.add('active');
-            
-            // Load preview content
-            loadPreviewContent(file);
+            // Show drawer
+            const drawer = document.getElementById('fileDetailsDrawer');
+            drawer.style.display = 'block';
+            setTimeout(() => {
+                drawer.classList.add('active');
+            }, 10);
         }
 
         // Load preview content based on file type
@@ -3354,25 +3914,61 @@
         let editLanguageFilesNew = [];
         let editLanguageCounterNew = 0;
         
+        // Function to add language file input for edit form (移至全局作用域)
+        function addEditLanguageFileInputNew(presetLanguage = '', presetFileInfo = null) {
+            // Show the file list container
+            const fileListContainer = document.getElementById('editLanguageFileListNew');
+            fileListContainer.style.display = 'block';
+            
+            editLanguageCounterNew++;
+            const itemId = `edit-lang-file-new-${editLanguageCounterNew}`;
+            
+            const languageFileItem = document.createElement('div');
+            languageFileItem.className = 'language-file-item';
+            languageFileItem.id = itemId;
+            languageFileItem.innerHTML = `
+                <select class="language-select" data-id="${itemId}" style="min-width: 180px; max-width: 220px; padding: 10px 12px; font-size: 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; background: white; cursor: pointer; height: 44px;">
+                    <option value="">选择语言</option>
+                    <option value="zh-CN">简体中文</option>
+                    <option value="zh-TW">繁体中文</option>
+                    <option value="en-US">English</option>
+                    <option value="ja-JP">日本語</option>
+                    <option value="ko-KR">한국어</option>
+                    <option value="fr-FR">Français</option>
+                    <option value="de-DE">Deutsch</option>
+                    <option value="es-ES">Español</option>
+                </select>
+                <div class="file-upload-zone" data-id="${itemId}" style="flex: 1; min-height: 44px; border: 2px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: ${presetFileInfo ? '#e8f5e8' : '#fafafa'}; padding: 0 20px; transition: all 0.3s ease; border-color: ${presetFileInfo ? '#4CAF50' : '#ddd'}; border-style: ${presetFileInfo ? 'solid' : 'dashed'};">
+                    <input type="file" id="edit-file-${itemId}" style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.mp4,.avi,.mov,.wmv,.mkv,.zip,.rar,.exe">
+                    <span class="file-upload-text" style="font-size: 14px; color: #666;">${presetFileInfo ? presetFileInfo.name || '现有文件' : '点击选择文件或拖拽到此处'}</span>
+                </div>
+                <button type="button" class="remove-language-btn" data-id="${itemId}" style="width: 36px; height: 36px; min-width: 36px; border: none; background: #000; color: white; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; flex-shrink: 0;">×</button>
+            `;
+            
+            fileListContainer.appendChild(languageFileItem);
+            
+            // Set preset values
+            if (presetLanguage) {
+                const langSelect = languageFileItem.querySelector('.language-select');
+                langSelect.value = presetLanguage;
+            }
+        }
         function editFile(fileId, tabId) {
             const file = tabsData[tabId].find(f => f.id == fileId);
             if (file) {
-                // Reset edit state
-                editLanguageFilesNew = [];
-                editLanguageCounterNew = 0;
-                
-                // Hide other content and show edit content
+                // 重用上传文件页面进行编辑
+                // Hide other content and show upload content
                 document.getElementById('dashboardContent').style.display = 'none';
                 document.getElementById('helpContent').style.display = 'none';
-                document.getElementById('uploadContent').style.display = 'none';
-                document.getElementById('editContent').style.display = 'block';
+                document.getElementById('editContent').style.display = 'none';
+                document.getElementById('uploadContent').style.display = 'block';
                 
-                // Update header
+                // Update header title
                 document.querySelector('.header-title').textContent = '编辑文件';
                 
-                // Populate category options first
-                const editCategorySelectNew = document.getElementById('editCategorySelectNew');
-                editCategorySelectNew.innerHTML = '<option value="">请选择分类</option>';
+                // Populate category options
+                const categorySelectNew = document.getElementById('categorySelectNew');
+                categorySelectNew.innerHTML = '<option value="">请选择分类</option>';
                 document.querySelectorAll('.tab-item').forEach(tab => {
                     const option = document.createElement('option');
                     option.value = tab.dataset.tab;
@@ -3380,35 +3976,75 @@
                     if (tab.dataset.tab === tabId) {
                         option.selected = true;
                     }
-                    editCategorySelectNew.appendChild(option);
+                    categorySelectNew.appendChild(option);
                 });
                 
                 // Populate form fields
-                document.getElementById('editFileNameNew').value = file.name.replace(/ \([^)]+\)$/, ''); // Remove language suffix
-                document.getElementById('editSystemTypeNew').value = file.systemType || '';
+                document.getElementById('fileNameNew').value = file.name.replace(/ \([^)]+\)$/, ''); // Remove language suffix
+                document.getElementById('systemTypeNew').value = file.systemType || '';
                 
-                // Clear language files list
-                const editLanguageFileListNew = document.getElementById('editLanguageFileListNew');
-                editLanguageFileListNew.innerHTML = '';
-                editLanguageFileListNew.style.display = 'none';
+                // Show/hide clear button based on system type value
+                const clearSystemTypeNew = document.getElementById('clearSystemTypeNew');
+                if (clearSystemTypeNew) {
+                    if (file.systemType) {
+                        clearSystemTypeNew.style.display = 'flex';
+                        clearSystemTypeNew.style.alignItems = 'center';
+                        clearSystemTypeNew.style.justifyContent = 'center';
+                    } else {
+                        clearSystemTypeNew.style.display = 'none';
+                    }
+                }
+                
+                // Clear and populate language files list
+                const languageFileListNew = document.getElementById('languageFileListNew');
+                languageFileListNew.innerHTML = '';
+                languageFileListNew.style.display = 'none';
+                languageFilesNew = [];
+                languageCounterNew = 0;
                 
                 // If file has language versions, populate them
-                if (file.languages && Object.keys(file.languages).length > 0) {
-                    Object.entries(file.languages).forEach(([lang, fileInfo]) => {
-                        addEditLanguageFileInputNew(lang, fileInfo);
+                if (file.language && Array.isArray(file.language) && file.language.length > 0) {
+                    file.language.forEach(lang => {
+                        addLanguageFileInputNew();
+                        // Set the language and mark as existing file
+                        const lastItem = languageFileListNew.lastElementChild;
+                        const langSelect = lastItem.querySelector('.language-select');
+                        const fileZone = lastItem.querySelector('.file-upload-zone');
+                        const fileText = lastItem.querySelector('.file-upload-text');
+                        
+                        // Map display names to option values
+                        const languageMap = {
+                            '简体中文': 'zh-CN',
+                            'English': 'en-US', 
+                            '日本語': 'ja-JP',
+                            '繁体中文': 'zh-TW'
+                        };
+                        
+                        langSelect.value = languageMap[lang] || lang;
+                        fileText.textContent = file.name;
+                        fileZone.style.background = '#e8f5e8';
+                        fileZone.style.borderColor = '#4CAF50';
+                        fileZone.style.borderStyle = 'solid';
+                        fileZone.classList.add('has-file');
                     });
                 } else {
                     // For single file, create one language entry
-                    addEditLanguageFileInputNew('', { 
-                        type: file.type, 
-                        size: file.size,
-                        name: file.name 
-                    });
+                    addLanguageFileInputNew();
+                    const lastItem = languageFileListNew.lastElementChild;
+                    const fileZone = lastItem.querySelector('.file-upload-zone');
+                    const fileText = lastItem.querySelector('.file-upload-text');
+                    
+                    fileText.textContent = file.name;
+                    fileZone.style.background = '#e8f5e8';
+                    fileZone.style.borderColor = '#4CAF50';
+                    fileZone.style.borderStyle = 'solid';
+                    fileZone.classList.add('has-file');
                 }
                 
                 // Store editing info
                 window.editingFileId = fileId;
                 window.editingTabId = tabId;
+                window.isEditMode = true; // 标记为编辑模式
             }
         }
 
@@ -3691,27 +4327,53 @@
                 });
             }
             
-            // Back to dashboard button - 统一返回逻辑
+            // Back button - 根据模式返回不同页面
             const backToDashboard = document.getElementById('backToDashboard');
             if (backToDashboard) {
                 backToDashboard.addEventListener('click', () => {
-                    // 与编辑页面返回逻辑保持一致
                     document.getElementById('uploadContent').style.display = 'none';
-                    document.getElementById('dashboardContent').style.display = 'none';
-                    document.getElementById('helpContent').style.display = 'block';
-                    document.querySelector('.header-title').textContent = '帮助中心';
+                    
+                    if (window.isEditMode) {
+                        // 编辑模式：返回帮助中心
+                        document.getElementById('helpContent').style.display = 'block';
+                        document.querySelector('.header-title').textContent = '帮助中心';
+                        if (window.editingTabId) {
+                            switchTab(window.editingTabId);
+                        }
+                        // 清理编辑状态
+                        window.isEditMode = false;
+                        window.editingFileId = null;
+                        window.editingTabId = null;
+                    } else {
+                        // 上传模式：返回仪表板
+                        document.getElementById('dashboardContent').style.display = 'block';
+                        document.querySelector('.header-title').textContent = '仪表盘';
+                    }
                 });
             }
             
-            // Cancel upload button - 统一取消操作逻辑
+            // Cancel upload button - 根据模式返回不同页面
             const cancelUploadNew = document.getElementById('cancelUploadNew');
             if (cancelUploadNew) {
                 cancelUploadNew.addEventListener('click', () => {
-                    // 与编辑页面取消逻辑保持一致
                     document.getElementById('uploadContent').style.display = 'none';
-                    document.getElementById('dashboardContent').style.display = 'none';
-                    document.getElementById('helpContent').style.display = 'block';
-                    document.querySelector('.header-title').textContent = '帮助中心';
+                    
+                    if (window.isEditMode) {
+                        // 编辑模式：返回帮助中心
+                        document.getElementById('helpContent').style.display = 'block';
+                        document.querySelector('.header-title').textContent = '帮助中心';
+                        if (window.editingTabId) {
+                            switchTab(window.editingTabId);
+                        }
+                        // 清理编辑状态
+                        window.isEditMode = false;
+                        window.editingFileId = null;
+                        window.editingTabId = null;
+                    } else {
+                        // 上传模式：返回帮助中心（因为上传是从帮助中心进入的）
+                        document.getElementById('helpContent').style.display = 'block';
+                        document.querySelector('.header-title').textContent = '帮助中心';
+                    }
                 });
             }
             
@@ -3825,7 +4487,7 @@
                     const category = document.getElementById('categorySelectNew').value;
                     const systemType = document.getElementById('systemTypeNew').value;
                     
-                    if (!fileName || !category || !systemType) {
+                    if (!fileName || !category) {
                         showNotification('请填写所有必填字段', 'warning');
                         return;
                     }
@@ -3848,25 +4510,57 @@
                         return;
                     }
                     
-                    // Add files to the appropriate category
                     const tabId = category;
-                    if (!tabsData[tabId]) {
-                        tabsData[tabId] = [];
-                    }
                     
-                    languageFilesNew.forEach(lf => {
-                        const fileExt = lf.file.name.substring(lf.file.name.lastIndexOf('.')).toLowerCase();
-                        const fileData = {
-                            id: Date.now() + Math.random(),
-                            name: `${fileName} (${lf.language})`,
+                    if (window.isEditMode) {
+                        // 编辑模式：更新现有文件
+                        if (window.editingFileId && window.editingTabId) {
+                            // 从原分类删除文件
+                            tabsData[window.editingTabId] = tabsData[window.editingTabId].filter(f => f.id !== window.editingFileId);
+                        }
+                        
+                        // 确保目标分类存在
+                        if (!tabsData[tabId]) {
+                            tabsData[tabId] = [];
+                        }
+                        
+                        // 添加更新后的文件数据
+                        const updatedFileData = {
+                            id: window.editingFileId || Date.now() + Math.random(),
+                            name: fileName,
                             systemType: systemType,
-                            size: formatFileSize(lf.file.size),
-                            type: fileExt,
-                            language: lf.language,
+                            language: languageFilesNew.map(lf => lf.language),
+                            type: languageFilesNew[0].file ? languageFilesNew[0].file.name.substring(languageFilesNew[0].file.name.lastIndexOf('.')).toLowerCase() : '.exe',
+                            size: languageFilesNew[0].file ? formatFileSize(languageFilesNew[0].file.size) : '125.6 MB',
                             uploadTime: new Date().toLocaleString('zh-CN')
                         };
-                        tabsData[tabId].push(fileData);
-                    });
+                        
+                        tabsData[tabId].push(updatedFileData);
+                        
+                        // 清理编辑状态
+                        window.isEditMode = false;
+                        window.editingFileId = null;
+                        window.editingTabId = null;
+                    } else {
+                        // 上传模式：添加新文件
+                        if (!tabsData[tabId]) {
+                            tabsData[tabId] = [];
+                        }
+                        
+                        languageFilesNew.forEach(lf => {
+                            const fileExt = lf.file.name.substring(lf.file.name.lastIndexOf('.')).toLowerCase();
+                            const fileData = {
+                                id: Date.now() + Math.random(),
+                                name: `${fileName} (${lf.language})`,
+                                systemType: systemType,
+                                size: formatFileSize(lf.file.size),
+                                type: fileExt,
+                                language: lf.language,
+                                uploadTime: new Date().toLocaleString('zh-CN')
+                            };
+                            tabsData[tabId].push(fileData);
+                        });
+                    }
                     
                     // Render file list and switch back to help content
                     renderFileList(tabId);
@@ -3886,7 +4580,7 @@
                     listContainer.innerHTML = '';
                     listContainer.style.display = 'none';
                     
-                    showNotification('文件上传成功！', 'success');
+                    showNotification(window.isEditMode ? '文件编辑成功！' : '文件上传成功！', 'success');
                 });
             }
             
@@ -3894,9 +4588,24 @@
             const backFromEdit = document.getElementById('backFromEdit');
             if (backFromEdit) {
                 backFromEdit.addEventListener('click', () => {
+                    // Hide edit content
                     document.getElementById('editContent').style.display = 'none';
-                    document.getElementById('helpContent').style.display = 'block';
-                    document.querySelector('.header-title').textContent = '帮助中心';
+                    
+                    // Show the content that was active before editing
+                    if (window.editingTabId) {
+                        // Return to help center with the tab that was being edited
+                        document.getElementById('helpContent').style.display = 'block';
+                        document.querySelector('.header-title').textContent = '帮助中心';
+                        switchTab(window.editingTabId);
+                    } else {
+                        // Default return to dashboard
+                        document.getElementById('dashboardContent').style.display = 'block';
+                        document.querySelector('.header-title').textContent = '仪表盘';
+                    }
+                    
+                    // Clear editing info
+                    window.editingFileId = null;
+                    window.editingTabId = null;
                 });
             }
             
@@ -4118,8 +4827,8 @@
                         return;
                     }
                     
-                    if (!systemType) {
-                        showNotification('请选择系统类型', 'warning');
+                    if (!categorySelect.value) {
+                        showNotification('请选择分类', 'warning');
                         return;
                     }
                     
@@ -4222,6 +4931,7 @@
                         id: Date.now(),
                         name: 'IndustrialControl-Setup-1.0.21',
                         systemType: 'Windows x64',
+                        language: ['简体中文', 'English'],
                         type: '.exe',
                         size: '125.6 MB',
                         uploadTime: '2025/08/15 20:26:27'
@@ -4230,6 +4940,7 @@
                         id: Date.now() + 1,
                         name: 'IndustrialControl-1.0.21-arm64',
                         systemType: 'mac(M芯片)',
+                        language: ['简体中文', 'English', '日本語'],
                         type: '.dmg',
                         size: '142.3 MB',
                         uploadTime: '2025/08/15 21:26:27'
@@ -4241,6 +4952,7 @@
                         id: Date.now() + 2,
                         name: '旭衡EMS介绍',
                         systemType: '通用',
+                        language: ['简体中文'],
                         type: '.mp4',
                         size: '125.3 MB',
                         uploadTime: '2024/12/10 10:28:27'
@@ -4249,6 +4961,7 @@
                         id: Date.now() + 3,
                         name: 'Neuron Gateway Introduction',
                         systemType: '通用',
+                        language: ['English', '日本語'],
                         type: '.mp4',
                         size: '98.7 MB',
                         uploadTime: '2025/05/22 17:14:27'
@@ -4260,6 +4973,7 @@
                         id: Date.now() + 4,
                         name: 'EMS_N2 Firmware Upgrade Package-1.2.3',
                         systemType: '通用',
+                        language: ['简体中文', 'English'],
                         type: '.zip',
                         size: '28.4 MB',
                         uploadTime: '2025/07/28 10:28:27'
@@ -4268,6 +4982,7 @@
                         id: Date.now() + 5,
                         name: 'EMS系统演示视频',
                         systemType: '通用',
+                        language: ['简体中文'],
                         type: '.mp4',
                         size: '156.8 MB',
                         uploadTime: '2024/12/10 10:28:27'
@@ -4276,6 +4991,7 @@
                         id: Date.now() + 6,
                         name: 'EMS安装包',
                         systemType: 'Windows x64',
+                        language: ['简体中文', 'English', '繁体中文'],
                         type: '.exe',
                         size: '89.5 MB',
                         uploadTime: '2024/12/07 16:45:20'
@@ -4288,6 +5004,12 @@
 
         // Initialize tabs
         initTabs();
+        
+        // Activate default tab
+        switchTab('tab1');
+        
+        // Initialize submenu events
+        initSubmenuEvents();
 
         // Edit File Dialog Management
         const editModal = document.getElementById('editModal');
@@ -4746,6 +5468,1202 @@
                 categoryModal.classList.remove('active');
             }
         });
+
+        // File Details Drawer functionality
+        function closeFileDrawer() {
+            const drawer = document.getElementById('fileDetailsDrawer');
+            drawer.classList.remove('active');
+            setTimeout(() => {
+                drawer.style.display = 'none';
+            }, 300);
+        }
+
+        // Close drawer button event listener
+        document.getElementById('closeDrawer').addEventListener('click', closeFileDrawer);
+
+        // Close drawer when clicking overlay
+        document.getElementById('fileDetailsDrawer').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('fileDetailsDrawer')) {
+                closeFileDrawer();
+            }
+        });
+
+        // Download language file function
+        function downloadLanguageFile(fileId, tabId, language) {
+            const file = tabsData[tabId].find(f => f.id == fileId);
+            if (!file) {
+                showNotification('文件未找到', 'error');
+                return;
+            }
+
+            // Show download notification
+            showNotification(`正在下载 ${language} 版本的 ${file.name}${file.type}`, 'success');
+            
+            // Simulate file download
+            console.log(`下载文件: ${file.name}${file.type} (${language} 版本)`);
+            
+            // In a real application, this would trigger an actual download
+            // For demo purposes, we'll just show a success message
+            setTimeout(() => {
+                showNotification(`${language} 版本下载完成`, 'success');
+            }, 1000);
+        }
+
+        // 在线帮助表单处理
+        const helpContactForm = document.getElementById('helpContactForm');
+        if (helpContactForm) {
+            helpContactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // 获取表单数据
+                const name = document.getElementById('contactName').value.trim();
+                const phone = document.getElementById('contactPhone').value.trim();
+                const email = document.getElementById('contactEmail').value.trim();
+                const problem = document.getElementById('contactProblem').value.trim();
+                
+                // 验证必填字段
+                if (!name || !phone || !email || !problem) {
+                    showNotification('请填写所有必填字段', 'warning');
+                    return;
+                }
+                
+                // 验证邮箱格式
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showNotification('请输入正确的邮箱格式', 'warning');
+                    return;
+                }
+                
+                // 验证电话格式（简单验证）
+                const phoneRegex = /^[\d\-\+\(\)\s]+$/;
+                if (!phoneRegex.test(phone)) {
+                    showNotification('请输入正确的电话格式', 'warning');
+                    return;
+                }
+                
+                // 模拟提交
+                showNotification('正在提交您的问题...', 'info');
+                
+                setTimeout(() => {
+                    showNotification('您的问题已提交成功，我们会尽快回复您！', 'success');
+                    
+                    // 清空表单
+                    helpContactForm.reset();
+                }, 1500);
+            });
+        }
+        
+        // 取消按钮处理
+        const cancelContact = document.getElementById('cancelContact');
+        if (cancelContact) {
+            cancelContact.addEventListener('click', () => {
+                // 清空表单
+                helpContactForm.reset();
+                showNotification('表单已清空', 'info');
+            });
+        }
+
+        // 新的简单在线帮助表单处理
+        const onlineHelpForm = document.getElementById('onlineHelpForm');
+        if (onlineHelpForm) {
+            onlineHelpForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('userName').value.trim();
+                const phone = document.getElementById('userPhone').value.trim();
+                const email = document.getElementById('userEmail').value.trim();
+                const problem = document.getElementById('userProblem').value.trim();
+                
+                // 验证必填字段
+                if (!name || !phone || !email || !problem) {
+                    showNotification('请填写所有必填字段', 'warning');
+                    return;
+                }
+                
+                // 验证邮箱格式
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showNotification('请输入正确的邮箱格式', 'warning');
+                    return;
+                }
+                
+                // 模拟提交
+                showNotification('正在提交您的问题...', 'info');
+                
+                setTimeout(() => {
+                    showNotification('您的问题已提交成功，我们会尽快回复您！', 'success');
+                    onlineHelpForm.reset();
+                }, 1500);
+            });
+        }
+        
+        // 重置按钮处理
+        const resetHelpForm = document.getElementById('resetHelpForm');
+        if (resetHelpForm) {
+            resetHelpForm.addEventListener('click', () => {
+                onlineHelpForm.reset();
+                showNotification('表单已重置', 'info');
+            });
+        }
+        
+        // 状态管理功能
+        function updateRequestStatus(requestId, newStatus) {
+            const selectElement = document.querySelector(`select[data-request-id="${requestId}"]`);
+            if (!selectElement) return;
+            
+            // 更新选择框样式
+            updateStatusSelectStyle(selectElement, newStatus);
+            
+            // 模拟API调用
+            showNotification(`问题 #${requestId} 状态已更新为: ${newStatus}`, 'success');
+            
+            // 更新统计数据
+            updateStatusStatistics();
+            
+            // 在实际应用中，这里应该调用后端API
+            // fetch('/api/help-requests/' + requestId, {
+            //     method: 'PATCH',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ status: newStatus })
+            // }).then(response => response.json())
+            //   .then(data => {
+            //       showNotification('状态更新成功', 'success');
+            //       updateStatusStatistics();
+            //   }).catch(error => {
+            //       showNotification('状态更新失败', 'error');
+            //   });
+        }
+        
+        // 更新状态选择框的样式
+        function updateStatusSelectStyle(selectElement, status) {
+            let backgroundColor, textColor;
+            
+            switch(status) {
+                case '新提交':
+                    backgroundColor = '#f8d7da';
+                    textColor = '#721c24';
+                    break;
+                case '处理中':
+                    backgroundColor = '#fff3cd';
+                    textColor = '#856404';
+                    break;
+                case '已解决':
+                    backgroundColor = '#d4edda';
+                    textColor = '#155724';
+                    break;
+                default:
+                    backgroundColor = '#e2e3e5';
+                    textColor = '#495057';
+            }
+            
+            selectElement.style.background = backgroundColor;
+            selectElement.style.color = textColor;
+        }
+        
+        // 更新状态统计
+        function updateStatusStatistics() {
+            const statusSelects = document.querySelectorAll('#helpRequestsList .status-select');
+            const stats = {
+                '新提交': 0,
+                '处理中': 0,
+                '已解决': 0
+            };
+            
+            statusSelects.forEach(select => {
+                const status = select.value;
+                if (stats.hasOwnProperty(status)) {
+                    stats[status]++;
+                }
+            });
+            
+            const total = Object.values(stats).reduce((sum, count) => sum + count, 0);
+            const statsText = `共 ${total} 条记录 | 新提交: ${stats['新提交']} | 处理中: ${stats['处理中']} | 已解决: ${stats['已解决']}`;
+            
+            const statsElement = document.querySelector('#simpleOnlineHelp .table-container + div div');
+            if (statsElement) {
+                statsElement.textContent = statsText;
+            }
+        }
+        
+        // 导出Excel功能
+        function exportToExcel() {
+            showNotification('正在准备Excel文件...', 'info');
+            
+            setTimeout(() => {
+                // 在实际应用中，这里应该调用后端API生成Excel文件
+                showNotification('Excel文件导出完成', 'success');
+                // window.open('/api/help-requests/export/excel', '_blank');
+            }, 2000);
+        }
+        
+        
+        
+        // 时间排序功能
+        let timeSortAscending = false; // 默认降序（最新的在前）
+        
+        function sortByTime() {
+            // 切换排序方向
+            timeSortAscending = !timeSortAscending;
+            
+            // 更新排序图标
+            const sortIcon = document.getElementById('timeSortIcon');
+            sortIcon.textContent = timeSortAscending ? '▲' : '▼';
+            sortIcon.style.color = '#007bff';
+            
+            // 对所有数据进行排序
+            allHelpRequests.sort((a, b) => {
+                const dateA = parseDateTime(a.submitTime);
+                const dateB = parseDateTime(b.submitTime);
+                
+                if (timeSortAscending) {
+                    return dateA - dateB; // 升序：最早的在前
+                } else {
+                    return dateB - dateA; // 降序：最新的在前
+                }
+            });
+            
+            // 重置到第一页并重新渲染
+            currentPageNumber = 1;
+            renderCurrentPage();
+            
+            // 显示排序提示
+            const sortDirection = timeSortAscending ? '升序（最早的在前）' : '降序（最新的在前）';
+            showNotification(`已按提交时间${sortDirection}排序`, 'info');
+        }
+        
+        // 解析日期时间字符串
+        function parseDateTime(timeStr) {
+            // 解析 "2024-01-15 14:32" 格式
+            try {
+                const [datePart, timePart] = timeStr.split(' ');
+                const [year, month, day] = datePart.split('-');
+                const [hour, minute] = timePart.split(':');
+                return new Date(year, month - 1, day, hour, minute);
+            } catch (error) {
+                console.error('日期解析错误:', error);
+                return new Date();
+            }
+        }
+        
+        // 翻页功能
+        let currentPageNumber = 1;
+        let itemsPerPage = 10;
+        let allHelpRequests = []; // 存储所有帮助请求数据
+        
+        // 初始化帮助请求数据
+        function initializeHelpRequestsData() {
+            // 从现有表格中提取数据（在实际应用中从API获取）
+            const rows = document.querySelectorAll('#helpRequestsList tr');
+            allHelpRequests = Array.from(rows).map((row, index) => {
+                const cells = row.cells;
+                return {
+                    id: index + 1,
+                    name: cells[0].textContent.trim(),
+                    phone: cells[1].textContent.trim(),
+                    email: cells[2].textContent.trim(),
+                    problem: cells[3].textContent.trim(),
+                    submitTime: cells[4].textContent.trim(),
+                    status: cells[5].querySelector('select').value,
+                    element: row
+                };
+            });
+        }
+        
+        // 渲染当前页面数据
+        function renderCurrentPage() {
+            const startIndex = (currentPageNumber - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentPageData = allHelpRequests.slice(startIndex, endIndex);
+            
+            const tbody = document.getElementById('helpRequestsList');
+            tbody.innerHTML = '';
+            
+            currentPageData.forEach(request => {
+                tbody.appendChild(request.element);
+            });
+            
+            updatePaginationControls();
+        }
+        
+        // 更新翻页控件
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(allHelpRequests.length / itemsPerPage);
+            
+            document.getElementById('currentPage').textContent = currentPageNumber;
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('totalRecords').textContent = allHelpRequests.length;
+            document.getElementById('pageSize').textContent = itemsPerPage;
+            
+            // 更新按钮状态
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            prevBtn.disabled = currentPageNumber <= 1;
+            nextBtn.disabled = currentPageNumber >= totalPages;
+            
+            // 更新按钮样式
+            if (prevBtn.disabled) {
+                prevBtn.style.opacity = '0.5';
+                prevBtn.style.cursor = 'not-allowed';
+            } else {
+                prevBtn.style.opacity = '1';
+                prevBtn.style.cursor = 'pointer';
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+            } else {
+                nextBtn.style.opacity = '1';
+                nextBtn.style.cursor = 'pointer';
+            }
+        }
+        
+        // 切换页面
+        function changePage(direction) {
+            const totalPages = Math.ceil(allHelpRequests.length / itemsPerPage);
+            
+            if (direction === 'prev' && currentPageNumber > 1) {
+                currentPageNumber--;
+                renderCurrentPage();
+                showNotification(`已切换到第 ${currentPageNumber} 页`, 'info');
+            } else if (direction === 'next' && currentPageNumber < totalPages) {
+                currentPageNumber++;
+                renderCurrentPage();
+                showNotification(`已切换到第 ${currentPageNumber} 页`, 'info');
+            }
+        }
+        
+        // 初始化翻页功能（在页面加载后调用）
+        function initializePagination() {
+            // 延迟执行以确保DOM已加载
+            setTimeout(() => {
+                initializeHelpRequestsData();
+                renderCurrentPage();
+            }, 100);
+        }
+        
+        // 修改原有的状态更新统计函数，移除统计显示
+        function updateStatusStatistics() {
+            // 只更新数据，不再显示统计信息
+            const statusSelects = document.querySelectorAll('#helpRequestsList .status-select');
+            // 统计逻辑保留但不显示
+        }
+        
+        // 详情抽屉功能
+        function viewRequestDetail(requestId) {
+            // 找到对应的请求数据
+            let request = allHelpRequests.find(r => r.id == requestId);
+            if (!request) {
+                // 从当前DOM中获取数据作为备用
+                const row = document.querySelector(`span[data-request-id="${requestId}"]`).closest('tr');
+                if (row) {
+                    const cells = row.cells;
+                    request = {
+                        id: requestId,
+                        name: cells[0].textContent.trim(),
+                        phone: cells[1].textContent.trim(),
+                        email: cells[2].textContent.trim(),
+                        problem: cells[3].textContent.trim(),
+                        submitTime: cells[4].textContent.trim(),
+                        status: cells[5].querySelector('span').getAttribute('data-status')
+                    };
+                }
+            }
+            
+            if (request) {
+                // 填充抽屉内容
+                document.getElementById('detailName').textContent = request.name;
+                document.getElementById('detailPhone').textContent = request.phone;
+                document.getElementById('detailEmail').textContent = request.email;
+                document.getElementById('detailSubmitTime').textContent = request.submitTime;
+                document.getElementById('detailProblem').textContent = request.problem;
+                document.getElementById('submitProgressTime').textContent = request.submitTime;
+                
+                // 设置状态选择器的值
+                document.getElementById('detailStatus').value = request.status;
+                
+                // 根据状态更新进度时间轴
+                updateProgressTimeline(request.status, request.submitTime);
+                
+                // 加载备注信息
+                loadRequestRemarks(requestId);
+                
+                // 显示抽屉
+                document.getElementById('detailDrawer').classList.add('active');
+                
+                // 存储当前查看的请求ID
+                window.currentRequestId = requestId;
+            }
+        }
+        
+        // 关闭详情抽屉
+        function closeDetailDrawer() {
+            document.getElementById('detailDrawer').classList.remove('active');
+            window.currentRequestId = null;
+        }
+
+        // 从抽屉中更新请求状态
+        function updateRequestStatusFromDrawer() {
+            const newStatus = document.getElementById('detailStatus').value;
+            const requestId = window.currentRequestId;
+            
+            if (requestId && newStatus) {
+                // 更新数据
+                const request = allHelpRequests.find(r => r.id == requestId);
+                if (request) {
+                    request.status = newStatus;
+                }
+                
+                // 更新表格中的状态显示
+                const statusSpan = document.querySelector(`[data-request-id="${requestId}"]`);
+                if (statusSpan) {
+                    statusSpan.textContent = newStatus;
+                    statusSpan.setAttribute('data-status', newStatus);
+                    
+                    // 更新状态颜色
+                    let bgColor, textColor;
+                    if (newStatus === '新提交') {
+                        bgColor = '#f8d7da';
+                        textColor = '#721c24';
+                    } else if (newStatus === '处理中') {
+                        bgColor = '#fff3cd';
+                        textColor = '#856404';
+                    } else if (newStatus === '已解决') {
+                        bgColor = '#d4edda';
+                        textColor = '#155724';
+                    }
+                    statusSpan.style.background = bgColor;
+                    statusSpan.style.color = textColor;
+                }
+                
+                // 更新抽屉中的进度时间轴
+                updateProgressTimeline(newStatus, request.submitTime);
+                
+                console.log(`状态已更新: 请求 ${requestId} -> ${newStatus}`);
+            }
+        }
+        
+        // 更新进度时间轴
+        function updateProgressTimeline(status, submitTime) {
+            const processingItem = document.getElementById('processingProgress');
+            const resolvedItem = document.getElementById('resolvedProgress');
+            
+            // 重置状态
+            processingItem.classList.remove('active');
+            resolvedItem.classList.remove('active');
+            
+            // 根据状态激活对应的进度
+            if (status === '处理中' || status === '已解决') {
+                processingItem.classList.add('active');
+                // 模拟处理开始时间（提交时间+1小时）
+                const processTime = new Date(parseDateTime(submitTime));
+                processTime.setHours(processTime.getHours() + 1);
+                processingItem.querySelector('.progress-time').textContent = 
+                    processTime.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).replace(/\//g, '-');
+            }
+            
+            if (status === '已解决') {
+                resolvedItem.classList.add('active');
+                // 模拟解决时间（处理时间+2小时）
+                const resolveTime = new Date(parseDateTime(submitTime));
+                resolveTime.setHours(resolveTime.getHours() + 3);
+                resolvedItem.querySelector('.progress-time').textContent = 
+                    resolveTime.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).replace(/\//g, '-');
+            } else {
+                resolvedItem.querySelector('.progress-time').textContent = '-';
+            }
+            
+            if (status === '新提交') {
+                processingItem.querySelector('.progress-time').textContent = '-';
+            }
+        }
+        
+        // 加载备注信息
+        function loadRequestRemarks(requestId) {
+            // 在实际应用中，这里会从服务器获取备注
+            const remarks = getStoredRemarks(requestId);
+            document.getElementById('remarkTextarea').value = remarks;
+        }
+        
+        // 保存备注
+        function saveRemark() {
+            const requestId = window.currentRequestId;
+            const remarkText = document.getElementById('remarkTextarea').value.trim();
+            
+            if (requestId) {
+                // 在实际应用中，这里会发送到服务器
+                storeRemarks(requestId, remarkText);
+                showNotification('备注保存成功', 'success');
+            }
+        }
+        
+        // 本地存储备注（模拟后端）
+        function storeRemarks(requestId, remarks) {
+            const storageKey = `help_request_${requestId}_remarks`;
+            localStorage.setItem(storageKey, remarks);
+        }
+        
+        // 获取存储的备注
+        function getStoredRemarks(requestId) {
+            const storageKey = `help_request_${requestId}_remarks`;
+            return localStorage.getItem(storageKey) || '';
+        }
+        
+        // 使函数全局可访问
+        window.updateRequestStatus = updateRequestStatus;
+        window.updateStatusSelectStyle = updateStatusSelectStyle;
+        window.updateStatusStatistics = updateStatusStatistics;
+        window.exportToExcel = exportToExcel;
+        window.sortByTime = sortByTime;
+        window.parseDateTime = parseDateTime;
+        window.changePage = changePage;
+        window.initializePagination = initializePagination;
+        window.viewRequestDetail = viewRequestDetail;
+        window.closeDetailDrawer = closeDetailDrawer;
+        window.updateProgressTimeline = updateProgressTimeline;
+        window.saveRemark = saveRemark;
+        window.updateRequestStatusFromDrawer = updateRequestStatusFromDrawer;
     </script>
+    
+    <!-- 详情右抽屉 -->
+    <div id="detailDrawer" class="new-detail-drawer detail-drawer">
+        <div class="new-drawer-mask" onclick="closeDetailDrawer()"></div>
+        <div class="new-drawer-panel">
+            <div class="new-drawer-header">
+                <h3 id="drawerTitle">问题详情</h3>
+                <button class="new-drawer-close" onclick="closeDetailDrawer()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="new-drawer-body">
+                <div class="detail-section">
+                    <h4>基础信息</h4>
+                    <div class="detail-item">
+                        <label>姓名:</label>
+                        <span id="detailName">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>联系电话:</label>
+                        <span id="detailPhone">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>邮箱:</label>
+                        <span id="detailEmail">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>提交时间:</label>
+                        <span id="detailSubmitTime">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>状态:</label>
+                        <select id="detailStatus" class="status-edit-select" onchange="updateRequestStatusFromDrawer()" style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background: white; min-width: 120px;">
+                            <option value="新提交">新提交</option>
+                            <option value="处理中">处理中</option>
+                            <option value="已解决">已解决</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>问题描述</h4>
+                    <div class="detail-problem" id="detailProblem">
+                        -
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>处理进度</h4>
+                    <div class="progress-timeline" id="progressTimeline">
+                        <div class="progress-item active">
+                            <div class="progress-dot"></div>
+                            <div class="progress-content">
+                                <div class="progress-title">问题已提交</div>
+                                <div class="progress-time" id="submitProgressTime">2024-01-15 14:32</div>
+                            </div>
+                        </div>
+                        <div class="progress-item" id="processingProgress">
+                            <div class="progress-dot"></div>
+                            <div class="progress-content">
+                                <div class="progress-title">开始处理</div>
+                                <div class="progress-time">-</div>
+                            </div>
+                        </div>
+                        <div class="progress-item" id="resolvedProgress">
+                            <div class="progress-dot"></div>
+                            <div class="progress-content">
+                                <div class="progress-title">问题解决</div>
+                                <div class="progress-time">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>备注信息</h4>
+                    <textarea id="remarkTextarea" class="remark-textarea" placeholder="添加备注信息..." rows="4"></textarea>
+                    <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                        <button class="btn dialog-btn primary" onclick="saveRemark()" style="padding: 8px 16px; font-size: 14px;">保存备注</button>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>操作记录</h4>
+                    <div class="operation-log">
+                        <div class="log-item">
+                            <div class="log-time">2024-01-15 14:32</div>
+                            <div class="log-content">用户提交问题</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-time">2024-01-15 15:30</div>
+                            <div class="log-content">系统管理员开始处理</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-time">2024-01-15 16:45</div>
+                            <div class="log-content">技术人员介入调查</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-time">2024-01-15 17:20</div>
+                            <div class="log-content">发现问题根因：服务器配置异常</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-time">2024-01-15 18:00</div>
+                            <div class="log-content">问题已修复，等待用户确认</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>相关文件</h4>
+                    <div class="file-list-small">
+                        <div class="file-item-small">
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">错误截图.png</div>
+                                <div class="file-size">1.2 MB</div>
+                            </div>
+                            <button class="btn-small">下载</button>
+                        </div>
+                        <div class="file-item-small">
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">系统日志.log</div>
+                                <div class="file-size">456 KB</div>
+                            </div>
+                            <button class="btn-small">下载</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 添加更多测试内容确保滚动 -->
+                <div class="detail-section">
+                    <h4>详细记录</h4>
+                    <div style="height: 400px; background: #f8f9fa; padding: 16px; border-radius: 4px;">
+                        <p>这是一个测试内容区域，用来测试抽屉的滚动功能。</p>
+                        <p>当内容超出抽屉高度时，应该能够滚动查看全部内容。</p>
+                        <p>第1行测试内容</p>
+                        <p>第2行测试内容</p>
+                        <p>第3行测试内容</p>
+                        <p>第4行测试内容</p>
+                        <p>第5行测试内容</p>
+                        <p>第6行测试内容</p>
+                        <p>第7行测试内容</p>
+                        <p>第8行测试内容</p>
+                        <p>第9行测试内容</p>
+                        <p>第10行测试内容</p>
+                        <p>第11行测试内容</p>
+                        <p>第12行测试内容</p>
+                        <p>第13行测试内容</p>
+                        <p>第14行测试内容</p>
+                        <p>第15行测试内容</p>
+                        <p>第16行测试内容</p>
+                        <p>第17行测试内容</p>
+                        <p>第18行测试内容</p>
+                        <p>第19行测试内容</p>
+                        <p>第20行测试内容</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .detail-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .detail-drawer.active {
+            pointer-events: all;
+            opacity: 1;
+        }
+        
+        .drawer-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+        
+        .drawer-content {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 480px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .detail-drawer.active .drawer-content {
+            transform: translateX(0);
+        }
+        
+        .drawer-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid #eee;
+            background: white;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+        
+        .drawer-header h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .drawer-close {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: #666;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .drawer-close:hover {
+            background: #f5f5f5;
+        }
+        
+        .drawer-body {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 24px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
+        }
+        
+        /* 新抽屉样式 */
+        .new-detail-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .new-detail-drawer.active,
+        .detail-drawer.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .new-drawer-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .new-drawer-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 500px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .new-detail-drawer.active .new-drawer-panel,
+        .detail-drawer.active .new-drawer-panel {
+            transform: translateX(0);
+        }
+
+        .new-drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            height: 70px;
+            box-sizing: border-box;
+        }
+
+        .new-drawer-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .new-drawer-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .new-drawer-close:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .new-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 24px;
+            background: #ffffff;
+            min-height: 0;
+        }
+
+        .new-drawer-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .new-drawer-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .new-drawer-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .new-drawer-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .detail-section {
+            margin-bottom: 32px;
+        }
+        
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .detail-section h4 {
+            margin: 0 0 16px 0;
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+        
+        .detail-item label {
+            min-width: 80px;
+            color: #666;
+            font-weight: 500;
+            margin-right: 12px;
+        }
+        
+        .detail-item span {
+            color: #333;
+            flex: 1;
+        }
+        
+        .detail-problem {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            color: #333;
+            line-height: 1.6;
+            border: 1px solid #e9ecef;
+        }
+        
+        .progress-timeline {
+            position: relative;
+        }
+        
+        .progress-item {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .progress-item::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 20px;
+            bottom: -20px;
+            width: 2px;
+            background: #e9ecef;
+        }
+        
+        .progress-item:last-child::before {
+            display: none;
+        }
+        
+        .progress-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e9ecef;
+            margin-right: 16px;
+            flex-shrink: 0;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #e9ecef;
+        }
+        
+        .progress-item.active .progress-dot {
+            background: #28a745;
+            box-shadow: 0 0 0 2px #28a745;
+        }
+        
+        .progress-content {
+            flex: 1;
+        }
+        
+        .progress-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .progress-time {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .remark-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+        
+        .remark-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        
+        /* 自定义滚动条样式 */
+        .drawer-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .drawer-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .drawer-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .drawer-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Firefox滚动条 */
+        .detail-drawer .drawer-body {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+        
+        /* 为详情区域添加最大高度和滚动 */
+        .detail-problem {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            color: #333;
+            line-height: 1.6;
+            border: 1px solid #e9ecef;
+            word-wrap: break-word;
+            word-break: break-word;
+            min-height: 60px;
+        }
+        
+        /* 为进度时间轴区域添加滚动支持 */
+        .progress-timeline {
+            position: relative;
+            padding-right: 8px;
+        }
+        
+        /* 操作记录样式 */
+        .operation-log {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .log-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            min-width: 120px;
+            color: #666;
+            font-size: 12px;
+            margin-right: 12px;
+        }
+        
+        .log-content {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        /* 文件列表样式 */
+        .file-list-small {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .file-item-small {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .file-item-small:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .file-size {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .btn-small {
+            padding: 4px 12px;
+            font-size: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-small:hover {
+            background: #0056b3;
+        }
+    </style>
+
 </body>
 </html>
