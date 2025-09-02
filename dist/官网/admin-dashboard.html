@@ -2966,6 +2966,9 @@
                         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                         this.classList.add('active');
                         
+                        // 初始化帮助中心数据
+                        initializeHelpCenter();
+                        
                         // 默认激活文档资料子项
                         setTimeout(() => {
                             const documentsSubitem = document.querySelector('.nav-subitem[data-section="documents"]');
@@ -3133,11 +3136,14 @@
 
         // Switch tab
         function switchTab(tabId) {
+            console.log('Switching to tab:', tabId);
+            
             // Update tab items
             document.querySelectorAll('.tab-item').forEach(tab => {
                 tab.classList.remove('active');
                 if (tab.dataset.tab === tabId) {
                     tab.classList.add('active');
+                    console.log('Activated tab button:', tab.textContent.trim());
                 }
             });
 
@@ -3146,8 +3152,18 @@
                 content.classList.remove('active');
                 if (content.id === tabId) {
                     content.classList.add('active');
+                    console.log('Activated tab content:', tabId);
+                    console.log('Tab data length:', (tabsData[tabId] || []).length);
                 }
             });
+            
+            // Force re-render the active tab to ensure fresh content
+            setTimeout(() => {
+                if (tabsData[tabId]) {
+                    renderFileList(tabId);
+                    console.log('Re-rendered tab:', tabId);
+                }
+            }, 10);
         }
 
         // Add new tab
@@ -3513,10 +3529,14 @@
 
         // Render file list as table with expand/collapse functionality
         function renderFileList(tabId) {
+            console.log('renderFileList called for tabId:', tabId);
             const fileList = document.getElementById(`fileList-${tabId}`);
+            console.log('fileList element found:', !!fileList);
             const files = tabsData[tabId] || [];
+            console.log('Files data for', tabId, ':', files.length, 'items:', files);
             
             if (files.length === 0) {
+                console.log('No files found for', tabId, 'showing empty state');
                 fileList.innerHTML = '<div class="empty-state">暂无文件</div>';
                 return;
             }
@@ -4913,103 +4933,103 @@
                 });
             }
             
+            // Initialize all tabs and render their data
+            console.log('Initializing tab data...');
+            document.querySelectorAll('.tab-content').forEach(content => {
+                const tabId = content.id;
+                // Initialize empty file list
+                if (!tabsData[tabId]) {
+                    tabsData[tabId] = [];
+                }
+                
+                // Add sample data for demonstration (remove this in production)
+                if (tabId === 'tab1') {
+                    tabsData[tabId] = [
+                        {
+                            id: Date.now(),
+                            name: 'IndustrialControl-Setup-1.0.21',
+                            systemType: 'Windows x64',
+                            language: ['简体中文', 'English'],
+                            type: '.exe',
+                            size: '125.6 MB',
+                            uploadTime: '2025/08/15 20:26:27'
+                        },
+                        {
+                            id: Date.now() + 1,
+                            name: 'IndustrialControl-1.0.21-arm64',
+                            systemType: 'mac(M芯片)',
+                            language: ['简体中文', 'English', '日本語'],
+                            type: '.dmg',
+                            size: '142.3 MB',
+                            uploadTime: '2025/08/15 21:26:27'
+                        }
+                    ];
+                } else if (tabId === 'tab2') {
+                    tabsData[tabId] = [
+                        {
+                            id: Date.now() + 2,
+                            name: '旭衡EMS介绍',
+                            systemType: '通用',
+                            language: ['简体中文'],
+                            type: '.mp4',
+                            size: '125.3 MB',
+                            uploadTime: '2024/12/10 10:28:27'
+                        },
+                        {
+                            id: Date.now() + 3,
+                            name: 'Neuron Gateway Introduction',
+                            systemType: '通用',
+                            language: ['English', '日本語'],
+                            type: '.mp4',
+                            size: '98.7 MB',
+                            uploadTime: '2025/05/22 17:14:27'
+                        }
+                    ];
+                } else if (tabId === 'tab3') {
+                    tabsData[tabId] = [
+                        {
+                            id: Date.now() + 4,
+                            name: 'EMS_N2 Firmware Upgrade Package-1.2.3',
+                            systemType: '通用',
+                            language: ['简体中文', 'English'],
+                            type: '.zip',
+                            size: '28.4 MB',
+                            uploadTime: '2025/07/28 10:28:27'
+                        },
+                        {
+                            id: Date.now() + 5,
+                            name: 'EMS系统演示视频',
+                            systemType: '通用',
+                            language: ['简体中文'],
+                            type: '.mp4',
+                            size: '156.8 MB',
+                            uploadTime: '2024/12/10 10:28:27'
+                        },
+                        {
+                            id: Date.now() + 6,
+                            name: 'EMS安装包',
+                            systemType: 'Windows x64',
+                            language: ['简体中文', 'English', '繁体中文'],
+                            type: '.msi',
+                            size: '89.2 MB',
+                            uploadTime: '2024/11/28 14:35:27'
+                        }
+                    ];
+                }
+                
+                console.log('Initialized data for', tabId, ':', tabsData[tabId].length, 'items');
+                renderFileList(tabId);
+            });
+
+            // Initialize tabs
+            initTabs();
+            
+            // Activate default tab
+            switchTab('tab1');
+
             helpCenterInitialized = true;
         }
         
-        // Initialize all tabs and render empty lists
-        document.querySelectorAll('.tab-content').forEach(content => {
-            const tabId = content.id;
-            // Initialize empty file list
-            if (!tabsData[tabId]) {
-                tabsData[tabId] = [];
-            }
-            
-            // Add sample data for demonstration (remove this in production)
-            if (tabId === 'tab1') {
-                tabsData[tabId] = [
-                    {
-                        id: Date.now(),
-                        name: 'IndustrialControl-Setup-1.0.21',
-                        systemType: 'Windows x64',
-                        language: ['简体中文', 'English'],
-                        type: '.exe',
-                        size: '125.6 MB',
-                        uploadTime: '2025/08/15 20:26:27'
-                    },
-                    {
-                        id: Date.now() + 1,
-                        name: 'IndustrialControl-1.0.21-arm64',
-                        systemType: 'mac(M芯片)',
-                        language: ['简体中文', 'English', '日本語'],
-                        type: '.dmg',
-                        size: '142.3 MB',
-                        uploadTime: '2025/08/15 21:26:27'
-                    }
-                ];
-            } else if (tabId === 'tab2') {
-                tabsData[tabId] = [
-                    {
-                        id: Date.now() + 2,
-                        name: '旭衡EMS介绍',
-                        systemType: '通用',
-                        language: ['简体中文'],
-                        type: '.mp4',
-                        size: '125.3 MB',
-                        uploadTime: '2024/12/10 10:28:27'
-                    },
-                    {
-                        id: Date.now() + 3,
-                        name: 'Neuron Gateway Introduction',
-                        systemType: '通用',
-                        language: ['English', '日本語'],
-                        type: '.mp4',
-                        size: '98.7 MB',
-                        uploadTime: '2025/05/22 17:14:27'
-                    }
-                ];
-            } else if (tabId === 'tab3') {
-                tabsData[tabId] = [
-                    {
-                        id: Date.now() + 4,
-                        name: 'EMS_N2 Firmware Upgrade Package-1.2.3',
-                        systemType: '通用',
-                        language: ['简体中文', 'English'],
-                        type: '.zip',
-                        size: '28.4 MB',
-                        uploadTime: '2025/07/28 10:28:27'
-                    },
-                    {
-                        id: Date.now() + 5,
-                        name: 'EMS系统演示视频',
-                        systemType: '通用',
-                        language: ['简体中文'],
-                        type: '.mp4',
-                        size: '156.8 MB',
-                        uploadTime: '2024/12/10 10:28:27'
-                    },
-                    {
-                        id: Date.now() + 6,
-                        name: 'EMS安装包',
-                        systemType: 'Windows x64',
-                        language: ['简体中文', 'English', '繁体中文'],
-                        type: '.exe',
-                        size: '89.5 MB',
-                        uploadTime: '2024/12/07 16:45:20'
-                    }
-                ];
-            }
-            
-            renderFileList(tabId);
-        });
-
-        // Initialize tabs
-        initTabs();
-        
-        // Activate default tab
-        switchTab('tab1');
-        
-        // Initialize submenu events
-        initSubmenuEvents();
 
         // Edit File Dialog Management
         const editModal = document.getElementById('editModal');
@@ -5892,6 +5912,9 @@
                 // 显示抽屉
                 document.getElementById('detailDrawer').classList.add('active');
                 
+                // 默认显示基础信息tab
+                switchDrawerTab('basic');
+                
                 // 存储当前查看的请求ID
                 window.currentRequestId = requestId;
             }
@@ -5901,6 +5924,46 @@
         function closeDetailDrawer() {
             document.getElementById('detailDrawer').classList.remove('active');
             window.currentRequestId = null;
+        }
+
+        // Tab切换功能
+        function switchDrawerTab(tabType) {
+            // 移除所有tab的active状态
+            document.querySelectorAll('.drawer-tabs .tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有tab内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // 激活选中的tab
+            if (tabType === 'basic') {
+                document.querySelector('.tab-item[onclick*="basic"]').classList.add('active');
+                document.getElementById('basicInfoTab').style.display = 'block';
+            } else if (tabType === 'records') {
+                document.querySelector('.tab-item[onclick*="records"]').classList.add('active');
+                document.getElementById('recordsTab').style.display = 'block';
+            }
+        }
+
+        // 删除文件功能
+        function deleteFile(fileName) {
+            if (confirm(`确定要删除文件 "${fileName}" 吗？`)) {
+                // 在实际应用中，这里会发送删除请求到服务器
+                console.log(`删除文件: ${fileName}`);
+                
+                // 从DOM中移除文件项
+                const fileItems = document.querySelectorAll('.file-item-small');
+                fileItems.forEach(item => {
+                    const nameElement = item.querySelector('.file-name');
+                    if (nameElement && nameElement.textContent === fileName) {
+                        item.remove();
+                        showNotification(`文件 "${fileName}" 已删除`, 'success');
+                    }
+                });
+            }
         }
 
         // 从抽屉中更新请求状态
@@ -6036,6 +6099,11 @@
         window.updateProgressTimeline = updateProgressTimeline;
         window.saveRemark = saveRemark;
         window.updateRequestStatusFromDrawer = updateRequestStatusFromDrawer;
+        window.deleteFile = deleteFile;
+        window.switchDrawerTab = switchDrawerTab;
+        
+        // Initialize submenu events when page loads
+        initSubmenuEvents();
     </script>
     
     <!-- 详情右抽屉 -->
@@ -6051,10 +6119,18 @@
                 </button>
             </div>
             
+            <!-- Tab 导航 -->
+            <div class="drawer-tabs">
+                <div class="tab-item active" onclick="switchDrawerTab('basic')">基础信息</div>
+                <div class="tab-item" onclick="switchDrawerTab('records')">处理记录</div>
+            </div>
+            
             <div class="new-drawer-body">
-                <div class="detail-section">
-                    <h4>基础信息</h4>
-                    <div class="detail-item">
+                <!-- 基础信息Tab -->
+                <div id="basicInfoTab" class="tab-content active">
+                    <div class="detail-section">
+                        <h4>基础信息</h4>
+                        <div class="detail-item">
                         <label>姓名:</label>
                         <span id="detailName">-</span>
                     </div>
@@ -6078,17 +6154,19 @@
                             <option value="已解决">已解决</option>
                         </select>
                     </div>
-                </div>
-                
-                <div class="detail-section">
-                    <h4>问题描述</h4>
-                    <div class="detail-problem" id="detailProblem">
-                        -
+                    
+                    <div class="detail-section">
+                        <h4>问题描述</h4>
+                        <div class="detail-problem" id="detailProblem">
+                            -
+                        </div>
                     </div>
                 </div>
                 
-                <div class="detail-section">
-                    <h4>处理进度</h4>
+                <!-- 处理记录Tab -->
+                <div id="recordsTab" class="tab-content" style="display: none;">
+                    <div class="detail-section">
+                        <h4>处理进度</h4>
                     <div class="progress-timeline" id="progressTimeline">
                         <div class="progress-item active">
                             <div class="progress-dot"></div>
@@ -6113,89 +6191,39 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="detail-section">
-                    <h4>备注信息</h4>
-                    <textarea id="remarkTextarea" class="remark-textarea" placeholder="添加备注信息..." rows="4"></textarea>
-                    <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
-                        <button class="btn dialog-btn primary" onclick="saveRemark()" style="padding: 8px 16px; font-size: 14px;">保存备注</button>
-                    </div>
-                </div>
-                
-                <div class="detail-section">
-                    <h4>操作记录</h4>
-                    <div class="operation-log">
-                        <div class="log-item">
-                            <div class="log-time">2024-01-15 14:32</div>
-                            <div class="log-content">用户提交问题</div>
-                        </div>
-                        <div class="log-item">
-                            <div class="log-time">2024-01-15 15:30</div>
-                            <div class="log-content">系统管理员开始处理</div>
-                        </div>
-                        <div class="log-item">
-                            <div class="log-time">2024-01-15 16:45</div>
-                            <div class="log-content">技术人员介入调查</div>
-                        </div>
-                        <div class="log-item">
-                            <div class="log-time">2024-01-15 17:20</div>
-                            <div class="log-content">发现问题根因：服务器配置异常</div>
-                        </div>
-                        <div class="log-item">
-                            <div class="log-time">2024-01-15 18:00</div>
-                            <div class="log-content">问题已修复，等待用户确认</div>
+                    
+                    <div class="detail-section">
+                        <h4>备注信息</h4>
+                        <textarea id="remarkTextarea" class="remark-textarea" placeholder="添加备注信息..." rows="4"></textarea>
+                        <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                            <button class="btn dialog-btn primary" onclick="saveRemark()" style="padding: 8px 16px; font-size: 14px;">保存备注</button>
                         </div>
                     </div>
-                </div>
-                
-                <div class="detail-section">
-                    <h4>相关文件</h4>
-                    <div class="file-list-small">
-                        <div class="file-item-small">
-                            <div class="file-icon">📄</div>
-                            <div class="file-info">
-                                <div class="file-name">错误截图.png</div>
-                                <div class="file-size">1.2 MB</div>
+                    
+                    <div class="detail-section">
+                        <h4>操作记录</h4>
+                        <div class="operation-log">
+                            <div class="log-item">
+                                <div class="log-time">2024-01-15 14:32</div>
+                                <div class="log-content">用户提交问题</div>
                             </div>
-                            <button class="btn-small">下载</button>
-                        </div>
-                        <div class="file-item-small">
-                            <div class="file-icon">📄</div>
-                            <div class="file-info">
-                                <div class="file-name">系统日志.log</div>
-                                <div class="file-size">456 KB</div>
+                            <div class="log-item">
+                                <div class="log-time">2024-01-15 15:30</div>
+                                <div class="log-content">系统管理员开始处理</div>
                             </div>
-                            <button class="btn-small">下载</button>
+                            <div class="log-item">
+                                <div class="log-time">2024-01-15 16:45</div>
+                                <div class="log-content">技术人员介入调查</div>
+                            </div>
+                            <div class="log-item">
+                                <div class="log-time">2024-01-15 17:20</div>
+                                <div class="log-content">发现问题根因：服务器配置异常</div>
+                            </div>
+                            <div class="log-item">
+                                <div class="log-time">2024-01-15 18:00</div>
+                                <div class="log-content">问题已修复，等待用户确认</div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- 添加更多测试内容确保滚动 -->
-                <div class="detail-section">
-                    <h4>详细记录</h4>
-                    <div style="height: 400px; background: #f8f9fa; padding: 16px; border-radius: 4px;">
-                        <p>这是一个测试内容区域，用来测试抽屉的滚动功能。</p>
-                        <p>当内容超出抽屉高度时，应该能够滚动查看全部内容。</p>
-                        <p>第1行测试内容</p>
-                        <p>第2行测试内容</p>
-                        <p>第3行测试内容</p>
-                        <p>第4行测试内容</p>
-                        <p>第5行测试内容</p>
-                        <p>第6行测试内容</p>
-                        <p>第7行测试内容</p>
-                        <p>第8行测试内容</p>
-                        <p>第9行测试内容</p>
-                        <p>第10行测试内容</p>
-                        <p>第11行测试内容</p>
-                        <p>第12行测试内容</p>
-                        <p>第13行测试内容</p>
-                        <p>第14行测试内容</p>
-                        <p>第15行测试内容</p>
-                        <p>第16行测试内容</p>
-                        <p>第17行测试内容</p>
-                        <p>第18行测试内容</p>
-                        <p>第19行测试内容</p>
-                        <p>第20行测试内容</p>
                     </div>
                 </div>
             </div>
@@ -6416,6 +6444,64 @@
         
         .detail-section:last-child {
             margin-bottom: 0;
+        }
+
+        .file-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        /* 抽屉Tab样式 - 参考文档资料页面 */
+        .drawer-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .drawer-tabs .tab-item {
+            flex: 1;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .drawer-tabs .tab-item:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .drawer-tabs .tab-item.active {
+            background: white;
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .drawer-tabs .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #007bff;
+        }
+
+        .tab-content {
+            display: block;
+        }
+
+        .tab-content.hidden {
+            display: none;
         }
         
         .detail-section h4 {
