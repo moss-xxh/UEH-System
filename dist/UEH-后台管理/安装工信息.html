@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安装人员信息 - Installer Information</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Signature Pad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+
+    <!-- Tailwind 配置 - 苹果风格 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0071e3',
+                        secondary: '#1d1d1f',
+                        tertiary: '#86868b',
+                        light: '#f5f5f7',
+                        success: '#34c759',
+                        warning: '#ff9500',
+                        danger: '#ff3b30',
+                        border: '#d2d2d7',
+                        covau: '#4A90E2',
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'apple': '0 2px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)',
+                        'apple-hover': '0 5px 15px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05)',
+                    }
+                },
+            }
+        }
+    </script>
+
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .input-focus {
+                @apply focus:ring-1 focus:ring-primary focus:border-primary focus:outline-none transition-all duration-200;
+            }
+            .btn-apple {
+                @apply bg-primary text-white font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-primary/90 active:bg-primary/80;
+            }
+            .btn-outline {
+                @apply border border-primary text-primary font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-primary/5 active:bg-primary/10;
+            }
+            .btn-outline-black {
+                @apply border border-black text-black font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-black/5 active:bg-black/10;
+            }
+            .btn-black {
+                @apply bg-black text-white font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-black/90 active:bg-black/80;
+            }
+            .btn-covau {
+                @apply bg-covau text-white font-medium py-3 px-6 rounded-full shadow-sm transition-all duration-200 hover:bg-covau/90 active:bg-covau/80;
+            }
+            .input-apple {
+                @apply w-full px-4 py-3 bg-light border border-border rounded-lg transition-all duration-200;
+                &:focus {
+                    @apply ring-1 ring-black border-black text-black outline-none;
+                }
+            }
+            .input-with-icon {
+                @apply pl-12;
+            }
+            .label-apple {
+                @apply block text-sm font-medium text-secondary mb-2;
+            }
+            .card-apple {
+                @apply bg-white/90 backdrop-blur-sm rounded-xl shadow-apple overflow-hidden transition-all duration-300 hover:shadow-apple-hover;
+            }
+            .section-title {
+                @apply text-lg font-semibold text-secondary mb-4 pb-2 border-b border-border;
+            }
+            .terms-box {
+                @apply bg-light border border-border rounded-lg p-4 mb-4;
+            }
+            .terms-list {
+                @apply pl-5 space-y-2;
+            }
+            .covau-logo {
+                @apply text-xl font-bold text-covau;
+            }
+            .signature-container {
+                @apply border-2 border-border rounded-lg overflow-hidden bg-white;
+            }
+            .signature-pad {
+                @apply w-full h-48 block;
+            }
+        }
+    </style>
+
+    <style>
+        /* 全局样式 */
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f5f5f7 100%);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 背景装饰 */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(50px);
+            opacity: 0.15;
+        }
+        
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: #0071e3;
+            top: -250px;
+            right: -250px;
+        }
+        
+        body::after {
+            width: 600px;
+            height: 600px;
+            background: #34c759;
+            bottom: -300px;
+            left: -300px;
+        }
+        
+        /* 打印样式优化 */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            body::before,
+            body::after {
+                display: none !important;
+            }
+            .signature-pad canvas {
+                page-break-inside: avoid;
+            }
+            .container {
+                max-width: none !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen font-sans text-secondary flex flex-col">
+    <!-- 头部导航 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-secondary">CovaU energy</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- 返回按钮 -->
+                <button onclick="history.back()" class="flex items-center px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <i class="fa fa-arrow-left mr-2"></i>
+                    返回
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-10 max-w-4xl flex-1" id="main-content">
+        <div class="card-apple p-6 md:p-8">
+            <!-- 可选标题 -->
+            <div class="mb-6 p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                <h2 class="text-lg font-semibold text-warning mb-2">
+                    <i class="fa fa-info-circle mr-2"></i>
+                    可选 - 仅适用于客户要求电池安装时
+                </h2>
+                <p class="text-sm text-tertiary">
+                    此部分仅在客户明确要求电池安装服务时需要填写
+                </p>
+            </div>
+            
+            <!-- 安装人员信息标题 -->
+            <h3 class="section-title">
+                安装人员信息
+            </h3>
+            
+            <!-- 表单字段 -->
+            <form id="installer-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="label-apple" for="installerName">
+                            安装人员姓名
+                        </label>
+                        <input type="text" 
+                               id="installerName" 
+                               name="installerName" 
+                               class="input-apple" 
+                               placeholder="请输入安装人员姓名">
+                    </div>
+                    
+                    <div>
+                        <label class="label-apple" for="installerCompany">
+                            安装公司
+                        </label>
+                        <input type="text" 
+                               id="installerCompany" 
+                               name="installerCompany" 
+                               class="input-apple" 
+                               placeholder="请输入安装公司">
+                    </div>
+                    
+                    <div>
+                        <label class="label-apple" for="installerLicense">
+                            安装人员执照号码
+                        </label>
+                        <input type="text" 
+                               id="installerLicense" 
+                               name="installerLicense" 
+                               class="input-apple" 
+                               placeholder="请输入安装人员执照号码">
+                    </div>
+                    
+                    <div>
+                        <label class="label-apple" for="installerDate">
+                            日期
+                        </label>
+                        <input type="date" 
+                               id="installerDate" 
+                               name="installerDate" 
+                               class="input-apple" 
+                               value="2025-09-04">
+                    </div>
+                </div>
+                
+                <!-- 安装人员声明 -->
+                <div class="terms-box mt-8">
+                    <h4 class="text-base font-semibold text-secondary mb-4">
+                        安装人员声明：
+                    </h4>
+                    <p class="text-secondary leading-relaxed">
+                        安装人员可以执行电池的安装、完成电池连接，并执行VPP计划所需的任何相关操作。通过签名，安装人员确认其角色和责任。
+                    </p>
+                </div>
+                
+                <!-- 安装人员签名 -->
+                <div class="mt-8">
+                    <h4 class="section-title">
+                        安装人员签名
+                    </h4>
+                    
+                    <div class="signature-container mb-4">
+                        <canvas id="installerSignature" 
+                                class="signature-pad" 
+                                width="1176" 
+                                height="392"
+                                style="background-color: white; touch-action: none; cursor: crosshair; user-select: none; width: 588px; height: 196px;">
+                        </canvas>
+                    </div>
+                    
+                    <!-- 清除签名按钮 -->
+                    <div class="flex justify-start">
+                        <button type="button" 
+                                id="clearSignature" 
+                                class="text-sm text-tertiary hover:text-danger transition-colors">
+                            <i class="fa fa-eraser mr-1"></i>
+                            清除签名
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="flex justify-center gap-4 mt-8 pt-6 border-t border-border no-print">
+                    <button type="button" 
+                            onclick="saveForm()" 
+                            class="btn-covau">
+                        <i class="fa fa-check mr-2"></i>
+                        保存信息
+                    </button>
+                    <button type="button" 
+                            onclick="clearForm()" 
+                            class="btn-outline-black">
+                        <i class="fa fa-refresh mr-2"></i>
+                        重置表单
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 状态消息 -->
+        <div id="statusMessage" class="hidden mt-4 p-4 rounded-lg text-center font-medium"></div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-white py-6 mt-auto border-t border-border no-print">
+        <div class="container mx-auto px-4 text-center text-tertiary text-sm">
+            <p>&copy; 2023 CovaU energy 安装人员信息系统 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        let installerSignaturePad;
+        
+        // 初始化签名板
+        function initializeSignaturePad() {
+            const canvas = document.getElementById('installerSignature');
+            installerSignaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)',
+                minWidth: 2,
+                maxWidth: 4,
+                throttle: 16,
+                minDistance: 5
+            });
+            
+            // 调整画布大小
+            function resizeCanvas() {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * ratio;
+                canvas.height = rect.height * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                canvas.style.width = rect.width + 'px';
+                canvas.style.height = rect.height + 'px';
+                installerSignaturePad.clear();
+            }
+            
+            // 初始化时调整
+            setTimeout(resizeCanvas, 100);
+            
+            // 窗口调整时重新调整
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 清除签名按钮
+            document.getElementById('clearSignature').addEventListener('click', function() {
+                installerSignaturePad.clear();
+                showStatus('签名已清除', 'info');
+            });
+            
+            // 加载保存的签名
+            const savedSignature = localStorage.getItem('installer-signature');
+            if (savedSignature) {
+                installerSignaturePad.fromDataURL(savedSignature);
+            }
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type = 'success') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `mt-4 p-4 rounded-lg text-center font-medium ${
+                type === 'success' ? 'bg-success/20 text-success border border-success/40' :
+                type === 'error' ? 'bg-danger/20 text-danger border border-danger/40' :
+                'bg-primary/20 text-primary border border-primary/40'
+            }`;
+            statusEl.classList.remove('hidden');
+            
+            setTimeout(() => {
+                statusEl.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // 保存表单
+        function saveForm() {
+            const formData = {
+                name: document.getElementById('installerName').value,
+                company: document.getElementById('installerCompany').value,
+                license: document.getElementById('installerLicense').value,
+                date: document.getElementById('installerDate').value,
+                signature: installerSignaturePad.isEmpty() ? null : installerSignaturePad.toDataURL()
+            };
+            
+            // 基本验证
+            if (!formData.name.trim()) {
+                showStatus('请输入安装人员姓名', 'error');
+                document.getElementById('installerName').focus();
+                return;
+            }
+            
+            if (!formData.company.trim()) {
+                showStatus('请输入安装公司', 'error');
+                document.getElementById('installerCompany').focus();
+                return;
+            }
+            
+            if (!formData.license.trim()) {
+                showStatus('请输入安装人员执照号码', 'error');
+                document.getElementById('installerLicense').focus();
+                return;
+            }
+            
+            if (!formData.signature) {
+                showStatus('请提供安装人员签名', 'error');
+                return;
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('installer-form-data', JSON.stringify(formData));
+            localStorage.setItem('installer-signature', formData.signature);
+            
+            showStatus('安装人员信息已成功保存！', 'success');
+        }
+        
+        // 重置表单
+        function clearForm() {
+            if (confirm('确定要重置所有信息吗？此操作不可撤销。')) {
+                document.getElementById('installer-form').reset();
+                document.getElementById('installerDate').value = '2025-09-04';
+                installerSignaturePad.clear();
+                localStorage.removeItem('installer-form-data');
+                localStorage.removeItem('installer-signature');
+                showStatus('表单已重置', 'info');
+            }
+        }
+        
+        // 加载保存的表单数据
+        function loadSavedData() {
+            const savedData = localStorage.getItem('installer-form-data');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    document.getElementById('installerName').value = data.name || '';
+                    document.getElementById('installerCompany').value = data.company || '';
+                    document.getElementById('installerLicense').value = data.license || '';
+                    document.getElementById('installerDate').value = data.date || '2025-09-04';
+                } catch (e) {
+                    console.log('无法加载保存的数据');
+                }
+            }
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSignaturePad();
+            loadSavedData();
+            
+            // 设置默认日期为今天
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + 
+                              String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(today.getDate()).padStart(2, '0');
+            document.getElementById('installerDate').value = dateString;
+        });
+    </script>
+</body>
+</html>
