@@ -1173,10 +1173,6 @@
 
         // 解决方案数据
         const solutions = {
-            // Banner管理方案
-            banner: [
-                // Banner方案内容已清空
-            ],
             // 户用解决方案
             residential: [
                 // 户用解决方案内容已清空
@@ -1304,10 +1300,6 @@
                     title: '户用解决方案',
                     subtitle: ''
                 },
-                'banner': {
-                    title: 'Banner管理',
-                    subtitle: '管理网站横幅图片内容'
-                },
                 'commercial': {
                     title: '工商储解决方案',
                     subtitle: '为工商业用户提供的大容量储能与能源管理系统'
@@ -1361,17 +1353,6 @@
         }
 
 
-        // 加载Banner数据
-        function loadBannerData() {
-            try {
-                const savedData = localStorage.getItem('bannerData');
-                if (savedData) {
-                    bannerConfig = JSON.parse(savedData);
-                }
-            } catch (error) {
-                console.log('加载Banner数据失败，使用默认配置');
-            }
-        }
 
         // 图片管理数据
         let imageData = JSON.parse(localStorage.getItem('residentialImages')) || [
@@ -1380,7 +1361,7 @@
                 name: "首页轮播图1",
                 description: "户用储能系统主要展示图片",
                 url: "https://picsum.photos/800/600?random=1",
-                page: "首页轮播",
+                page: "户用",
                 status: "active",
                 uploadDate: "2024-01-15 09:30:00"
             },
@@ -1389,7 +1370,7 @@
                 name: "产品详情图",
                 description: "户用光储一体机产品展示",
                 url: "https://picsum.photos/800/600?random=2",
-                page: "产品页面",
+                page: "工商储",
                 status: "active",
                 uploadDate: "2024-01-20 14:15:30"
             },
@@ -1398,7 +1379,7 @@
                 name: "应用场景图",
                 description: "家庭应用场景示意图",
                 url: "https://picsum.photos/800/600?random=3",
-                page: "解决方案",
+                page: "充电站",
                 status: "inactive",
                 uploadDate: "2024-01-25 16:45:12"
             }
@@ -1685,8 +1666,6 @@
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', async function() {
-            // 加载Banner数据
-            loadBannerData();
             
             // 初始化通用侧边栏
             initUniversalSidebar();
