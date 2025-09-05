@@ -2266,7 +2266,92 @@
         .modal-btn-confirm:hover {
             background: #b91c1c;
         }
+        
+        /* 在线帮助页面专用样式 - 强制隐藏仪表盘内容 */
+        #dashboardContent {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* 确保在线帮助内容始终可见 */
+        #simpleOnlineHelp {
+            display: block !important;
+            visibility: visible !important;
+        }
     </style>
+    
+    <!-- 紧急修复 - 在head中定义全局函数 -->
+    <script>
+        function viewRequestDetail(requestId) {
+            console.log('正在显示请求详情:', requestId);
+            
+            // 从表格中获取数据填充到抽屉中
+            const row = document.querySelector(`span[data-request-id="${requestId}"]`).closest('tr');
+            if (row) {
+                const cells = row.cells;
+                const name = cells[0].textContent.trim();
+                const phone = cells[1].textContent.trim();
+                const email = cells[2].textContent.trim();
+                const problem = cells[3].textContent.trim();
+                const submitTime = cells[4].textContent.trim();
+                const status = cells[5].querySelector('span').getAttribute('data-status');
+                
+                // 填充抽屉内容
+                document.getElementById('detailName').textContent = name;
+                document.getElementById('detailPhone').textContent = phone;
+                document.getElementById('detailEmail').textContent = email;
+                document.getElementById('detailSubmitTime').textContent = submitTime;
+                document.getElementById('detailProblem').textContent = problem;
+                document.getElementById('submitProgressTime').textContent = submitTime;
+                
+                // 设置状态选择器的值
+                const detailStatus = document.getElementById('detailStatus');
+                if (detailStatus) {
+                    detailStatus.value = status;
+                }
+                
+                // 显示抽屉
+                const detailDrawer = document.getElementById('detailDrawer');
+                if (detailDrawer) {
+                    detailDrawer.classList.add('active');
+                    console.log('详情抽屉已显示');
+                } else {
+                    console.error('未找到详情抽屉元素');
+                }
+            }
+        }
+        
+        function closeDetailDrawer() {
+            console.log('正在关闭详情抽屉');
+            const detailDrawer = document.getElementById('detailDrawer');
+            if (detailDrawer) {
+                detailDrawer.classList.remove('active');
+                console.log('详情抽屉已关闭');
+            }
+        }
+        
+        // 确保toggleSubmenu函数在全局作用域可用
+        function toggleSubmenu(groupId, navItem) {
+            console.log('Head toggleSubmenu called:', groupId, navItem);
+            const navGroup = document.getElementById(groupId);
+            if (navGroup) {
+                const wasExpanded = navGroup.classList.contains('expanded');
+                navGroup.classList.toggle('expanded');
+                
+                console.log('Group', groupId, wasExpanded ? 'collapsed' : 'expanded');
+                
+                // 如果展开，设置为活跃状态
+                if (!wasExpanded) {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    navItem.classList.add('active');
+                    console.log('Set active for', groupId);
+                }
+            } else {
+                console.error('Nav group not found:', groupId);
+            }
+            return false;
+        }
+    </script>
 </head>
 <body>
     <div class="app">
@@ -3164,6 +3249,7 @@
                     document.getElementById('helpCenterNav').classList.add('active');
                     document.querySelector('.nav-subitem[data-section="documents"]')?.classList.add('active');
                     break;
+                case '在线帮助.html':
                 case 'online-help.html':
                     document.getElementById('helpCenterGroup').classList.add('expanded');
                     document.getElementById('helpCenterNav').classList.add('active');
@@ -6043,25 +6129,32 @@
         // 翻页功能
         let currentPageNumber = 1;
         let itemsPerPage = 10;
-        let allHelpRequests = []; // 存储所有帮助请求数据
+        // allHelpRequests 已在全局声明
         
         // 初始化帮助请求数据
         function initializeHelpRequestsData() {
             // 从现有表格中提取数据（在实际应用中从API获取）
             const rows = document.querySelectorAll('#helpRequestsList tr');
+            console.log('Found rows:', rows.length);
+            
             allHelpRequests = Array.from(rows).map((row, index) => {
                 const cells = row.cells;
-                return {
-                    id: index + 1,
-                    name: cells[0].textContent.trim(),
-                    phone: cells[1].textContent.trim(),
-                    email: cells[2].textContent.trim(),
-                    problem: cells[3].textContent.trim(),
-                    submitTime: cells[4].textContent.trim(),
-                    status: cells[5].querySelector('span').getAttribute('data-status'),
-                    element: row
-                };
-            });
+                if (cells.length >= 6) {
+                    return {
+                        id: index + 1,
+                        name: cells[0].textContent.trim(),
+                        phone: cells[1].textContent.trim(),
+                        email: cells[2].textContent.trim(),
+                        problem: cells[3].textContent.trim(),
+                        submitTime: cells[4].textContent.trim(),
+                        status: cells[5].querySelector('span').getAttribute('data-status'),
+                        element: row
+                    };
+                }
+                return null;
+            }).filter(item => item !== null);
+            
+            console.log('Initialized help requests:', allHelpRequests.length);
         }
         
         // 渲染当前页面数据
@@ -6147,8 +6240,18 @@
         
         // 详情抽屉功能
         function viewRequestDetail(requestId) {
+            console.log('=== viewRequestDetail DEBUG ===');
+            console.log('requestId:', requestId);
+            console.log('allHelpRequests length:', allHelpRequests.length);
+            console.log('allHelpRequests:', allHelpRequests);
+            
+            // 测试弹窗
+            alert(`正在打开请求 ${requestId} 的详情...`);
+            
             // 找到对应的请求数据
             let request = allHelpRequests.find(r => r.id == requestId);
+            console.log('Found request:', request);
+            
             if (!request) {
                 // 从当前DOM中获取数据作为备用
                 const row = document.querySelector(`span[data-request-id="${requestId}"]`).closest('tr');
@@ -6287,27 +6390,38 @@
             const processingItem = document.getElementById('processingProgress');
             const resolvedItem = document.getElementById('resolvedProgress');
             
+            // 检查元素是否存在
+            if (!processingItem || !resolvedItem) {
+                console.log('Progress timeline elements not found');
+                return;
+            }
+            
             // 根据状态激活对应的进度
             if (status === '处理中' || status === '已解决') {
                 // 模拟处理开始时间（提交时间+1小时）
                 const processTime = new Date(parseDateTime(submitTime));
                 processTime.setHours(processTime.getHours() + 1);
-                processingItem.querySelector('span').textContent = 
-                    processTime.toLocaleString('zh-CN', {
+                
+                const processingSpan = processingItem.querySelector('span');
+                if (processingSpan) {
+                    processingSpan.textContent = processTime.toLocaleString('zh-CN', {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',
                         hour: '2-digit',
                         minute: '2-digit'
                     }).replace(/\//g, '-');
+                }
             }
             
             if (status === '已解决') {
                 // 模拟解决时间（处理时间+2小时）
                 const resolveTime = new Date(parseDateTime(submitTime));
                 resolveTime.setHours(resolveTime.getHours() + 3);
-                resolvedItem.querySelector('span').textContent = 
-                    resolveTime.toLocaleString('zh-CN', {
+                
+                const resolvedSpan = resolvedItem.querySelector('span');
+                if (resolvedSpan) {
+                    resolvedSpan.textContent = resolveTime.toLocaleString('zh-CN', {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',
@@ -6315,11 +6429,17 @@
                         minute: '2-digit'
                     }).replace(/\//g, '-');
             } else {
-                resolvedItem.querySelector('span').textContent = '-';
+                const resolvedSpan = resolvedItem.querySelector('span');
+                if (resolvedSpan) {
+                    resolvedSpan.textContent = '-';
+                }
             }
             
             if (status === '新提交') {
-                processingItem.querySelector('span').textContent = '-';
+                const processingSpan = processingItem.querySelector('span');
+                if (processingSpan) {
+                    processingSpan.textContent = '-';
+                }
             }
         }
         
@@ -6375,6 +6495,9 @@
         window.deleteFile = deleteFile;
         window.switchDrawerTab = switchDrawerTab;
         
+        // 全局变量声明
+        let allHelpRequests = [];
+        
         // Initialize online help page 
         document.addEventListener('DOMContentLoaded', async function() {
             // 初始化通用侧边栏
@@ -6391,6 +6514,40 @@
             
             // Show simple online help content
             document.getElementById('simpleOnlineHelp').style.display = 'block';
+            document.querySelector('.header-title').textContent = '在线帮助';
+            
+            // 强制确保在线帮助内容可见并隐藏仪表盘
+            setTimeout(() => {
+                const dashboardContent = document.getElementById('dashboardContent');
+                const simpleOnlineHelp = document.getElementById('simpleOnlineHelp');
+                const helpContent = document.getElementById('helpContent');
+                const uploadContent = document.getElementById('uploadContent');
+                const editContent = document.getElementById('editContent');
+                
+                // 强制隐藏所有其他内容区域
+                if (dashboardContent) dashboardContent.style.display = 'none';
+                if (helpContent) helpContent.style.display = 'none';
+                if (uploadContent) uploadContent.style.display = 'none';
+                if (editContent) editContent.style.display = 'none';
+                
+                // 强制显示在线帮助内容
+                if (simpleOnlineHelp) {
+                    simpleOnlineHelp.style.display = 'block';
+                    console.log('Forced online help content to be visible');
+                }
+                
+                // 初始化分页和数据
+                initializePagination();
+            }, 100);
+            
+            // 添加额外的检查，确保仪表盘内容不会被显示
+            setTimeout(() => {
+                const dashboardContent = document.getElementById('dashboardContent');
+                if (dashboardContent && dashboardContent.style.display !== 'none') {
+                    dashboardContent.style.display = 'none';
+                    console.log('Force hidden dashboard content again');
+                }
+            }, 500);
             
             // Wait a moment for the sidebar to load, then activate online help
             setTimeout(() => {
@@ -6416,11 +6573,15 @@
 
         // User Authentication and Logout
         // No authentication required - direct access
-        const userName = 'Admin'; // 默认用户名
+        // userName already declared above
 
         // Set avatar
         const userAvatar = document.getElementById('userAvatar');
-        userAvatar.childNodes[0].textContent = userName.charAt(0).toUpperCase();
+        if (userAvatar && userAvatar.childNodes[0]) {
+            userAvatar.childNodes[0].textContent = userName.charAt(0).toUpperCase();
+        } else if (userAvatar) {
+            userAvatar.textContent = userName.charAt(0).toUpperCase();
+        }
         
         // User menu functionality
         const userDropdown = document.getElementById('userDropdown');
@@ -6492,6 +6653,18 @@
                 logoutModal.classList.remove('show');
             }
         });
+        
+        }); // 关闭 DOMContentLoaded 事件监听器
+        
+        // 全局函数定义 - 确保HTML onclick可以访问
+        window.viewRequestDetail = function(requestId) {
+            alert('查看详情功能被点击了！请求ID: ' + requestId);
+            console.log('viewRequestDetail called for:', requestId);
+        };
+        
+        window.closeDetailDrawer = function() {
+            console.log('closeDetailDrawer called');
+        };
         
     </script>
     

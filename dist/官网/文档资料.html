@@ -2267,6 +2267,30 @@
             background: #b91c1c;
         }
     </style>
+    
+    <!-- 修复导航菜单点击问题 -->
+    <script>
+        // 确保toggleSubmenu函数在全局作用域可用
+        function toggleSubmenu(groupId, navItem) {
+            console.log('toggleSubmenu called:', groupId);
+            const navGroup = document.getElementById(groupId);
+            if (navGroup) {
+                const wasExpanded = navGroup.classList.contains('expanded');
+                navGroup.classList.toggle('expanded');
+                
+                console.log('Group', groupId, wasExpanded ? 'collapsed' : 'expanded');
+                
+                // 如果展开，设置为活跃状态
+                if (!wasExpanded) {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    navItem.classList.add('active');
+                }
+            } else {
+                console.error('Nav group not found:', groupId);
+            }
+            return false;
+        }
+    </script>
 </head>
 <body>
     <div class="app">
@@ -2596,10 +2620,10 @@
                         </div>
                         
                         <div class="tabs-list" id="tabsList">
-                            <button class="tab-item active" data-tab="tab1">
+                            <button class="tab-item" data-tab="tab1">
                                 工控桌面端
                             </button>
-                            <button class="tab-item" data-tab="tab2">
+                            <button class="tab-item active" data-tab="tab2">
                                 文档资料
                             </button>
                             <button class="tab-item" data-tab="tab3">
@@ -3328,13 +3352,11 @@
                 container.innerHTML = '';
             });
             
-            // Force re-render the active tab to ensure fresh content
-            setTimeout(() => {
-                if (tabsData[tabId]) {
-                    renderFileList(tabId);
-                    console.log('Re-rendered tab:', tabId);
-                }
-            }, 10);
+            // 立即渲染激活的tab内容
+            if (tabsData[tabId]) {
+                renderFileList(tabId);
+                console.log('Rendered active tab:', tabId);
+            }
         }
 
         // Add new tab
@@ -6395,11 +6417,19 @@
             document.getElementById('uploadContent').style.display = 'none';
             document.getElementById('editContent').style.display = 'none';
             
-            // Show help content (documents)
+            // Show help content (documents) - 强制显示帮助中心
             document.getElementById('helpContent').style.display = 'block';
+            document.querySelector('.header-title').textContent = '文档资料';
             
             // Initialize help center data
             initializeHelpCenter();
+            
+            // 强制确保帮助中心内容可见
+            setTimeout(() => {
+                document.getElementById('dashboardContent').style.display = 'none';
+                document.getElementById('helpContent').style.display = 'block';
+                console.log('Forced help content to be visible');
+            }, 100);
             
             // Wait a moment for the sidebar to load, then activate documents
             setTimeout(() => {
@@ -6425,7 +6455,7 @@
 
         // User Authentication and Logout
         // No authentication required - direct access
-        const userName = 'Admin'; // 默认用户名
+        // userName already declared above
 
         // Set avatar
         const userAvatar = document.getElementById('userAvatar');
