@@ -794,15 +794,29 @@
 
         // 初始化
         function init() {
-            // 应用保存的语言设置
-            changeLanguage(currentLang);
-            generateMockData();
-            generateExitedUsers();
-            updateStats();
-            updateTableHeader();
-            renderTable();
-            updateTabCounts();
-            initEventListeners();
+            try {
+                console.log('Initializing admin page...');
+                // 应用保存的语言设置
+                changeLanguage(currentLang);
+                console.log('Language changed');
+                generateMockData();
+                console.log('Mock data generated:', mockData.length, 'items');
+                generateExitedUsers();
+                console.log('Exited users generated');
+                updateStats();
+                console.log('Stats updated');
+                updateTableHeader();
+                console.log('Table header updated');
+                renderTable();
+                console.log('Table rendered');
+                updateTabCounts();
+                console.log('Tab counts updated');
+                initEventListeners();
+                console.log('Event listeners initialized');
+                console.log('Initialization complete');
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
         }
         
         // 生成退出用户测试数据
@@ -874,8 +888,10 @@
 
         // 渲染表格
         function renderTable() {
+            console.log('renderTable() called, currentTab:', currentTab);
             const tbody = document.getElementById('data-table-body');
             const emptyState = document.getElementById('empty-state');
+            console.log('Found tbody:', !!tbody, 'emptyState:', !!emptyState);
             
             // 应用筛选
             filteredData = filterData();
