@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Authorization Management</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -177,12 +174,6 @@
             background: #a8a8a8;
         }
         
-        /* 防止抽屉打开时页面滚动 */
-        body.drawer-open {
-            overflow: hidden;
-            padding-right: 17px; /* 补偿滚动条宽度 */
-        }
-        
         /* 表格样式 */
         .table-container {
             overflow-x: auto;
@@ -208,14 +199,74 @@
     <!-- 侧边栏 -->
     <aside class="sidebar w-64 bg-white shadow-sm fixed md:relative h-full z-40">
         <div class="p-6 border-b border-border">
-            <img src="新logo.png" alt="Logo" class="h-8 max-w-[150px] object-contain">
+            <img src="logo_副本.png" alt="Logo" class="h-8 max-w-[150px] object-contain">
         </div>
         <nav class="p-4">
             <ul class="space-y-2">
                 <li>
-                    <a href="#" id="auth-management-link" class="flex items-center gap-3 px-4 py-3 bg-black text-white rounded-lg" onclick="showMainPage(event)">
+                    <a href="../index.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-home"></i>
+                        <span data-i18n="nav_home">首页</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="auth-management-link" class="flex items-center gap-3 px-4 py-3 bg-black text-white rounded-lg cursor-default">
                         <i class="fa fa-shield"></i>
                         <span data-i18n="auth_management">授权管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../002.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-line-chart"></i>
+                        <span data-i18n="nav_profit">利润分析</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../family-new.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-users"></i>
+                        <span data-i18n="nav_family">家庭管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../001.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-bar-chart"></i>
+                        <span data-i18n="nav_analysis">数据分析</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../organization-new.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-sitemap"></i>
+                        <span data-i18n="nav_organization">组织管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../push-strategy-page.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-bullhorn"></i>
+                        <span data-i18n="nav_push_strategy">推送策略</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../operation-log-page.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-history"></i>
+                        <span data-i18n="nav_operation_log">操作日志</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../message-center.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-bell"></i>
+                        <span data-i18n="nav_message_center">消息中心</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../settings.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-cog"></i>
+                        <span data-i18n="nav_settings">设置</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="help.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fa fa-question-circle"></i>
+                        <span data-i18n="nav_help">帮助中心</span>
                     </a>
                 </li>
             </ul>
@@ -334,12 +385,12 @@
                         <!-- 时间选择 -->
                         <div class="flex items-center gap-3">
                             <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="time_label">时间</label>
-                            <select id="time-filter" class="input-apple flex-1">
-                                <option value="" data-i18n="all_time">所有时间</option>
-                                <option value="today" data-i18n="today">今天</option>
-                                <option value="this_week" data-i18n="this_week">本周</option>
-                                <option value="this_month" data-i18n="this_month">本月</option>
-                            </select>
+                            <div class="relative flex-1">
+                                <input type="date" id="date-filter" class="input-apple input-with-icon w-full" placeholder="YYYY-MM-DD">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                            </div>
                         </div>
                         <!-- 账号输入 -->
                         <div class="flex items-center gap-3">
@@ -598,10 +649,6 @@
                 th_auth_status: 'Auth Status',
                 th_remarks: 'Remarks',
                 th_operations: 'Operations',
-                detail: 'Details',
-                details_title: 'Details',
-                basic_info: 'Basic Information',
-                status_info: 'Status Information',
                 exit_vpp: 'Exit VPP',
                 confirm_exit: 'Confirm Exit',
                 cancel: 'Cancel',
@@ -681,10 +728,6 @@
                 th_status: '状态',
                 th_remarks: '备注',
                 th_operations: '操作',
-                detail: '详情',
-                details_title: '详情',
-                basic_info: '基本信息',
-                status_info: '状态信息',
                 exit_vpp: '退出VPP',
                 confirm_exit: '确认退出',
                 cancel: '取消',
@@ -929,35 +972,29 @@
                             '-'}
                     </td>
                     <td class="px-4 py-3" onclick="event.stopPropagation()">
-                        <div class="flex gap-2 items-center">
-                            <button onclick="showDetailsDrawer(${item.id})" class="inline-flex items-center px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
-                                <i class="fa fa-eye w-3 h-3 mr-1.5"></i>
-                                ${translations[currentLang].detail || 'Details'}
-                            </button>
-                            ${currentTab === 'exited' ? 
-                                `<button onclick="showRestoreModal(${item.id})" class="px-3 py-1 text-xs bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    ${translations[currentLang].restore || '恢复'}
-                                </button>` :
-                                currentTab === 'unauthorized' ?
-                                `<div class="flex gap-2">
-                                    <button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
-                                        <i class="fa fa-check mr-1"></i>
-                                        ${translations[currentLang].detect || '检测'}
-                                    </button>
-                                    <button onclick="showRejectModal(${item.id})" class="px-3 py-1.5 text-xs text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-all duration-200">
-                                        <i class="fa fa-times mr-1"></i>
-                                        ${translations[currentLang].reject || '驳回'}
-                                    </button>
-                                </div>` :
-                                currentTab === 'rejected' ?
-                                `` :
-                                `<button onclick="showExitVPPModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
-                                    <i class="fa fa-sign-out mr-1"></i>
-                                    ${translations[currentLang].exit_vpp}
-                                </button>`
-                            }
-                        </div>
+                        ${currentTab === 'exited' ? 
+                            `<button onclick="showRestoreModal(${item.id})" class="px-3 py-1 text-xs bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
+                                <i class="fa fa-undo mr-1"></i>
+                                ${translations[currentLang].restore || '恢复'}
+                            </button>` :
+                            currentTab === 'unauthorized' ?
+                            `<div class="flex gap-2">
+                                <button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
+                                    <i class="fa fa-check mr-1"></i>
+                                    ${translations[currentLang].detect || '检测'}
+                                </button>
+                                <button onclick="showRejectModal(${item.id})" class="px-3 py-1.5 text-xs text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-all duration-200">
+                                    <i class="fa fa-times mr-1"></i>
+                                    ${translations[currentLang].reject || '驳回'}
+                                </button>
+                            </div>` :
+                            currentTab === 'rejected' ?
+                            `-` :
+                            `<button onclick="showExitVPPModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
+                                <i class="fa fa-sign-out mr-1"></i>
+                                ${translations[currentLang].exit_vpp}
+                            </button>`
+                        }
                     </td>
                 </tr>
             `).join('');
@@ -1204,16 +1241,17 @@
             document.getElementById('meter-input').placeholder = lang === 'zh' ? '输入电表号' : 'Enter NMI';
             document.getElementById('current-lang').textContent = lang === 'zh' ? '中文' : 'English';
             
-            // 更新时间筛选器选项
-            const timeFilter = document.getElementById('time-filter');
-            if (timeFilter) {
-                const options = timeFilter.querySelectorAll('option[data-i18n]');
-                options.forEach(option => {
-                    const key = option.getAttribute('data-i18n');
-                    if (translations[lang][key]) {
-                        option.textContent = translations[lang][key];
-                    }
-                });
+            // 更新日期输入的标签格式
+            const dateInput = document.getElementById('date-filter');
+            if (dateInput) {
+                // 为日期输入添加格式提示
+                if (lang === 'zh') {
+                    dateInput.setAttribute('title', '选择日期');
+                    dateInput.setAttribute('placeholder', 'YYYY-MM-DD');
+                } else {
+                    dateInput.setAttribute('title', 'Select date');
+                    dateInput.setAttribute('placeholder', 'YYYY-MM-DD');
+                }
             }
             
             // 重新生成数据和渲染
@@ -1620,194 +1658,6 @@
         //     });
         // }
         
-        // 显示详情抽屉
-        window.showDetailsDrawer = function(id) {
-            const item = mockData.find(d => d.id === id);
-            if (!item) return;
-            
-            const drawer = document.getElementById('details-drawer');
-            const drawerContent = document.getElementById('drawer-content');
-            const drawerOverlay = document.getElementById('drawer-overlay');
-            const formContent = document.getElementById('drawer-form-content');
-            
-            // 禁用页面滚动
-            document.body.classList.add('drawer-open');
-            
-            // 生成详情内容
-            formContent.innerHTML = generateDetailsContent(item);
-            
-            // 显示抽屉容器
-            drawer.classList.remove('hidden');
-            
-            // 强制重排，然后开始动画
-            drawer.offsetHeight;
-            
-            // 同时显示遮罩和滑入抽屉
-            drawerOverlay.classList.add('opacity-100');
-            drawerOverlay.classList.remove('opacity-0');
-            drawerContent.classList.remove('translate-x-full');
-        }
-        
-        // 关闭详情抽屉
-        window.closeDetailsDrawer = function() {
-            const drawer = document.getElementById('details-drawer');
-            const drawerContent = document.getElementById('drawer-content');
-            const drawerOverlay = document.getElementById('drawer-overlay');
-            
-            // 恢复页面滚动
-            document.body.classList.remove('drawer-open');
-            
-            // 同时隐藏遮罩和滑出抽屉
-            drawerOverlay.classList.add('opacity-0');
-            drawerOverlay.classList.remove('opacity-100');
-            drawerContent.classList.add('translate-x-full');
-            
-            // 等待动画完成后隐藏整个容器
-            setTimeout(() => {
-                drawer.classList.add('hidden');
-            }, 300);
-        }
-        
-        // 生成详情内容
-        function generateDetailsContent(item) {
-            return `
-                <div class="space-y-6">
-                    <!-- 客户信息 -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '客户信息' : 'Customer Information'}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '客户姓名' : 'Customer Name'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.account}</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '手机号码' : 'Phone Number'}</label>
-                                <p class="text-base font-medium text-gray-900">+61 480629013</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '邮箱地址' : 'Email Address'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.account}@example.com</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电表号 (NMI)' : 'NMI'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.meter}</p>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '供电地址' : 'Power Supply Address'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.address}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 设备信息 -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '设备信息' : 'Device Information'}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电池品牌' : 'Battery Brand'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.brand}</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电池账号' : 'Battery Account'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.account}</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '逆变器序列号' : 'Inverter Serial Number'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.sn}</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电池序列号' : 'Battery Serial Number'}</label>
-                                <p class="text-base font-medium text-gray-900">BAT${item.sn.slice(-5)}</p>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电池容量 (Ah)' : 'Battery Capacity (Ah)'}</label>
-                                <p class="text-base font-medium text-gray-900">280 Ah</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 安装商信息 -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '安装商信息' : 'Installer Information'}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '安装商姓名' : 'Installer Name'}</label>
-                                <p class="text-base font-medium text-gray-900">John Smith</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '公司名称' : 'Company Name'}</label>
-                                <p class="text-base font-medium text-gray-900">Solar Solutions Pty Ltd</p>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电工执照号' : 'Electrician License'}</label>
-                                <p class="text-base font-medium text-gray-900">EC643</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 签名信息 -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '签名信息' : 'Signature Information'}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="text-sm text-gray-600 mb-2 block">${currentLang === 'zh' ? '客户签名' : 'Customer Signature'}</label>
-                                <div class="bg-white border border-gray-200 rounded-lg p-4 h-24 flex flex-col items-center justify-center">
-                                    <svg width="120" height="30" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" class="mb-1">
-                                        <path d="M10 20 Q 20 10, 30 20 T 50 20 Q 60 15, 70 20 T 90 20 Q 100 15, 110 20" 
-                                              stroke="#2563eb" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                        <path d="M15 25 Q 25 15, 35 25 T 55 25" 
-                                              stroke="#2563eb" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7"/>
-                                    </svg>
-                                    <p class="text-xs text-gray-500 mt-1">2025/9/7</p>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-2 block">${currentLang === 'zh' ? '安装工签名' : 'Installer Signature'}</label>
-                                <div class="bg-white border border-gray-200 rounded-lg p-4 h-24 flex flex-col items-center justify-center">
-                                    <svg width="120" height="30" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" class="mb-1">
-                                        <path d="M5 15 Q 15 5, 25 15 T 45 15 M 50 10 L 60 20 L 70 10 M 75 15 Q 85 5, 95 15 T 115 15" 
-                                              stroke="#059669" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                        <path d="M8 23 Q 18 13, 28 23 T 48 23" 
-                                              stroke="#059669" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
-                                    </svg>
-                                    <p class="text-xs text-gray-500 mt-1">2025/9/7</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 授权状态 -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '授权状态' : 'Authorization Status'}</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '提交时间' : 'Submit Time'}</label>
-                                <p class="text-base font-medium text-gray-900">${item.submitTime}</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '授权状态' : 'Authorization Status'}</label>
-                                <span class="px-3 py-1 rounded-full text-sm ${
-                                    item.status === 'active' 
-                                        ? 'bg-success/10 text-success' 
-                                        : 'bg-warning/10 text-warning'
-                                }">
-                                    ${item.status === 'active' ? 
-                                        (currentLang === 'zh' ? '已授权' : 'Authorized') : 
-                                        (currentLang === 'zh' ? '未授权' : 'Unauthorized')}
-                                </span>
-                            </div>
-                            ${item.status === 'inactive' && item.remarkType ? 
-                                `<div class="md:col-span-2">
-                                    <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '备注' : 'Remarks'}</label>
-                                    <p class="text-base font-medium text-red-600">${translations[currentLang][item.remarkType]}</p>
-                                </div>` : 
-                                ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
         // 导出函数到全局
         window.switchTab = switchTab;
         window.restoreToVPP = restoreToVPP;
@@ -1815,29 +1665,5 @@
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', init);
     </script>
-
-    <!-- 详情抽屉 -->
-    <div id="details-drawer" class="fixed inset-0 z-50 hidden">
-        <!-- 背景遮罩 -->
-        <div class="fixed inset-0 bg-black/50 transition-opacity opacity-0" id="drawer-overlay" onclick="closeDetailsDrawer()"></div>
-        
-        <!-- 抽屉内容 -->
-        <div class="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out translate-x-full flex flex-col" id="drawer-content">
-            <!-- 抽屉头部 -->
-            <div class="flex items-center justify-between p-6 border-b border-border bg-white flex-shrink-0">
-                <h2 class="text-xl font-semibold" data-i18n="details_title">Details</h2>
-                <button onclick="closeDetailsDrawer()" class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 focus:ring-2 focus:ring-gray-300 focus:ring-offset-1">
-                    <i class="fa fa-times text-lg"></i>
-                </button>
-            </div>
-            
-            <!-- 抽屉内容区 -->
-            <div class="flex-1 overflow-y-auto">
-                <div class="p-6" id="drawer-form-content">
-                    <!-- 详情内容将通过JavaScript动态添加 -->
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
