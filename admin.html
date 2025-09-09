@@ -745,9 +745,8 @@
         // 生成模拟数据
         function generateMockData() {
             const brands = ['ipotisedge', 'FOX ESS', 'weiheng'];
-            const cities = currentLang === 'zh' 
-                ? ['悉尼, 新南威尔士州', '墨尔本, 维多利亚州', '布里斯班, 昆士兰州', '珀斯, 西澳大利亚州'] 
-                : ['Sydney, NSW', 'Melbourne, VIC', 'Brisbane, QLD', 'Perth, WA'];
+            // 强制使用英文城市名称
+            const cities = ['Sydney, NSW', 'Melbourne, VIC', 'Brisbane, QLD', 'Perth, WA'];
             
             mockData = [];
             const today = new Date();
@@ -785,7 +784,7 @@
                     sn: `SN2024${Math.floor(Math.random() * 10000)}`,
                     address: cities[Math.floor(Math.random() * cities.length)],
                     meter: Math.floor(Math.random() * 100000000).toString(),
-                    submitTime: date.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    submitTime: date.toLocaleString('en-US'),
                     status: status,
                     remarkType: remarkType,
                     isExited: false
@@ -830,9 +829,8 @@
         function generateExitedUsers() {
             // 如果localStorage中没有退出用户，添加2条测试数据
             if (exitedUsers.length === 0) {
-                const cities = currentLang === 'zh' 
-                    ? ['悉尼, 新南威尔士州', '墨尔本, 维多利亚州'] 
-                    : ['Sydney, NSW', 'Melbourne, VIC'];
+                // 强制使用英文城市名称
+                const cities = ['Sydney, NSW', 'Melbourne, VIC'];
                 
                 exitedUsers = [
                     {
@@ -842,11 +840,11 @@
                         sn: 'SN2024001',
                         address: cities[0],
                         meter: '12345678',
-                        submitTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                        submitTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US'),
                         status: 'active',
                         remarkType: '',
                         isExited: true,
-                        exitTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US')
+                        exitTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleString('en-US')
                     },
                     {
                         id: 1002,
@@ -855,11 +853,11 @@
                         sn: 'SN2024002',
                         address: cities[1],
                         meter: '87654321',
-                        submitTime: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                        submitTime: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toLocaleString('en-US'),
                         status: 'active',
                         remarkType: '',
                         isExited: true,
-                        exitTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US')
+                        exitTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleString('en-US')
                     }
                 ];
                 localStorage.setItem('exitedVPPUsers', JSON.stringify(exitedUsers));
@@ -1165,7 +1163,7 @@
             const deviceIndex = mockData.findIndex(d => d.id == deviceId);
             if (deviceIndex !== -1) {
                 const exitedDevice = mockData[deviceIndex];
-                exitedDevice.exitTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                exitedDevice.exitTime = new Date().toLocaleString('en-US');
                 
                 // 添加到退出用户列表
                 exitedUsers.push(exitedDevice);
@@ -1515,7 +1513,7 @@
             const deviceIndex = mockData.findIndex(d => d.id === deviceId);
             if (deviceIndex !== -1) {
                 const rejectedDevice = {...mockData[deviceIndex]};
-                rejectedDevice.rejectedTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                rejectedDevice.rejectedTime = new Date().toLocaleString('en-US');
                 rejectedDevice.rejectionReason = reason;
                 rejectedDevice.isRejected = true;
                 
