@@ -32,11 +32,27 @@
             background-size: 50px 50px;
         }
         
+        .bg-cover-image {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            opacity: 0.15;
+            z-index: 1;
+            pointer-events: none;
+            object-fit: contain;
+        }
+        
         .login-container {
             backdrop-filter: blur(20px);
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
         }
         
         .input-group {
@@ -165,6 +181,7 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
+            z-index: 20;
         }
         
         .lang-toggle:hover {
@@ -180,12 +197,18 @@
             width: 80px;
             height: 80px;
             margin: 0 auto 16px;
-            background: #000000;
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         .checkbox-container {
@@ -239,12 +262,27 @@
                 top: 16px;
                 right: 16px;
             }
+            
+            .bg-cover-image {
+                max-width: 100%;
+                opacity: 0.1;
+            }
+        }
+        
+        @media (max-height: 800px) {
+            .bg-cover-image {
+                opacity: 0.08;
+                max-width: 600px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Background Pattern -->
     <div class="bg-pattern"></div>
+    
+    <!-- Cover Image Background -->
+    <img src="封面.jpg" alt="Cover" class="bg-cover-image">
     
     <!-- Language Toggle -->
     <div class="lang-toggle" id="langToggle">
@@ -259,7 +297,7 @@
             <!-- Logo and Branding -->
             <div class="logo-container">
                 <div class="logo">
-                    <i class="fas fa-bolt text-white text-3xl"></i>
+                    <img src="新logo.png" alt="UEH Logo">
                 </div>
                 <h1 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="login_title">UEH Energy Management</h1>
                 <p class="text-gray-600 text-sm" data-i18n="login_subtitle">Welcome back! Please sign in to continue.</p>
