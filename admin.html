@@ -731,8 +731,13 @@
 
         // 当前语言 - 强制默认为英文，忽略localStorage
         let currentLang = 'en';
-        // 清除可能存在的中文语言设置
-        localStorage.removeItem('language');
+        // 立即清除任何语言设置，确保始终使用英文
+        try {
+            localStorage.clear(); // 清除所有localStorage数据
+            console.log('localStorage cleared to ensure English language');
+        } catch (e) {
+            console.log('Cannot clear localStorage:', e);
+        }
 
         // 模拟数据
         let mockData = [];
@@ -798,8 +803,8 @@
         function init() {
             try {
                 console.log('Initializing admin page...');
-                // 应用保存的语言设置
-                changeLanguage(currentLang);
+                // 应用默认语言设置（不保存到localStorage）
+                changeLanguage(currentLang, false);
                 console.log('Language changed');
                 generateMockData();
                 console.log('Mock data generated:', mockData.length, 'items');
@@ -1210,9 +1215,11 @@
 
 
         // 语言切换
-        function changeLanguage(lang) {
+        function changeLanguage(lang, saveToStorage = true) {
             currentLang = lang;
-            localStorage.setItem('language', lang); // 保存到localStorage
+            if (saveToStorage) {
+                localStorage.setItem('language', lang); // 保存到localStorage
+            }
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang][key]) {
