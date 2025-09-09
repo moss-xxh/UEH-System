@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .info { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+        .english { color: green; }
+        .chinese { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Language Debug Page</h1>
+    <div id="debug-info"></div>
+    
+    <script>
+        // 强制清除localStorage
+        try {
+            localStorage.clear();
+            console.log('LocalStorage cleared');
+        } catch (e) {
+            console.log('Cannot clear localStorage:', e);
+        }
+        
+        // 强制设置英文
+        let currentLang = 'en';
+        
+        // 显示调试信息
+        const debugInfo = document.getElementById('debug-info');
+        
+        function addDebugInfo(label, value, isGood = true) {
+            const div = document.createElement('div');
+            div.className = `info ${isGood ? 'english' : 'chinese'}`;
+            div.innerHTML = `<strong>${label}:</strong> ${value}`;
+            debugInfo.appendChild(div);
+        }
+        
+        addDebugInfo('Current Language', currentLang, currentLang === 'en');
+        addDebugInfo('Browser Language', navigator.language, navigator.language.startsWith('en'));
+        addDebugInfo('LocalStorage Language', localStorage.getItem('language') || 'null', !localStorage.getItem('language'));
+        addDebugInfo('Date Format Test', new Date().toLocaleString('en-US'), true);
+        addDebugInfo('Chinese Date Test', new Date().toLocaleString('zh-CN'), false);
+        
+        // 测试翻译
+        const translations = {
+            en: { auth_management: 'Authorization Management' },
+            zh: { auth_management: '授权管理' }
+        };
+        
+        addDebugInfo('Translation Test', translations[currentLang].auth_management, currentLang === 'en');
+        
+        // 显示地址测试
+        const cities = currentLang === 'zh' 
+            ? ['悉尼, 新南威尔士州', '墨尔本, 维多利亚州'] 
+            : ['Sydney, NSW', 'Melbourne, VIC'];
+            
+        addDebugInfo('Address Test', cities[0], currentLang === 'en');
+        
+        // 检查URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        addDebugInfo('URL Lang Parameter', langParam || 'none', !langParam || langParam === 'en');
+        
+        // 检查cookies
+        addDebugInfo('Document Cookies', document.cookie || 'none', true);
+        
+        console.log('Debug page loaded - all values should show English');
+    </script>
+</body>
+</html>
