@@ -729,8 +729,10 @@
             }
         };
 
-        // 当前语言 - 从localStorage读取，默认为英文
-        let currentLang = localStorage.getItem('language') || 'en';
+        // 当前语言 - 强制默认为英文，忽略localStorage
+        let currentLang = 'en';
+        // 清除可能存在的中文语言设置
+        localStorage.removeItem('language');
 
         // 模拟数据
         let mockData = [];
