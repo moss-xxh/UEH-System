@@ -14,39 +14,26 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             position: relative;
             overflow: hidden;
         }
         
-        .bg-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 1px, transparent 1px),
-                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
         
         .bg-cover-image {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
+            width: 50vw;
             height: 100vh;
-            opacity: 0.15;
-            z-index: 1;
+            opacity: 1;
+            z-index: 5;
             pointer-events: none;
             object-fit: cover;
         }
         
         .login-container {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
             position: relative;
@@ -167,23 +154,28 @@
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
         
-        .lang-toggle {
+        .lang-selector {
             position: absolute;
             top: 24px;
             right: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 8px 16px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
             z-index: 20;
         }
         
-        .lang-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            z-index: 10;
+            margin-top: 0.5rem;
+            min-width: 8rem;
+            background: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lang-dropdown.show {
+            display: block;
         }
         
         .logo-container {
@@ -274,22 +266,33 @@
     </style>
 </head>
 <body>
-    <!-- Background Pattern -->
-    <div class="bg-pattern"></div>
     
     <!-- Cover Image Background -->
     <img src="封面.jpg" alt="Cover" class="bg-cover-image">
     
     <!-- Language Toggle -->
-    <div class="lang-toggle" id="langToggle">
-        <i class="fas fa-globe mr-2"></i>
-        <span id="currentLang">English</span>
-        <i class="fas fa-chevron-down ml-2 text-sm"></i>
+    <div class="lang-selector">
+        <button id="lang-toggle-btn" class="flex items-center px-3 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+            <span id="current-lang" class="mr-1">English</span>
+            <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+        <div id="lang-dropdown" class="lang-dropdown">
+            <button class="lang-option w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors" data-lang="zh">
+                中文
+            </button>
+            <button class="lang-option w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors" data-lang="en">
+                English
+            </button>
+        </div>
     </div>
     
+    
     <!-- Main Content -->
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="login-container rounded-2xl p-12 w-full max-w-md fade-in">
+    <div class="flex min-h-screen">
+        <!-- Left side is for image (already positioned) -->
+        <!-- Right side for login -->
+        <div class="w-1/2 ml-auto flex items-center justify-center p-4">
+            <div class="p-12 w-full max-w-md fade-in">
             <!-- Logo and Branding -->
             <div class="logo-container">
                 <div class="logo">
@@ -316,11 +319,6 @@
                     <label for="password" class="sr-only" data-i18n="password_label">Password</label>
                 </div>
                 
-                <div class="checkbox-container">
-                    <div class="custom-checkbox" id="rememberCheckbox"></div>
-                    <label for="remember" class="text-sm text-gray-600 cursor-pointer select-none" data-i18n="remember_me">Remember me</label>
-                    <input type="checkbox" id="remember" class="sr-only">
-                </div>
                 
                 <button type="submit" class="btn-primary">
                     <span class="flex items-center justify-center">
@@ -329,14 +327,7 @@
                     </span>
                 </button>
                 
-                <div class="text-center">
-                    <a href="#" class="text-sm text-gray-600 hover:text-blue-600 transition-colors" id="forgotPassword" data-i18n="forgot_password">Forgot your password?</a>
-                </div>
             </form>
-            
-            <!-- Footer -->
-            <div class="text-center mt-8 text-xs text-gray-500">
-                <p data-i18n="footer_text">© 2024 UEH Energy Management System. All rights reserved.</p>
             </div>
         </div>
     </div>
@@ -385,18 +376,29 @@
             updatePlaceholders();
             
             // Language toggle
-            document.getElementById('langToggle').addEventListener('click', function() {
-                currentLang = currentLang === 'en' ? 'zh' : 'en';
-                changeLanguage(currentLang);
-                updatePlaceholders();
+            document.getElementById('lang-toggle-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdown = document.getElementById('lang-dropdown');
+                dropdown.classList.toggle('show');
             });
             
-            // Custom checkbox
-            document.getElementById('rememberCheckbox').addEventListener('click', function() {
-                const checkbox = document.getElementById('remember');
-                checkbox.checked = !checkbox.checked;
-                this.classList.toggle('checked', checkbox.checked);
+            // Language options
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const selectedLang = this.getAttribute('data-lang');
+                    currentLang = selectedLang;
+                    changeLanguage(currentLang);
+                    updatePlaceholders();
+                    document.getElementById('lang-dropdown').classList.remove('show');
+                });
             });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                document.getElementById('lang-dropdown').classList.remove('show');
+            });
+            
             
             // Password toggle
             document.getElementById('togglePassword').addEventListener('click', function() {
@@ -434,7 +436,7 @@
         
         function changeLanguage(lang) {
             currentLang = lang;
-            document.getElementById('currentLang').textContent = lang === 'en' ? 'English' : '中文';
+            document.getElementById('current-lang').textContent = lang === 'en' ? 'English' : '中文';
             document.title = translations[lang].login_title;
             
             // Update all translatable elements
@@ -451,51 +453,33 @@
         function handleLogin() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
             const loginBtn = document.querySelector('.btn-primary');
             const loginText = document.getElementById('loginText');
             const loadingSpinner = document.getElementById('loadingSpinner');
-            
-            // Basic validation
-            if (!username) {
-                showToast(translations[currentLang].username_required, 'error');
-                return;
-            }
-            
-            if (!password) {
-                showToast(translations[currentLang].password_required, 'error');
-                return;
-            }
             
             // Show loading state
             loginBtn.disabled = true;
             loginText.style.opacity = '0.7';
             loadingSpinner.style.display = 'block';
             
-            // Simulate login process
+            // Direct login without validation
             setTimeout(() => {
-                // Success - no validation needed
                 showToast(translations[currentLang].login_success, 'success');
                 
                 // Save login data
                 const loginData = {
-                    username: username,
-                    loginTime: new Date().toISOString(),
-                    remember: remember
+                    username: username || 'admin',
+                    loginTime: new Date().toISOString()
                 };
                 
-                if (remember) {
-                    localStorage.setItem('loginData', JSON.stringify(loginData));
-                } else {
-                    sessionStorage.setItem('loginData', JSON.stringify(loginData));
-                }
+                sessionStorage.setItem('loginData', JSON.stringify(loginData));
                 
                 // Redirect to admin page
                 setTimeout(() => {
                     window.location.href = 'admin.html';
                 }, 1500);
                 
-            }, 2000);
+            }, 1000);
         }
         
         function showToast(message, type = 'success') {
