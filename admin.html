@@ -794,7 +794,6 @@
 
         // 初始化
         function init() {
-<<<<<<< HEAD
             try {
                 console.log('Initializing admin page...');
                 // 应用保存的语言设置
@@ -818,17 +817,6 @@
             } catch (error) {
                 console.error('Error during initialization:', error);
             }
-=======
-            // 应用保存的语言设置
-            changeLanguage(currentLang);
-            generateMockData();
-            generateExitedUsers();
-            updateStats();
-            updateTableHeader();
-            renderTable();
-            updateTabCounts();
-            initEventListeners();
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
         }
         
         // 生成退出用户测试数据
@@ -900,15 +888,10 @@
 
         // 渲染表格
         function renderTable() {
-<<<<<<< HEAD
             console.log('renderTable() called, currentTab:', currentTab);
             const tbody = document.getElementById('data-table-body');
             const emptyState = document.getElementById('empty-state');
             console.log('Found tbody:', !!tbody, 'emptyState:', !!emptyState);
-=======
-            const tbody = document.getElementById('data-table-body');
-            const emptyState = document.getElementById('empty-state');
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
             
             // 应用筛选
             filteredData = filterData();
@@ -1017,12 +1000,8 @@
             
             
             // 账号筛选
-<<<<<<< HEAD
             const accountInputElement = document.getElementById('account-input');
             const accountTerm = accountInputElement ? accountInputElement.value.toLowerCase() : '';
-=======
-            const accountTerm = document.getElementById('account-input').value.toLowerCase();
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
             if (accountTerm) {
                 data = data.filter(item => 
                     item.account.toLowerCase().includes(accountTerm)
@@ -1038,23 +1017,15 @@
             }
             
             // 品牌筛选
-<<<<<<< HEAD
             const brandFilterElement = document.getElementById('brand-filter');
             const brandFilter = brandFilterElement ? brandFilterElement.value : '';
-=======
-            const brandFilter = document.getElementById('brand-filter').value;
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
             if (brandFilter) {
                 data = data.filter(item => item.brand === brandFilter);
             }
             
             // 电表号筛选
-<<<<<<< HEAD
             const meterInputElement = document.getElementById('meter-input');
             const meterTerm = meterInputElement ? meterInputElement.value.toLowerCase() : '';
-=======
-            const meterTerm = document.getElementById('meter-input').value.toLowerCase();
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
             if (meterTerm) {
                 data = data.filter(item => 
                     item.meter.toLowerCase().includes(meterTerm)
@@ -1062,12 +1033,8 @@
             }
             
             // 时间筛选
-<<<<<<< HEAD
             const dateFilterElement = document.getElementById('date-filter');
             const dateFilter = dateFilterElement ? dateFilterElement.value : '';
-=======
-            const dateFilter = document.getElementById('date-filter').value;
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
             if (dateFilter) {
                 const selectedDate = new Date(dateFilter);
                 data = data.filter(item => {
@@ -1311,12 +1278,8 @@
                 document.getElementById('sn-input').value = '';
                 document.getElementById('meter-input').value = '';
                 document.getElementById('brand-filter').value = '';
-<<<<<<< HEAD
                 const dateFilterElement = document.getElementById('date-filter');
                 if (dateFilterElement) dateFilterElement.value = '';
-=======
-                document.getElementById('date-filter').value = '';
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
                 currentPage = 1;
                 renderTable();
             });
@@ -1343,7 +1306,6 @@
                 renderTable();
             });
             
-<<<<<<< HEAD
             const dateFilterListener = document.getElementById('date-filter');
             if (dateFilterListener) {
                 dateFilterListener.addEventListener('change', function() {
@@ -1351,12 +1313,6 @@
                     renderTable();
                 });
             }
-=======
-            document.getElementById('date-filter').addEventListener('change', function() {
-                currentPage = 1;
-                renderTable();
-            });
->>>>>>> e57bfa5846c4999f6c024d179aecc21c0dbf8bcb
             
             // 分页
             document.getElementById('prev-page').addEventListener('click', function() {
