@@ -182,25 +182,11 @@
             overflow: hidden;
             padding-right: 17px; /* 补偿滚动条宽度 */
         }
-        
+
         /* 表格样式 */
         .table-container {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-        }
-        
-        /* 侧边栏样式 */
-        .sidebar {
-            transition: transform 0.3s ease;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
         }
 
         /* 完全隐藏日期选择器的原生占位符 */
@@ -220,57 +206,46 @@
         }
     </style>
 </head>
-<body class="min-h-screen font-sans text-secondary flex">
-    <!-- 侧边栏 -->
-    <aside class="sidebar w-64 bg-white shadow-sm fixed md:relative h-full z-40">
-        <div class="p-6 border-b border-border">
-            <img src="新logo.png" alt="Logo" class="h-8 max-w-[150px] object-contain">
-        </div>
-        <nav class="p-4">
-            <ul class="space-y-2">
-                <li>
-                    <a href="#" id="auth-management-link" class="flex items-center gap-3 px-4 py-3 bg-black text-white rounded-lg" onclick="showMainPage(event)">
+<body class="min-h-screen font-sans text-secondary">
+    <!-- 头部导航 -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <!-- 左侧：Logo -->
+            <div class="flex items-center gap-6">
+                <img src="新logo.png" alt="Logo" class="h-8 max-w-[150px] object-contain">
+
+                <!-- 导航菜单 -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="#" id="auth-management-link" class="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-black/90 transition-colors" onclick="showMainPage(event)">
                         <i class="fa fa-shield"></i>
                         <span data-i18n="auth_management">授权管理</span>
                     </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+                </nav>
+            </div>
 
-    <!-- 主内容区 -->
-    <div class="flex-1 flex flex-col">
-        <!-- 头部导航 -->
-        <header class="bg-white shadow-sm sticky top-0 z-30">
-            <div class="px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <button id="menu-toggle" class="md:hidden text-secondary">
-                        <i class="fa fa-bars text-xl"></i>
+            <!-- 右侧：语言选择器 -->
+            <div class="flex items-center gap-3">
+                <!-- 语言选择器 -->
+                <div class="lang-selector">
+                    <button id="lang-toggle-btn" class="flex items-center px-3 py-2 rounded-full bg-light hover:bg-gray-200 transition-colors">
+                        <span id="current-lang" class="mr-1">中文</span>
+                        <i class="fa fa-chevron-down text-xs"></i>
                     </button>
-                    <h1 class="text-xl font-semibold" data-i18n="auth_management">授权管理</h1>
-                </div>
-                <div class="flex items-center gap-3">
-                    <!-- 语言选择器 -->
-                    <div class="lang-selector">
-                        <button id="lang-toggle-btn" class="flex items-center px-3 py-2 rounded-full bg-light hover:bg-gray-200 transition-colors">
-                            <span id="current-lang" class="mr-1">中文</span>
-                            <i class="fa fa-chevron-down text-xs"></i>
+                    <div id="lang-dropdown" class="lang-dropdown">
+                        <button class="lang-option w-full text-left px-4 py-3 hover:bg-light transition-colors" data-lang="zh">
+                            中文
                         </button>
-                        <div id="lang-dropdown" class="lang-dropdown">
-                            <button class="lang-option w-full text-left px-4 py-3 hover:bg-light transition-colors" data-lang="zh">
-                                中文
-                            </button>
-                            <button class="lang-option w-full text-left px-4 py-3 hover:bg-light transition-colors" data-lang="en">
-                                English
-                            </button>
-                        </div>
+                        <button class="lang-option w-full text-left px-4 py-3 hover:bg-light transition-colors" data-lang="en">
+                            English
+                        </button>
                     </div>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- 主内容 -->
-        <main class="flex-1 p-6">
+    <!-- 主内容 -->
+    <main class="p-6 w-full">
             <!-- 统计卡片 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- 总用户统计 -->
@@ -414,6 +389,10 @@
                                 <span data-i18n="unauthorized_tab">未授权</span>
                                 <span class="ml-1 text-xs opacity-60" id="unauthorized-count">(0)</span>
                             </button>
+                            <button id="tab-dispatch-failed" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('dispatch-failed')">
+                                <span data-i18n="dispatch_failed_tab">调度失败</span>
+                                <span class="ml-1 text-xs opacity-60" id="dispatch-failed-count">(0)</span>
+                            </button>
                             <button id="tab-exited" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('exited')">
                                 <span data-i18n="exited_tab">已退出</span>
                                 <span class="ml-1 text-xs opacity-60" id="exited-count">(0)</span>
@@ -439,7 +418,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_brand">品牌</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_address">地址</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_meter">电表号</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_submit_time">提交时间</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_submit_time">更新时间</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" id="status-header" data-i18n="th_auth_status">授权状态</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_remarks">备注</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_operations">操作</th>
@@ -470,8 +449,7 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+    </main>
 
     <!-- 详情模态框 -->
     <div id="detail-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
@@ -483,6 +461,21 @@
                 </button>
             </div>
             <div class="p-5 overflow-y-auto max-h-[70vh]" id="detail-content">
+                <!-- 详情内容将通过JavaScript动态添加 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Brand详情模态框 -->
+    <div id="brand-detail-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold" data-i18n="detail_title">授权详情</h3>
+                <button id="close-brand-detail-btn" class="text-tertiary hover:text-secondary transition-colors p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto max-h-[70vh]" id="brand-detail-content">
                 <!-- 详情内容将通过JavaScript动态添加 -->
             </div>
         </div>
@@ -642,6 +635,8 @@
                 auth_list: 'Authorization List',
                 authorized_tab: 'Authorized',
                 unauthorized_tab: 'Unauthorized',
+                dispatch_failed_tab: 'Dispatch Failed',
+                dispatch_failed_status: 'Failed',
                 exited_tab: 'Exited',
                 th_brand: 'Brand',
                 th_account: 'Account',
@@ -649,7 +644,7 @@
                 th_address: 'Address',
                 th_meter: 'NMI',
                 meter_label: 'NMI',
-                th_submit_time: 'Submit Time',
+                th_submit_time: 'Update Time',
                 th_auth_status: 'Auth Status',
                 th_remarks: 'Remarks',
                 th_operations: 'Operations',
@@ -683,6 +678,7 @@
                 detect_success: 'Detection successful, authorized',
                 restore_vpp: 'Restore to VPP',
                 exit_time: 'Exit Time',
+                dispatch_status: 'Dispatch Status',
                 no_exited_users: 'No exited users',
                 restore_success: 'Successfully restored to VPP',
                 restore: 'Restore',
@@ -729,6 +725,8 @@
                 auth_list: '授权列表',
                 authorized_tab: '已授权',
                 unauthorized_tab: '未授权',
+                dispatch_failed_tab: '调度失败',
+                dispatch_failed_status: '失败',
                 exited_tab: '已退出',
                 th_brand: '品牌',
                 th_account: '账号',
@@ -736,7 +734,7 @@
                 th_address: '地址',
                 th_meter: '电表号',
                 meter_label: '电表号',
-                th_submit_time: '提交时间',
+                th_submit_time: '更新时间',
                 th_status: '状态',
                 th_remarks: '备注',
                 th_operations: '操作',
@@ -770,6 +768,7 @@
                 detect_success: '检测成功，已授权',
                 restore_vpp: '恢复到VPP',
                 exit_time: '退出时间',
+                dispatch_status: '调度状态',
                 no_exited_users: '暂无退出用户',
                 restore_success: '成功恢复到VPP计划',
                 restore: '恢复',
@@ -836,6 +835,7 @@
                     status: 'active',
                     remarkType: '',
                     isExited: false,
+                    dispatchFailed: false,
                     checkCode: selectedBrand === 'Alpha' ? `CHK${Math.floor(Math.random() * 100000)}` : '',
                     apiKey: selectedBrand === 'FOX ESS' ? `KEY${Math.random().toString(36).substring(2, 15)}` : ''
                 });
@@ -863,11 +863,36 @@
                         status: 'inactive',
                         remarkType: remarkType,
                         isExited: false,
+                        dispatchFailed: false,
                         checkCode: brand === 'Alpha' ? `CHK${Math.floor(Math.random() * 100000)}` : '',
                         apiKey: brand === 'FOX ESS' ? `KEY${Math.random().toString(36).substring(2, 15)}` : ''
                     });
                 }
             });
+
+            // 生成5条调度失败数据
+            let dispatchFailedId = 50;
+            for (let i = 0; i < 5; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - Math.floor(Math.random() * 10 + 1));
+
+                const selectedBrand = brands[Math.floor(Math.random() * brands.length)];
+                mockData.push({
+                    id: dispatchFailedId++,
+                    brand: selectedBrand,
+                    account: `user${1000 + dispatchFailedId}`,
+                    sn: `SN2024${Math.floor(Math.random() * 10000)}`,
+                    address: cities[Math.floor(Math.random() * cities.length)],
+                    meter: Math.floor(Math.random() * 100000000).toString(),
+                    submitTime: date.toLocaleString('en-US'),
+                    status: 'inactive',
+                    remarkType: 'dispatch_failed',
+                    isExited: false,
+                    dispatchFailed: true,
+                    checkCode: selectedBrand === 'Alpha' ? `CHK${Math.floor(Math.random() * 100000)}` : '',
+                    apiKey: selectedBrand === 'FOX ESS' ? `KEY${Math.random().toString(36).substring(2, 15)}` : ''
+                });
+            }
         }
 
 
@@ -1003,13 +1028,25 @@
                     </td>
                     <td class="px-4 py-3 text-sm font-medium">${item.account}</td>
                     <td class="px-4 py-3 text-sm">${item.sn}</td>
-                    <td class="px-4 py-3 text-sm">${item.brand}</td>
+                    <td class="px-4 py-3 text-sm" onclick="event.stopPropagation()">
+                        ${item.brand.toLowerCase().includes('ipo') || item.brand.toLowerCase().includes('alpha') ?
+                            `<span class="text-blue-600 hover:text-blue-800 cursor-pointer inline-flex items-center gap-1" onclick="viewBrandDetail(${item.id})">
+                                <span>${item.brand}</span>
+                                <i class="fa fa-info-circle"></i>
+                            </span>` :
+                            item.brand
+                        }
+                    </td>
                     <td class="px-4 py-3 text-sm">${item.address}</td>
                     <td class="px-4 py-3 text-sm">${item.meter}</td>
                     <td class="px-4 py-3 text-sm">${item.submitTime}</td>
                     <td class="px-4 py-3">
                         ${currentTab === 'exited' ?
                             `<span class="text-sm">${item.exitTime || '-'}</span>` :
+                            currentTab === 'dispatch-failed' ?
+                            `<span class="px-2 py-1 text-xs rounded-full bg-danger/10 text-danger">
+                                ${translations[currentLang].dispatch_failed_status || '失败'}
+                            </span>` :
                             `<span class="px-2 py-1 text-xs rounded-full ${
                                 item.status === 'active'
                                     ? 'bg-success/10 text-success'
@@ -1026,7 +1063,7 @@
                             `<span class="text-danger">${translations[currentLang][item.remarkType]}</span>` :
                             '-'}
                     </td>
-                    ${currentTab === 'unauthorized' ? `
+                    ${currentTab === 'unauthorized' || currentTab === 'dispatch-failed' ? `
                     <td class="px-4 py-3 text-sm" onclick="event.stopPropagation()">
                         ${item.brand === 'ipotisedge' ?
                             `<button onclick="showGuidanceModal()" class="text-blue-600 hover:text-blue-800 underline">
@@ -1041,11 +1078,19 @@
                             <button onclick="showDetailsDrawer(${item.id})" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                 <i class="fa fa-edit"></i>
                             </button>
+                            <button onclick="viewDetail(${item.id})" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-gray-600 text-white rounded-lg shadow-sm hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition-all duration-200">
+                                <i class="fa fa-eye"></i>
+                            </button>
                             ` : ''}
                             ${currentTab === 'exited' ?
                                 `<button onclick="showRestoreModal(${item.id})" class="px-3 py-1 text-xs bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
                                     <i class="fa fa-undo mr-1"></i>
                                     ${translations[currentLang].restore || '恢复'}
+                                </button>` :
+                                currentTab === 'dispatch-failed' ?
+                                `<button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-check mr-1"></i>' : ''}
+                                    ${translations[currentLang].detect || '检测'}
                                 </button>` :
                                 currentTab === 'unauthorized' ?
                                 `<button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
@@ -1075,9 +1120,11 @@
             let data;
 
             if (currentTab === 'authorized') {
-                data = [...mockData.filter(item => item.status === 'active' && !item.isExited)];
+                data = [...mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed)];
             } else if (currentTab === 'unauthorized') {
-                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited)];
+                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed)];
+            } else if (currentTab === 'dispatch-failed') {
+                data = [...mockData.filter(item => item.dispatchFailed && !item.isExited)];
             } else if (currentTab === 'exited') {
                 data = [...exitedUsers];
             } else {
@@ -1233,7 +1280,76 @@
 
             modal.classList.remove('hidden');
         }
-        
+
+        // 查看Brand详情
+        window.viewBrandDetail = function(id) {
+            const item = mockData.find(d => d.id === id);
+            if (!item) return;
+
+            const modal = document.getElementById('brand-detail-modal');
+            const content = document.getElementById('brand-detail-content');
+
+            // 根据品牌显示不同内容
+            let contentHtml = '';
+
+            if (item.brand.toLowerCase().includes('ipo')) {
+                // ipotisedge品牌
+                contentHtml = `
+                    <div class="space-y-6">
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-base">1. <span data-i18n="guidance_step1">Open Solar Touch(System) and log in</span></h4>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <p class="text-sm">
+                                    <a href="https://service.cloudinverter.net/#/user/login" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                        https://service.cloudinverter.net/#/user/login
+                                    </a>
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Account:</span>
+                                        <span class="font-medium ml-2">VPPAdmin</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Password:</span>
+                                        <span class="font-medium ml-2">VPPAdmin</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.brand.toLowerCase().includes('alpha')) {
+                // Alpha品牌
+                contentHtml = `
+                    <div class="space-y-6">
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-base">1. Open Alpha ESS and log in</h4>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <p class="text-sm">
+                                    <a href="https://apicloud.alphaess.com" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                        https://apicloud.alphaess.com
+                                    </a>
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Account:</span>
+                                        <span class="font-medium ml-2">ems@unitedenergyhub.com.au</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Password:</span>
+                                        <span class="font-medium ml-2">123456789</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = contentHtml;
+            modal.classList.remove('hidden');
+        }
+
         // 显示退出VPP模态框
         window.showExitVPPModal = function(id) {
             document.getElementById('exit-vpp-device-id').value = id;
@@ -1846,13 +1962,24 @@
             document.getElementById('close-detail-btn').addEventListener('click', function() {
                 document.getElementById('detail-modal').classList.add('hidden');
             });
-            
+
             document.getElementById('detail-modal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     this.classList.add('hidden');
                 }
             });
-            
+
+            // 关闭Brand详情模态框
+            document.getElementById('close-brand-detail-btn').addEventListener('click', function() {
+                document.getElementById('brand-detail-modal').classList.add('hidden');
+            });
+
+            document.getElementById('brand-detail-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+
             // 退出VPP模态框点击外部关闭
             document.getElementById('exit-vpp-modal').addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -1879,11 +2006,6 @@
                 if (e.target === this) {
                     closeGuidanceModal();
                 }
-            });
-
-            // 移动端菜单切换
-            document.getElementById('menu-toggle').addEventListener('click', function() {
-                document.querySelector('.sidebar').classList.toggle('show');
             });
         }
 
@@ -1939,6 +2061,8 @@
             if (statusHeader) {
                 if (currentTab === 'exited') {
                     statusHeader.textContent = translations[currentLang].exit_time || '退出时间';
+                } else if (currentTab === 'dispatch-failed') {
+                    statusHeader.textContent = translations[currentLang].dispatch_status || '调度状态';
                 } else {
                     statusHeader.textContent = translations[currentLang].th_auth_status || '授权状态';
                 }
@@ -1948,7 +2072,7 @@
             const tableHead = document.querySelector('thead tr');
             const existingGuidanceHeader = document.getElementById('guidance-header');
 
-            if (currentTab === 'unauthorized') {
+            if (currentTab === 'unauthorized' || currentTab === 'dispatch-failed') {
                 // 添加指引列（如果不存在）
                 if (!existingGuidanceHeader) {
                     const guidanceHeader = document.createElement('th');
@@ -1970,8 +2094,9 @@
         
         // 更新Tab计数
         function updateTabCounts() {
-            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited).length;
-            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited).length;
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed).length;
+            const dispatchFailedCount = mockData.filter(item => item.dispatchFailed && !item.isExited).length;
             const exitedCount = exitedUsers.length;
 
             if (document.getElementById('authorized-count')) {
@@ -1979,6 +2104,9 @@
             }
             if (document.getElementById('unauthorized-count')) {
                 document.getElementById('unauthorized-count').textContent = `(${unauthorizedCount})`;
+            }
+            if (document.getElementById('dispatch-failed-count')) {
+                document.getElementById('dispatch-failed-count').textContent = `(${dispatchFailedCount})`;
             }
             if (document.getElementById('exited-count')) {
                 document.getElementById('exited-count').textContent = `(${exitedCount})`;
