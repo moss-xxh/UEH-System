@@ -389,13 +389,17 @@
                                 <span data-i18n="unauthorized_tab">未授权</span>
                                 <span class="ml-1 text-xs opacity-60" id="unauthorized-count">(0)</span>
                             </button>
-                            <button id="tab-dispatch-failed" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('dispatch-failed')">
-                                <span data-i18n="dispatch_failed_tab">调度失败</span>
-                                <span class="ml-1 text-xs opacity-60" id="dispatch-failed-count">(0)</span>
+                            <button id="tab-rejected" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('rejected')">
+                                <span data-i18n="rejected_tab">已驳回</span>
+                                <span class="ml-1 text-xs opacity-60" id="rejected-count">(0)</span>
                             </button>
                             <button id="tab-exited" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('exited')">
                                 <span data-i18n="exited_tab">已退出</span>
                                 <span class="ml-1 text-xs opacity-60" id="exited-count">(0)</span>
+                            </button>
+                            <button id="tab-dispatch-failed" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('dispatch-failed')">
+                                <span data-i18n="dispatch_failed_tab">授权失败</span>
+                                <span class="ml-1 text-xs opacity-60" id="dispatch-failed-count">(0)</span>
                             </button>
                         </div>
                         <div class="flex gap-2">
@@ -533,6 +537,32 @@
         </div>
     </div>
 
+    <!-- 驳回模态框 -->
+    <div id="reject-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-times-circle text-danger mr-2"></i>
+                    <span data-i18n="reject_title">驳回申请</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-700 mb-3" data-i18n="reject_message">请输入驳回原因（选填）：</p>
+                <textarea id="reject-reason" rows="4" class="w-full px-4 py-3 bg-light border border-border rounded-lg resize-none focus:ring-1 focus:ring-black focus:border-black focus:outline-none transition-all" placeholder="请输入驳回原因..."></textarea>
+                <input type="hidden" id="reject-device-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeRejectModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmReject()" class="px-4 py-2 rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors">
+                    <i class="fa fa-times mr-2"></i>
+                    <span data-i18n="confirm_reject">确认驳回</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 恢复VPP计划模态框 -->
     <div id="restore-vpp-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
         <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
@@ -637,6 +667,14 @@
                 unauthorized_tab: 'Unauthorized',
                 dispatch_failed_tab: 'Dispatch Failed',
                 dispatch_failed_status: 'Failed',
+                rejected_tab: 'Rejected',
+                reject_title: 'Reject Application',
+                reject_message: 'Please enter rejection reason (optional):',
+                confirm_reject: 'Confirm Reject',
+                reject: 'Reject',
+                reject_success: 'Successfully rejected',
+                rejection_reason: 'Rejection Reason',
+                rejected_time: 'Rejected Time',
                 exited_tab: 'Exited',
                 th_brand: 'Brand',
                 th_account: 'Account',
@@ -686,6 +724,8 @@
                 restore_vpp_message: 'Are you sure you want to restore this user to VPP plan?',
                 restore_vpp_warning: 'The user will rejoin the VPP plan after restoration.',
                 confirm_restore: 'Confirm Restore',
+                restore_to_unauthorized: 'Restore to Unauthorized',
+                restore_to_unauthorized_success: 'Successfully restored to unauthorized',
                 save: 'Save',
                 delete: 'Delete',
                 delete_confirm_title: 'Confirm Delete',
@@ -725,8 +765,16 @@
                 auth_list: '授权列表',
                 authorized_tab: '已授权',
                 unauthorized_tab: '未授权',
-                dispatch_failed_tab: '调度失败',
+                dispatch_failed_tab: '授权失败',
                 dispatch_failed_status: '失败',
+                rejected_tab: '已驳回',
+                reject_title: '驳回申请',
+                reject_message: '请输入驳回原因（选填）：',
+                confirm_reject: '确认驳回',
+                reject: '驳回',
+                reject_success: '已成功驳回',
+                rejection_reason: '驳回原因',
+                rejected_time: '驳回时间',
                 exited_tab: '已退出',
                 th_brand: '品牌',
                 th_account: '账号',
@@ -776,6 +824,8 @@
                 restore_vpp_message: '您确定要将此用户恢复到VPP计划吗？',
                 restore_vpp_warning: '恢复后用户将重新加入VPP计划。',
                 confirm_restore: '确认恢复',
+                restore_to_unauthorized: '恢复到未授权',
+                restore_to_unauthorized_success: '已成功恢复到未授权',
                 save: '保存',
                 delete: '删除',
                 delete_confirm_title: '确认删除',
@@ -791,15 +841,8 @@
             }
         };
 
-        // 当前语言 - 强制默认为英文，忽略localStorage
-        let currentLang = 'en';
-        // 立即清除任何语言设置，确保始终使用英文
-        try {
-            localStorage.clear(); // 清除所有localStorage数据
-            console.log('localStorage cleared to ensure English language');
-        } catch (e) {
-            console.log('Cannot clear localStorage:', e);
-        }
+        // 当前语言 - 从localStorage读取，默认为英文
+        let currentLang = localStorage.getItem('language') || 'en';
 
         // 模拟数据
         let mockData = [];
@@ -972,13 +1015,13 @@
 
         // 更新统计数据
         function updateStats() {
-            // 总用户数（不包括已退出的）
-            const totalUsers = mockData.filter(item => !item.isExited).length;
+            // 总用户数（不包括已退出和已驳回的）
+            const totalUsers = mockData.filter(item => !item.isExited && !item.isRejected).length;
             document.getElementById('total-users').textContent = totalUsers;
 
-            // 已授权和未授权统计（不包括已退出的）
-            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited).length;
-            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited).length;
+            // 已授权和未授权统计（不包括已退出和已驳回的）
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected).length;
 
             document.getElementById('total-authorized').textContent = authorizedCount;
             document.getElementById('total-unauthorized').textContent = unauthorizedCount;
@@ -986,12 +1029,12 @@
             // 今日数据统计
             const today = new Date().toDateString();
             const todayData = mockData.filter(item => {
-                return new Date(item.submitTime).toDateString() === today && !item.isExited;
+                return new Date(item.submitTime).toDateString() === today && !item.isExited && !item.isRejected;
             });
-            
+
             const todayAuthorized = todayData.filter(item => item.status === 'active').length;
             const todayUnauthorized = todayData.filter(item => item.status === 'inactive').length;
-            
+
             document.getElementById('today-total').textContent = todayData.length;
             document.getElementById('today-authorized').textContent = todayAuthorized;
             document.getElementById('today-unauthorized').textContent = todayUnauthorized;
@@ -1043,6 +1086,8 @@
                     <td class="px-4 py-3">
                         ${currentTab === 'exited' ?
                             `<span class="text-sm">${item.exitTime || '-'}</span>` :
+                            currentTab === 'rejected' ?
+                            `<span class="text-sm">${item.rejectedTime || '-'}</span>` :
                             currentTab === 'dispatch-failed' ?
                             `<span class="px-2 py-1 text-xs rounded-full bg-danger/10 text-danger">
                                 ${translations[currentLang].dispatch_failed_status || '失败'}
@@ -1057,7 +1102,9 @@
                         }
                     </td>
                     <td class="px-4 py-3 text-sm">
-                        ${currentTab === 'unauthorized' && !item.hasDetected ?
+                        ${currentTab === 'rejected' ?
+                            (item.rejectionReason ? `<span class="text-sm">${item.rejectionReason}</span>` : '-') :
+                            currentTab === 'unauthorized' && !item.hasDetected ?
                             '-' :
                             item.status === 'inactive' && item.remarkType && item.hasDetected ?
                             `<span class="text-danger">${translations[currentLang][item.remarkType]}</span>` :
@@ -1074,15 +1121,26 @@
                     ` : ''}
                     <td class="px-4 py-3" onclick="event.stopPropagation()">
                         <div class="flex gap-2 items-center">
-                            ${currentTab !== 'exited' ? `
+                            ${currentTab !== 'exited' && currentTab !== 'rejected' ? `
                             <button onclick="showDetailsDrawer(${item.id})" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                 <i class="fa fa-edit"></i>
                             </button>
+                            ` : ''}
+                            ${currentTab !== 'exited' ? `
                             <button onclick="viewDetail(${item.id})" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-gray-600 text-white rounded-lg shadow-sm hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition-all duration-200">
                                 <i class="fa fa-eye"></i>
                             </button>
                             ` : ''}
-                            ${currentTab === 'exited' ?
+                            ${currentTab === 'rejected' ?
+                                `<button onclick="restoreToUnauthorized(${item.id})" class="px-3 py-1.5 text-xs bg-warning text-white rounded-lg hover:bg-warning/90 transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-undo mr-1"></i>' : ''}
+                                    ${translations[currentLang].restore_to_unauthorized || '恢复到未授权'}
+                                </button>
+                                <button onclick="showDeleteModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-trash mr-1"></i>' : ''}
+                                    ${translations[currentLang].delete || '删除'}
+                                </button>` :
+                                currentTab === 'exited' ?
                                 `<button onclick="showRestoreModal(${item.id})" class="px-3 py-1 text-xs bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
                                     <i class="fa fa-undo mr-1"></i>
                                     ${translations[currentLang].restore || '恢复'}
@@ -1097,9 +1155,9 @@
                                     ${currentLang === 'zh' ? '<i class="fa fa-check mr-1"></i>' : ''}
                                     ${translations[currentLang].detect || '检测'}
                                 </button>
-                                <button onclick="showDeleteModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
-                                    ${currentLang === 'zh' ? '<i class="fa fa-trash mr-1"></i>' : ''}
-                                    ${translations[currentLang].delete || '删除'}
+                                <button onclick="showRejectModal(${item.id})" class="px-3 py-1 text-xs text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-times mr-1"></i>' : ''}
+                                    ${translations[currentLang].reject || '驳回'}
                                 </button>` :
                                 `<button onclick="showExitVPPModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
                                     <i class="fa fa-sign-out mr-1"></i>
@@ -1120,15 +1178,17 @@
             let data;
 
             if (currentTab === 'authorized') {
-                data = [...mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed)];
+                data = [...mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed && !item.isRejected)];
             } else if (currentTab === 'unauthorized') {
-                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed)];
+                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed && !item.isRejected)];
             } else if (currentTab === 'dispatch-failed') {
-                data = [...mockData.filter(item => item.dispatchFailed && !item.isExited)];
+                data = [...mockData.filter(item => item.dispatchFailed && !item.isExited && !item.isRejected)];
+            } else if (currentTab === 'rejected') {
+                data = [...rejectedUsers];
             } else if (currentTab === 'exited') {
                 data = [...exitedUsers];
             } else {
-                data = [...mockData.filter(item => !item.isExited)];
+                data = [...mockData.filter(item => !item.isExited && !item.isRejected)];
             }
             
             
@@ -1199,9 +1259,20 @@
             document.getElementById('next-page').disabled = currentPage >= totalPages;
         }
 
+        // 辅助函数：根据当前tab从正确的数组中查找数据
+        function findItemById(id) {
+            if (currentTab === 'rejected') {
+                return rejectedUsers.find(d => d.id === id);
+            } else if (currentTab === 'exited') {
+                return exitedUsers.find(d => d.id === id);
+            } else {
+                return mockData.find(d => d.id === id);
+            }
+        }
+
         // 查看详情
         window.viewDetail = function(id) {
-            const item = mockData.find(d => d.id === id);
+            const item = findItemById(id);
             if (!item) return;
 
             const modal = document.getElementById('detail-modal');
@@ -1361,7 +1432,50 @@
             document.getElementById('exit-vpp-modal').classList.add('hidden');
             document.getElementById('exit-vpp-device-id').value = '';
         }
-        
+
+        // 显示驳回模态框
+        window.showRejectModal = function(id) {
+            document.getElementById('reject-device-id').value = id;
+            document.getElementById('reject-modal').classList.remove('hidden');
+        }
+
+        // 关闭驳回模态框
+        window.closeRejectModal = function() {
+            document.getElementById('reject-modal').classList.add('hidden');
+            document.getElementById('reject-device-id').value = '';
+            document.getElementById('reject-reason').value = '';
+        }
+
+        // 确认驳回
+        window.confirmReject = function() {
+            const deviceId = parseInt(document.getElementById('reject-device-id').value);
+            const reason = document.getElementById('reject-reason').value.trim();
+
+            if (!deviceId) return;
+
+            // 查找要驳回的设备
+            const deviceIndex = mockData.findIndex(d => d.id === deviceId);
+            if (deviceIndex !== -1) {
+                const rejectedDevice = {...mockData[deviceIndex]};
+                rejectedDevice.rejectedTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                rejectedDevice.rejectionReason = reason;
+                rejectedDevice.isRejected = true;
+
+                // 添加到驳回用户列表
+                rejectedUsers.push(rejectedDevice);
+                localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                // 标记为已驳回
+                mockData[deviceIndex].isRejected = true;
+
+                showSuccessToast(translations[currentLang].reject_success || '已成功驳回', 'error');
+            }
+
+            closeRejectModal();
+            renderTable();
+            updateStats();
+        }
+
         // 显示恢复模态框
         window.showRestoreModal = function(id) {
             document.getElementById('restore-vpp-device-id').value = id;
@@ -1398,6 +1512,21 @@
             const deviceId = parseInt(document.getElementById('delete-device-id').value);
             if (!deviceId) return;
 
+            // 如果是已驳回的数据，从rejectedUsers中删除
+            if (currentTab === 'rejected') {
+                const rejectedIndex = rejectedUsers.findIndex(item => item.id === deviceId);
+                if (rejectedIndex !== -1) {
+                    rejectedUsers.splice(rejectedIndex, 1);
+                    localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                    closeDeleteModal();
+                    showSuccessToast(translations[currentLang].delete_success || '删除成功');
+                    renderTable();
+                    updateStats();
+                }
+                return;
+            }
+
             // 从mockData中删除该记录
             const itemIndex = mockData.findIndex(item => item.id === deviceId);
             if (itemIndex !== -1) {
@@ -1427,7 +1556,46 @@
 
         // 存储退出的用户
         let exitedUsers = JSON.parse(localStorage.getItem('exitedVPPUsers') || '[]');
-        
+        // 存储驳回的用户
+        let rejectedUsers = JSON.parse(localStorage.getItem('rejectedUsers') || '[]');
+
+        // 初始化2条驳回测试数据（如果还没有数据）
+        if (rejectedUsers.length === 0) {
+            const now = new Date();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            rejectedUsers = [
+                {
+                    id: 2001,
+                    brand: 'Sungrow',
+                    account: 'rejected_user1@example.com',
+                    sn: 'SG-REJ-001',
+                    address: '123 Rejected St, Sydney, NSW',
+                    meter: 'NMI-REJ-001',
+                    submitTime: yesterday.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    status: 'inactive',
+                    isRejected: true,
+                    rejectedTime: yesterday.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    rejectionReason: '账号信息不完整，无法验证'
+                },
+                {
+                    id: 2002,
+                    brand: 'Growatt',
+                    account: 'rejected_user2@example.com',
+                    sn: 'GW-REJ-002',
+                    address: '456 Rejected Ave, Melbourne, VIC',
+                    meter: 'NMI-REJ-002',
+                    submitTime: now.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    status: 'inactive',
+                    isRejected: true,
+                    rejectedTime: now.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    rejectionReason: '设备序列号与注册信息不匹配'
+                }
+            ];
+            localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+        }
+
         // 确认退出VPP
         window.confirmExitVPP = function() {
             const deviceId = document.getElementById('exit-vpp-device-id').value;
@@ -2001,6 +2169,13 @@
                 }
             });
 
+            // 驳回模态框点击外部关闭
+            document.getElementById('reject-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRejectModal();
+                }
+            });
+
             // 指引模态框点击外部关闭
             document.getElementById('guidance-modal').addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -2061,6 +2236,8 @@
             if (statusHeader) {
                 if (currentTab === 'exited') {
                     statusHeader.textContent = translations[currentLang].exit_time || '退出时间';
+                } else if (currentTab === 'rejected') {
+                    statusHeader.textContent = translations[currentLang].rejected_time || '驳回时间';
                 } else if (currentTab === 'dispatch-failed') {
                     statusHeader.textContent = translations[currentLang].dispatch_status || '调度状态';
                 } else {
@@ -2094,9 +2271,10 @@
         
         // 更新Tab计数
         function updateTabCounts() {
-            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed).length;
-            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed).length;
-            const dispatchFailedCount = mockData.filter(item => item.dispatchFailed && !item.isExited).length;
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed && !item.isRejected).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed && !item.isRejected).length;
+            const dispatchFailedCount = mockData.filter(item => item.dispatchFailed && !item.isExited && !item.isRejected).length;
+            const rejectedCount = rejectedUsers.length;
             const exitedCount = exitedUsers.length;
 
             if (document.getElementById('authorized-count')) {
@@ -2107,6 +2285,9 @@
             }
             if (document.getElementById('dispatch-failed-count')) {
                 document.getElementById('dispatch-failed-count').textContent = `(${dispatchFailedCount})`;
+            }
+            if (document.getElementById('rejected-count')) {
+                document.getElementById('rejected-count').textContent = `(${rejectedCount})`;
             }
             if (document.getElementById('exited-count')) {
                 document.getElementById('exited-count').textContent = `(${exitedCount})`;
@@ -2144,8 +2325,32 @@
             if (!isFromBatch) {
                 showSuccessToast(currentLang === 'zh' ? '正在检测中...' : 'Detecting...', 'black');
             }
-            
+
             setTimeout(() => {
+                // 如果是已驳回的数据，从rejectedUsers中查找
+                if (currentTab === 'rejected') {
+                    const rejectedIndex = rejectedUsers.findIndex(d => d.id === id);
+                    if (rejectedIndex !== -1) {
+                        // 从已驳回列表移除
+                        const restoredItem = rejectedUsers.splice(rejectedIndex, 1)[0];
+                        // 恢复到mockData，并更新为已授权状态
+                        restoredItem.status = 'active';
+                        restoredItem.isRejected = false;
+                        delete restoredItem.rejectedTime;
+                        delete restoredItem.rejectionReason;
+                        mockData.push(restoredItem);
+                        // 更新localStorage
+                        localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                        if (!isFromBatch) {
+                            showSuccessToast(translations[currentLang].detect_success || '检测成功，已授权');
+                            updateStats();
+                            renderTable();
+                        }
+                    }
+                    return;
+                }
+
                 // 查找设备
                 const deviceIndex = mockData.findIndex(d => d.id === id);
                 if (deviceIndex !== -1) {
@@ -2179,7 +2384,33 @@
                 }
             }, isFromBatch ? 500 : 1500); // 批量检测时更快
         }
-        
+
+        // 恢复到未授权
+        window.restoreToUnauthorized = function(id) {
+            showSuccessToast(currentLang === 'zh' ? '正在恢复...' : 'Restoring...', 'black');
+
+            setTimeout(() => {
+                const rejectedIndex = rejectedUsers.findIndex(d => d.id === id);
+                if (rejectedIndex !== -1) {
+                    // 从已驳回列表移除
+                    const restoredItem = rejectedUsers.splice(rejectedIndex, 1)[0];
+                    // 恢复到mockData，并更新为未授权状态
+                    restoredItem.status = 'inactive';
+                    restoredItem.isRejected = false;
+                    delete restoredItem.rejectedTime;
+                    delete restoredItem.rejectionReason;
+                    mockData.push(restoredItem);
+                    // 更新localStorage
+                    localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                    showSuccessToast(translations[currentLang].restore_to_unauthorized_success || '已成功恢复到未授权');
+                    updateStats();
+                    renderTable();
+                    updateTabCounts();
+                }
+            }, 1000);
+        }
+
         // 批量检测 - 已移除
         // window.performBatchDetection = function() {
         //     // 根据当前tab选择不同的项目
@@ -2261,7 +2492,7 @@
 
         // 显示详情抽屉
         window.showDetailsDrawer = function(id) {
-            const item = mockData.find(d => d.id === id);
+            const item = findItemById(id);
             if (!item) return;
 
             // 保存当前编辑的ID
