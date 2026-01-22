@@ -1,0 +1,3480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Authorization Management</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Tailwind 配置 - 苹果风格 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0071e3',
+                        secondary: '#1d1d1f',
+                        tertiary: '#86868b',
+                        light: '#f5f5f7',
+                        success: '#34c759',
+                        warning: '#ff9500',
+                        danger: '#ff3b30',
+                        border: '#d2d2d7',
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'apple': '0 2px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)',
+                        'apple-hover': '0 5px 15px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05)',
+                    }
+                },
+            }
+        }
+    </script>
+
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .input-focus {
+                @apply focus:ring-1 focus:ring-primary focus:border-primary focus:outline-none transition-all duration-200;
+            }
+            .btn-apple {
+                @apply bg-primary text-white font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-primary/90 active:bg-primary/80;
+            }
+            .btn-outline {
+                @apply border border-primary text-primary font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-primary/5 active:bg-primary/10;
+            }
+            .btn-outline-black {
+                @apply border border-black text-black font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-black/5 active:bg-black/10;
+            }
+            .btn-black {
+                @apply bg-black text-white font-medium py-2.5 px-4 rounded-full shadow-sm transition-all duration-200 hover:bg-black/90 active:bg-black/80;
+            }
+            .input-apple {
+                @apply w-full px-4 py-3 bg-light border border-border rounded-lg transition-all duration-200;
+                &:focus {
+                    @apply ring-1 ring-black border-black text-black outline-none;
+                }
+            }
+            .input-with-icon {
+                @apply pl-12;
+            }
+            .label-apple {
+                @apply block text-sm font-medium text-secondary mb-2;
+            }
+            .card-apple {
+                @apply bg-white/90 backdrop-blur-sm rounded-xl shadow-apple overflow-hidden transition-all duration-300 hover:shadow-apple-hover;
+            }
+        }
+    </style>
+
+    <style>
+        /* 全局样式 */
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f5f5f7 100%);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 背景装饰 */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(50px);
+            opacity: 0.15;
+        }
+        
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: #0071e3;
+            top: -250px;
+            right: -250px;
+        }
+        
+        body::after {
+            width: 600px;
+            height: 600px;
+            background: #34c759;
+            bottom: -300px;
+            left: -300px;
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 按钮按下效果 */
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        /* 语言选择器样式 */
+        .lang-selector {
+            position: relative;
+        }
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            z-index: 10;
+            margin-top: 0.5rem;
+            min-width: 8rem;
+            background: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        
+        /* 状态消息动画 */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .status-message {
+            animation: fadeSlideIn 0.3s ease-out;
+        }
+        
+        /* 滚动条样式 - 苹果风格 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* 防止抽屉打开时页面滚动 */
+        body.drawer-open {
+            overflow: hidden;
+            padding-right: 17px; /* 补偿滚动条宽度 */
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 完全隐藏日期选择器的原生占位符 */
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+            display: none;
+        }
+
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 1;
+        }
+
+        /* 当获得焦点或有值时显示日期输入字段 */
+        input[type="date"]:focus::-webkit-datetime-edit-fields-wrapper,
+        input[type="date"].has-value::-webkit-datetime-edit-fields-wrapper {
+            display: inline-flex;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans text-secondary">
+    <!-- 头部导航 -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <!-- 左侧：Logo -->
+            <div class="flex items-center gap-6">
+                <img src="新logo.png" alt="Logo" class="h-8 max-w-[150px] object-contain">
+
+                <!-- 导航菜单 -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="#" id="auth-management-link" class="nav-link flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-black/90 transition-colors" onclick="showAuthManagement(event)">
+                        <i class="fa fa-shield"></i>
+                        <span data-i18n="auth_management">授权管理</span>
+                    </a>
+                    <a href="#" id="org-management-link" class="nav-link flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors" onclick="showOrgManagement(event)">
+                        <i class="fa fa-users"></i>
+                        <span data-i18n="org_management">组织管理</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 右侧：语言选择器 -->
+            <div class="flex items-center gap-3">
+                <!-- 语言选择器 -->
+                <div class="lang-selector">
+                    <button id="lang-toggle-btn" class="flex items-center px-3 py-2 rounded-full bg-light hover:bg-gray-200 transition-colors">
+                        <span id="current-lang" class="mr-1">中文</span>
+                        <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="lang-dropdown" class="lang-dropdown">
+                        <button class="lang-option w-full text-left px-4 py-3 hover:bg-light transition-colors" data-lang="zh">
+                            中文
+                        </button>
+                        <button class="lang-option w-full text-left px-4 py-3 hover:bg-light transition-colors" data-lang="en">
+                            English
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="p-6 w-full">
+        <!-- 授权管理页面 -->
+        <div id="auth-page">
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- 总用户统计 -->
+                <div class="card-apple p-6">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                                    <i class="fa fa-users text-primary"></i>
+                                </div>
+                                <p class="text-tertiary text-sm font-medium" data-i18n="total_users">总用户</p>
+                            </div>
+                            <p class="text-3xl font-bold" id="total-users">50</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-success/5 rounded-lg p-3 border border-success/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-success font-medium" data-i18n="authorized_label">已授权</span>
+                                    <span class="text-lg font-bold text-success" id="total-authorized">36</span>
+                                </div>
+                            </div>
+                            <div class="bg-warning/5 rounded-lg p-3 border border-warning/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-warning font-medium" data-i18n="unauthorized_label">未授权</span>
+                                    <span class="text-lg font-bold text-warning" id="total-unauthorized">14</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 今日新增 -->
+                <div class="card-apple p-6">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-info/10 rounded-xl flex items-center justify-center">
+                                    <i class="fa fa-calendar-plus-o text-info"></i>
+                                </div>
+                                <p class="text-tertiary text-sm font-medium" data-i18n="today_new">今日新增</p>
+                            </div>
+                            <p class="text-3xl font-bold" id="today-total">4</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-success/5 rounded-lg p-3 border border-success/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-success font-medium" data-i18n="authorized_label">已授权</span>
+                                    <span class="text-lg font-bold text-success" id="today-authorized">3</span>
+                                </div>
+                            </div>
+                            <div class="bg-warning/5 rounded-lg p-3 border border-warning/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-warning font-medium" data-i18n="unauthorized_label">未授权</span>
+                                    <span class="text-lg font-bold text-warning" id="today-unauthorized">1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 搜索和筛选 -->
+            <div class="card-apple p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4" data-i18n="search_title">查询条件</h3>
+                <div class="space-y-4">
+                    <!-- 第一行：品牌、时间、账号 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- 品牌选择 -->
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="brand_label">品牌</label>
+                            <select id="brand-filter" class="input-apple flex-1">
+                                <option value="" data-i18n="all_brands">所有品牌</option>
+                                <option value="ipotisedge">ipotisedge</option>
+                                <option value="foxess">FOX ESS</option>
+                                <option value="alpha">Alpha</option>
+                            </select>
+                        </div>
+                        <!-- 时间选择 -->
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="time_label">时间</label>
+                            <input type="date" id="date-filter" class="input-apple flex-1" style="color-scheme: light;">
+                        </div>
+                        <!-- 账号输入 -->
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="account_label">账号</label>
+                            <div class="relative flex-1">
+                                <input type="text" id="account-input" placeholder="输入账号" class="input-apple input-with-icon w-full">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 第二行：设备SN、电表号 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- 设备SN -->
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="sn_label">设备SN</label>
+                            <div class="relative flex-1">
+                                <input type="text" id="sn-input" placeholder="输入设备SN" class="input-apple input-with-icon w-full">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary">
+                                    <i class="fa fa-barcode"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 电表号 -->
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm text-tertiary whitespace-nowrap min-w-[70px]" data-i18n="meter_label">电表号</label>
+                            <div class="relative flex-1">
+                                <input type="text" id="meter-input" placeholder="输入电表号" class="input-apple input-with-icon w-full">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary">
+                                    <i class="fa fa-tachometer"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 查询和重置按钮 -->
+                        <div class="flex items-center justify-end gap-3">
+                            <button id="reset-btn" class="btn-outline-black px-6">
+                                <i class="fa fa-refresh mr-2"></i>
+                                <span data-i18n="reset_btn">重置</span>
+                            </button>
+                            <button id="search-btn" class="btn-black px-6">
+                                <i class="fa fa-search mr-2"></i>
+                                <span data-i18n="search_btn">查询</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="card-apple">
+                <div class="p-4 border-b border-border">
+                    <div class="flex justify-between items-center">
+                        <!-- Tabs 替换授权列表位置 -->
+                        <div class="flex gap-1">
+                            <button id="tab-authorized" class="tab-btn px-3 py-1.5 text-sm rounded-md bg-black text-white font-medium transition-all" onclick="switchTab('authorized')">
+                                <span data-i18n="authorized_tab">已授权</span>
+                                <span class="ml-1 text-xs opacity-80" id="authorized-count">(0)</span>
+                            </button>
+                            <button id="tab-unauthorized" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('unauthorized')">
+                                <span data-i18n="unauthorized_tab">未授权</span>
+                                <span class="ml-1 text-xs opacity-60" id="unauthorized-count">(0)</span>
+                            </button>
+                            <button id="tab-rejected" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('rejected')">
+                                <span data-i18n="rejected_tab">已驳回</span>
+                                <span class="ml-1 text-xs opacity-60" id="rejected-count">(0)</span>
+                            </button>
+                            <button id="tab-exited" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('exited')">
+                                <span data-i18n="exited_tab">已退出</span>
+                                <span class="ml-1 text-xs opacity-60" id="exited-count">(0)</span>
+                            </button>
+                            <button id="tab-dispatch-failed" class="tab-btn px-3 py-1.5 text-sm rounded-md text-tertiary hover:bg-light transition-all" onclick="switchTab('dispatch-failed')">
+                                <span data-i18n="dispatch_failed_tab">授权失败</span>
+                                <span class="ml-1 text-xs opacity-60" id="dispatch-failed-count">(0)</span>
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="table-export-btn" class="btn-outline-black px-4 py-2">
+                                <i class="fa fa-download mr-2"></i>
+                                <span data-i18n="export">导出</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="w-full">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary">
+                                    <input type="checkbox" id="select-all" class="rounded">
+                                </th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_account">账号</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_sn">设备SN</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_brand">品牌</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_address">地址</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_meter">电表号</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_submit_time">更新时间</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" id="status-header" data-i18n="th_auth_status">授权状态</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_remarks">备注</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_operations">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                            <!-- 数据将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="p-12 text-center hidden">
+                        <i class="fa fa-inbox text-6xl text-tertiary/30 mb-4"></i>
+                        <p class="text-tertiary" data-i18n="no_data">暂无数据</p>
+                    </div>
+                </div>
+                <!-- 分页 -->
+                <div class="p-4 border-t border-border flex justify-between items-center">
+                    <div class="text-sm text-tertiary">
+                        <span data-i18n="showing">显示</span> <span id="showing-range">0-0</span> <span data-i18n="of">共</span> <span id="total-records">0</span> <span data-i18n="records">条记录</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="prev-page" class="px-3 py-1 rounded-lg border border-border hover:bg-light transition-colors disabled:opacity-50">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <span class="px-3 py-1" id="page-info">1 / 1</span>
+                        <button id="next-page" class="px-3 py-1 rounded-lg border border-border hover:bg-light transition-colors disabled:opacity-50">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 组织管理页面 -->
+        <div id="org-page" class="hidden">
+            <!-- 页面标题 -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-secondary" data-i18n="org_management">组织管理</h2>
+                    <p class="text-tertiary text-sm mt-1" data-i18n="org_management_desc">管理系统用户的账号和权限</p>
+                </div>
+                <button onclick="showAddUserModal()" class="btn-black px-6">
+                    <i class="fa fa-plus mr-2"></i>
+                    <span data-i18n="add_user">添加用户</span>
+                </button>
+            </div>
+
+            <!-- 搜索区域 -->
+            <div class="card-apple p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm text-tertiary whitespace-nowrap min-w-[50px]" data-i18n="nickname_label">昵称</label>
+                        <input type="text" id="user-nickname-search" class="input-apple flex-1" placeholder="">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm text-tertiary whitespace-nowrap min-w-[50px]" data-i18n="account_label">账号</label>
+                        <input type="text" id="user-account-search" class="input-apple flex-1" placeholder="">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm text-tertiary whitespace-nowrap min-w-[50px]" data-i18n="status_label">状态</label>
+                        <select id="user-status-search" class="input-apple flex-1">
+                            <option value="" data-i18n="all_status">全部</option>
+                            <option value="enabled" data-i18n="enabled">启用</option>
+                            <option value="disabled" data-i18n="disabled">禁用</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-end gap-3">
+                        <button onclick="resetUserSearch()" class="btn-outline-black px-4">
+                            <i class="fa fa-refresh mr-2"></i>
+                            <span data-i18n="reset_btn">重置</span>
+                        </button>
+                        <button onclick="searchUsers()" class="btn-black px-4">
+                            <i class="fa fa-search mr-2"></i>
+                            <span data-i18n="search_btn">查询</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户列表表格 -->
+            <div class="card-apple">
+                <div class="p-4 border-b border-border">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold" data-i18n="user_list">用户列表</h3>
+                        <span class="text-sm text-tertiary">
+                            <span data-i18n="total">共</span>
+                            <span id="user-total-count">0</span>
+                            <span data-i18n="users_unit">人</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="w-full">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_nickname">昵称</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_user_account">账号</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_status">状态</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_create_time">创建时间</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_remarks">备注</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-tertiary" data-i18n="th_operations">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body">
+                            <!-- 用户数据将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
+                    <div id="user-empty-state" class="p-12 text-center hidden">
+                        <i class="fa fa-user-times text-6xl text-tertiary/30 mb-4"></i>
+                        <p class="text-tertiary" data-i18n="no_users">暂无用户数据</p>
+                    </div>
+                </div>
+                <!-- 分页 -->
+                <div class="p-4 border-t border-border flex justify-between items-center">
+                    <div class="text-sm text-tertiary">
+                        <span data-i18n="showing">显示</span> <span id="user-showing-range">0-0</span> <span data-i18n="of">共</span> <span id="user-total-records">0</span> <span data-i18n="records">条记录</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="user-prev-page" onclick="prevUserPage()" class="px-3 py-1 rounded-lg border border-border hover:bg-light transition-colors disabled:opacity-50">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <span class="px-3 py-1" id="user-page-info">1 / 1</span>
+                        <button id="user-next-page" onclick="nextUserPage()" class="px-3 py-1 rounded-lg border border-border hover:bg-light transition-colors disabled:opacity-50">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 添加/编辑用户模态框 -->
+    <div id="user-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold" id="user-modal-title" data-i18n="add_user">添加用户</h3>
+                <button onclick="closeUserModal()" class="text-tertiary hover:text-secondary transition-colors p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <input type="hidden" id="edit-user-id">
+                <div>
+                    <label class="label-apple" data-i18n="nickname_label">昵称</label>
+                    <input type="text" id="user-nickname" class="input-apple" placeholder="">
+                </div>
+                <div>
+                    <label class="label-apple" data-i18n="account_label">账号</label>
+                    <input type="text" id="user-account" class="input-apple" placeholder="">
+                </div>
+                <div>
+                    <label class="label-apple" data-i18n="password_label">密码</label>
+                    <div class="relative">
+                        <input type="password" id="user-password" class="input-apple pr-10" placeholder="">
+                        <button type="button" onclick="toggleUserPassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-tertiary hover:text-secondary">
+                            <i class="fa fa-eye" id="password-toggle-icon"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-tertiary mt-1" id="password-hint" data-i18n="password_hint">编辑时留空则不修改密码</p>
+                </div>
+                <div>
+                    <label class="label-apple" data-i18n="status_label">状态</label>
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="user-status" value="enabled" checked class="w-4 h-4">
+                            <span data-i18n="enabled">启用</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="user-status" value="disabled" class="w-4 h-4">
+                            <span data-i18n="disabled">禁用</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="label-apple" data-i18n="remarks_label">备注</label>
+                    <textarea id="user-remarks" rows="3" class="input-apple resize-none" placeholder=""></textarea>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeUserModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="saveUser()" class="btn-black px-6">
+                    <i class="fa fa-check mr-2"></i>
+                    <span data-i18n="save">保存</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除用户确认模态框 -->
+    <div id="delete-user-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-exclamation-triangle text-danger mr-2"></i>
+                    <span data-i18n="delete_user_title">确认删除用户</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-700 mb-3" data-i18n="delete_user_message">您确定要删除这个用户吗？</p>
+                <p class="text-sm text-danger" data-i18n="delete_user_warning">此操作不可恢复。</p>
+                <input type="hidden" id="delete-user-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeDeleteUserModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmDeleteUser()" class="px-4 py-2 rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors">
+                    <i class="fa fa-trash mr-2"></i>
+                    <span data-i18n="confirm_delete">确认删除</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div id="detail-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold" data-i18n="detail_title">授权详情</h3>
+                <button id="close-detail-btn" class="text-tertiary hover:text-secondary transition-colors p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto max-h-[70vh]" id="detail-content">
+                <!-- 详情内容将通过JavaScript动态添加 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Brand详情模态框 -->
+    <div id="brand-detail-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold" data-i18n="detail_title">授权详情</h3>
+                <button id="close-brand-detail-btn" class="text-tertiary hover:text-secondary transition-colors p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto max-h-[70vh]" id="brand-detail-content">
+                <!-- 详情内容将通过JavaScript动态添加 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 退出VPP计划模态框 -->
+    <div id="exit-vpp-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-exclamation-triangle text-warning mr-2"></i>
+                    <span data-i18n="exit_vpp_title">退出VPP计划</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-700 mb-3" data-i18n="exit_vpp_message">您确定要退出VPP计划吗？</p>
+                <p class="text-sm text-danger" data-i18n="exit_vpp_warning">此操作不可恢复。</p>
+                <input type="hidden" id="exit-vpp-device-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeExitVPPModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmExitVPP()" class="px-4 py-2 rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors">
+                    <i class="fa fa-sign-out mr-2"></i>
+                    <span data-i18n="confirm_exit">确认退出</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div id="delete-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-exclamation-triangle text-danger mr-2"></i>
+                    <span data-i18n="delete_confirm_title">确认删除</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-700 mb-3" data-i18n="delete_confirm_message">您确定要删除这条记录吗？</p>
+                <p class="text-sm text-danger" data-i18n="delete_confirm_warning">此操作不可恢复。</p>
+                <input type="hidden" id="delete-device-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmDelete()" class="px-4 py-2 rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors">
+                    <i class="fa fa-trash mr-2"></i>
+                    <span data-i18n="confirm_delete">确认删除</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 驳回模态框 -->
+    <div id="reject-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-times-circle text-danger mr-2"></i>
+                    <span data-i18n="reject_title">驳回申请</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-700 mb-3" data-i18n="reject_message">请输入驳回原因（选填）：</p>
+                <textarea id="reject-reason" rows="4" class="w-full px-4 py-3 bg-light border border-border rounded-lg resize-none focus:ring-1 focus:ring-black focus:border-black focus:outline-none transition-all" placeholder="请输入驳回原因..."></textarea>
+                <input type="hidden" id="reject-device-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeRejectModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmReject()" class="px-4 py-2 rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors">
+                    <i class="fa fa-times mr-2"></i>
+                    <span data-i18n="confirm_reject">确认驳回</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 恢复VPP计划模态框 -->
+    <div id="restore-vpp-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-border">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fa fa-undo text-success mr-2"></i>
+                    <span data-i18n="restore_vpp_title">恢复VPP计划</span>
+                </h3>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-700 mb-3" data-i18n="restore_vpp_message">您确定要将此用户恢复到VPP计划吗？</p>
+                <p class="text-sm text-success" data-i18n="restore_vpp_warning">恢复后用户将重新加入VPP计划。</p>
+                <input type="hidden" id="restore-vpp-device-id">
+            </div>
+            <div class="p-5 border-t border-border flex justify-end gap-3">
+                <button onclick="closeRestoreModal()" class="px-4 py-2 rounded-lg border border-border hover:bg-light transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmRestore()" class="px-4 py-2 bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
+                    <span data-i18n="confirm_restore">确认恢复</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作指引模态框 -->
+    <div id="guidance-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold" data-i18n="guidance_title">操作指引</h3>
+                <button onclick="closeGuidanceModal()" class="text-tertiary hover:text-secondary transition-colors p-1">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                <!-- Step 1 -->
+                <div class="space-y-3">
+                    <h4 class="font-semibold text-base">1. <span data-i18n="guidance_step1">Open Solar Touch(System) and log in</span></h4>
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                        <p class="text-sm">
+                            <a href="https://service.cloudinverter.net/#/user/login" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                https://service.cloudinverter.net/#/user/login
+                            </a>
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-600">Account:</span>
+                                <span class="font-medium ml-2">VPPAdmin</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Password:</span>
+                                <span class="font-medium ml-2">VPPAdmin</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="space-y-3">
+                    <h4 class="font-semibold text-base">2. <span data-i18n="guidance_step2">Add device according to the following image</span></h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <img src="提示.jpg" alt="Guidance Screenshot" class="w-full rounded-lg shadow-lg">
+                    </div>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex justify-end">
+                <button onclick="closeGuidanceModal()" class="px-6 py-2 bg-black text-white rounded-lg hover:bg-black/90 transition-colors">
+                    <span data-i18n="cancel">关闭</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 语言翻译数据
+        const translations = {
+            en: {
+                total_users: 'Total Users',
+                total_authorized: 'Authorized',
+                today_new: 'Today\'s New',
+                authorized_label: 'Authorized',
+                unauthorized_label: 'Unauthorized',
+                percentage: 'Percentage',
+                search_title: 'Search Criteria',
+                auth_status_label: 'Auth Status',
+                all_status: 'All',
+                authorized: 'Authorized',
+                unauthorized: 'Unauthorized',
+                brand_label: 'Brand',
+                time_label: 'Time',
+                account_label: 'Account',
+                sn_label: 'Device SN',
+                search_btn: 'Search',
+                reset_btn: 'Reset',
+                all_brands: 'All Brands',
+                all_time: 'All Time',
+                today: 'Today',
+                this_week: 'This Week',
+                this_month: 'This Month',
+                auth_list: 'Authorization List',
+                authorized_tab: 'Authorized',
+                unauthorized_tab: 'Unauthorized',
+                dispatch_failed_tab: 'Dispatch Failed',
+                dispatch_failed_status: 'Failed',
+                rejected_tab: 'Rejected',
+                reject_title: 'Reject Application',
+                reject_message: 'Please enter rejection reason (optional):',
+                confirm_reject: 'Confirm Reject',
+                reject: 'Reject',
+                reject_success: 'Successfully rejected',
+                rejection_reason: 'Rejection Reason',
+                rejected_time: 'Rejected Time',
+                exited_tab: 'Exited',
+                th_brand: 'Brand',
+                th_account: 'Account',
+                th_sn: 'Device SN',
+                th_address: 'Address',
+                th_meter: 'NMI',
+                meter_label: 'NMI',
+                th_submit_time: 'Update Time',
+                th_auth_status: 'Auth Status',
+                th_remarks: 'Remarks',
+                th_operations: 'Operations',
+                detail: 'Details',
+                details_title: 'Details',
+                basic_info: 'Basic Information',
+                status_info: 'Status Information',
+                exit_vpp: 'Exit VPP',
+                confirm_exit: 'Confirm Exit',
+                cancel: 'Cancel',
+                exit_vpp_title: 'Exit VPP Plan',
+                exit_vpp_message: 'Are you sure you want to exit the VPP plan?',
+                exit_vpp_warning: 'This action cannot be undone.',
+                account_not_exist: 'Account does not exist',
+                device_not_exist: 'Device does not exist',
+                both_not_exist: 'Account and device do not exist',
+                no_data: 'No Data',
+                showing: 'Showing',
+                of: 'of',
+                records: 'records',
+                detail_title: 'Authorization Detail',
+                view: 'View',
+                active: 'Active',
+                inactive: 'Inactive',
+                search_placeholder: 'Search account, device SN or address...',
+                export: 'Export',
+                refresh: 'Refresh',
+                auth_management: 'Authorization Management',
+                exit_users: 'Exited Users',
+                detect: 'Check',
+                detect_success: 'Detection successful, authorized',
+                restore_vpp: 'Restore to VPP',
+                exit_time: 'Exit Time',
+                dispatch_status: 'Dispatch Status',
+                no_exited_users: 'No exited users',
+                restore_success: 'Successfully restored to VPP',
+                restore: 'Restore',
+                restore_vpp_title: 'Restore to VPP Plan',
+                restore_vpp_message: 'Are you sure you want to restore this user to VPP plan?',
+                restore_vpp_warning: 'The user will rejoin the VPP plan after restoration.',
+                confirm_restore: 'Confirm Restore',
+                restore_to_unauthorized: 'Restore to Unauthorized',
+                restore_to_unauthorized_success: 'Successfully restored to unauthorized',
+                save: 'Save',
+                delete: 'Delete',
+                delete_confirm_title: 'Confirm Delete',
+                delete_confirm_message: 'Are you sure you want to delete this record?',
+                delete_confirm_warning: 'This action cannot be undone.',
+                confirm_delete: 'Confirm Delete',
+                delete_success: 'Successfully deleted',
+                guidance: 'Guid',
+                view_guidance: 'View',
+                guidance_title: 'Operation Guidance',
+                guidance_step1: 'Open Solar Touch(System) and log in',
+                guidance_step2: 'Add device according to the following image',
+                // 组织管理
+                org_management: 'Organization',
+                org_management_desc: 'Manage system user accounts and permissions',
+                add_user: 'Add User',
+                edit_user: 'Edit User',
+                user_list: 'User List',
+                total: 'Total',
+                users_unit: 'users',
+                nickname_label: 'Nickname',
+                password_label: 'Password',
+                status_label: 'Status',
+                remarks_label: 'Remarks',
+                enabled: 'Enabled',
+                disabled: 'Disabled',
+                th_nickname: 'Nickname',
+                th_user_account: 'Account',
+                th_status: 'Status',
+                th_create_time: 'Created Time',
+                no_users: 'No users found',
+                password_hint: 'Leave blank to keep current password',
+                delete_user_title: 'Confirm Delete User',
+                delete_user_message: 'Are you sure you want to delete this user?',
+                delete_user_warning: 'This action cannot be undone.',
+            },
+            zh: {
+                total_users: '总用户',
+                total_authorized: '已授权',
+                today_new: '今日新增',
+                authorized_label: '已授权',
+                unauthorized_label: '未授权',
+                percentage: '占比',
+                search_title: '查询条件',
+                auth_status_label: '授权状态',
+                all_status: '全部',
+                authorized: '已授权',
+                unauthorized: '未授权',
+                brand_label: '品牌',
+                time_label: '时间',
+                account_label: '账号',
+                sn_label: '设备SN',
+                search_btn: '查询',
+                reset_btn: '重置',
+                all_brands: '所有品牌',
+                all_time: '所有时间',
+                today: '今天',
+                this_week: '本周',
+                this_month: '本月',
+                auth_list: '授权列表',
+                authorized_tab: '已授权',
+                unauthorized_tab: '未授权',
+                dispatch_failed_tab: '授权失败',
+                dispatch_failed_status: '失败',
+                rejected_tab: '已驳回',
+                reject_title: '驳回申请',
+                reject_message: '请输入驳回原因（选填）：',
+                confirm_reject: '确认驳回',
+                reject: '驳回',
+                reject_success: '已成功驳回',
+                rejection_reason: '驳回原因',
+                rejected_time: '驳回时间',
+                exited_tab: '已退出',
+                th_brand: '品牌',
+                th_account: '账号',
+                th_sn: '设备SN',
+                th_address: '地址',
+                th_meter: '电表号',
+                meter_label: '电表号',
+                th_submit_time: '更新时间',
+                th_status: '状态',
+                th_remarks: '备注',
+                th_operations: '操作',
+                detail: '详情',
+                details_title: '详情',
+                basic_info: '基本信息',
+                status_info: '状态信息',
+                exit_vpp: '退出VPP',
+                confirm_exit: '确认退出',
+                cancel: '取消',
+                exit_vpp_title: '退出VPP计划',
+                exit_vpp_message: '您确定要退出VPP计划吗？',
+                exit_vpp_warning: '此操作不可恢复。',
+                account_not_exist: '账号不存在',
+                device_not_exist: '设备不存在',
+                both_not_exist: '账号设备不存在',
+                no_data: '暂无数据',
+                showing: '显示',
+                of: '共',
+                records: '条记录',
+                detail_title: '授权详情',
+                view: '查看',
+                active: '活跃',
+                inactive: '未激活',
+                search_placeholder: '搜索账号、设备SN或地址...',
+                export: '导出',
+                refresh: '刷新',
+                auth_management: '授权管理',
+                exit_users: '退出用户',
+                detect: '检测',
+                detect_success: '检测成功，已授权',
+                restore_vpp: '恢复到VPP',
+                exit_time: '退出时间',
+                dispatch_status: '调度状态',
+                no_exited_users: '暂无退出用户',
+                restore_success: '成功恢复到VPP计划',
+                restore: '恢复',
+                restore_vpp_title: '恢复到VPP计划',
+                restore_vpp_message: '您确定要将此用户恢复到VPP计划吗？',
+                restore_vpp_warning: '恢复后用户将重新加入VPP计划。',
+                confirm_restore: '确认恢复',
+                restore_to_unauthorized: '恢复到未授权',
+                restore_to_unauthorized_success: '已成功恢复到未授权',
+                save: '保存',
+                delete: '删除',
+                delete_confirm_title: '确认删除',
+                delete_confirm_message: '您确定要删除这条记录吗？',
+                delete_confirm_warning: '此操作不可恢复。',
+                confirm_delete: '确认删除',
+                delete_success: '删除成功',
+                guidance: '指引',
+                view_guidance: '详情',
+                guidance_title: '操作指引',
+                guidance_step1: '打开Solar Touch(System)并登录',
+                guidance_step2: '根据下图添加设备',
+                // 组织管理
+                org_management: '组织管理',
+                org_management_desc: '管理系统用户的账号和权限',
+                add_user: '添加用户',
+                edit_user: '编辑用户',
+                user_list: '用户列表',
+                total: '共',
+                users_unit: '人',
+                nickname_label: '昵称',
+                password_label: '密码',
+                status_label: '状态',
+                remarks_label: '备注',
+                enabled: '启用',
+                disabled: '禁用',
+                th_nickname: '昵称',
+                th_user_account: '账号',
+                th_status: '状态',
+                th_create_time: '创建时间',
+                no_users: '暂无用户数据',
+                password_hint: '编辑时留空则不修改密码',
+                delete_user_title: '确认删除用户',
+                delete_user_message: '您确定要删除这个用户吗？',
+                delete_user_warning: '此操作不可恢复。',
+            }
+        };
+
+        // 当前语言 - 从localStorage读取，默认为英文
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        // 模拟数据
+        let mockData = [];
+
+        // 生成模拟数据
+        function generateMockData() {
+            const brands = ['ipotisedge', 'FOX ESS', 'Alpha'];
+            // 强制使用英文城市名称
+            const cities = ['Sydney, NSW', 'Melbourne, VIC', 'Brisbane, QLD', 'Perth, WA'];
+
+            mockData = [];
+            const today = new Date();
+
+            // 生成数据：37条已授权
+            for (let i = 1; i <= 37; i++) {
+                const date = new Date();
+                // 今天的数据
+                if (i <= 4) {
+                    date.setHours(date.getHours() - Math.floor(Math.random() * 24));
+                } else {
+                    date.setDate(date.getDate() - Math.floor(Math.random() * 29 + 1));
+                }
+
+                const selectedBrand = brands[Math.floor(Math.random() * brands.length)];
+                mockData.push({
+                    id: i,
+                    brand: selectedBrand,
+                    account: `user${1000 + i}`,
+                    sn: `SN2024${Math.floor(Math.random() * 10000)}`,
+                    address: cities[Math.floor(Math.random() * cities.length)],
+                    meter: Math.floor(Math.random() * 100000000).toString(),
+                    submitTime: date.toLocaleString('en-US'),
+                    status: 'active',
+                    remarkType: '',
+                    isExited: false,
+                    dispatchFailed: false,
+                    checkCode: selectedBrand === 'Alpha' ? `CHK${Math.floor(Math.random() * 100000)}` : '',
+                    apiKey: selectedBrand === 'FOX ESS' ? `KEY${Math.random().toString(36).substring(2, 15)}` : ''
+                });
+            }
+
+            // 生成6条未授权数据：每个品牌2条
+            let unauthorizedId = 38;
+            brands.forEach((brand, index) => {
+                // 每个品牌生成2条未授权记录
+                for (let j = 0; j < 2; j++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - Math.floor(Math.random() * 15 + 1));
+
+                    // 第一条可以检测成功，第二条检测失败
+                    const remarkType = j === 1 ? 'account_not_exist' : '';
+
+                    mockData.push({
+                        id: unauthorizedId++,
+                        brand: brand,
+                        account: `user${1000 + unauthorizedId}`,
+                        sn: `SN2024${Math.floor(Math.random() * 10000)}`,
+                        address: cities[Math.floor(Math.random() * cities.length)],
+                        meter: Math.floor(Math.random() * 100000000).toString(),
+                        submitTime: date.toLocaleString('en-US'),
+                        status: 'inactive',
+                        remarkType: remarkType,
+                        isExited: false,
+                        dispatchFailed: false,
+                        checkCode: brand === 'Alpha' ? `CHK${Math.floor(Math.random() * 100000)}` : '',
+                        apiKey: brand === 'FOX ESS' ? `KEY${Math.random().toString(36).substring(2, 15)}` : ''
+                    });
+                }
+            });
+
+            // 生成5条调度失败数据
+            let dispatchFailedId = 50;
+            for (let i = 0; i < 5; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - Math.floor(Math.random() * 10 + 1));
+
+                const selectedBrand = brands[Math.floor(Math.random() * brands.length)];
+                mockData.push({
+                    id: dispatchFailedId++,
+                    brand: selectedBrand,
+                    account: `user${1000 + dispatchFailedId}`,
+                    sn: `SN2024${Math.floor(Math.random() * 10000)}`,
+                    address: cities[Math.floor(Math.random() * cities.length)],
+                    meter: Math.floor(Math.random() * 100000000).toString(),
+                    submitTime: date.toLocaleString('en-US'),
+                    status: 'inactive',
+                    remarkType: 'dispatch_failed',
+                    isExited: false,
+                    dispatchFailed: true,
+                    checkCode: selectedBrand === 'Alpha' ? `CHK${Math.floor(Math.random() * 100000)}` : '',
+                    apiKey: selectedBrand === 'FOX ESS' ? `KEY${Math.random().toString(36).substring(2, 15)}` : ''
+                });
+            }
+        }
+
+
+        // 分页变量
+        let currentPage = 1;
+        const pageSize = 10;
+        let filteredData = [];
+        let currentTab = 'authorized'; // 当前选中的tab
+
+        // 初始化
+        function init() {
+            try {
+                console.log('Initializing admin page...');
+                // 应用默认语言设置（不保存到localStorage）
+                changeLanguage(currentLang, false);
+                console.log('Language changed');
+                generateMockData();
+                console.log('Mock data generated:', mockData.length, 'items');
+                generateExitedUsers();
+                console.log('Exited users generated');
+                updateStats();
+                console.log('Stats updated');
+                updateTableHeader();
+                console.log('Table header updated');
+                renderTable();
+                console.log('Table rendered');
+                updateTabCounts();
+                console.log('Tab counts updated');
+                initEventListeners();
+                console.log('Event listeners initialized');
+                initDrawerAddressModal();
+                console.log('Address modal initialized');
+                console.log('Initialization complete');
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
+        }
+        
+        // 生成退出用户测试数据
+        function generateExitedUsers() {
+            // 如果localStorage中没有退出用户，添加2条测试数据
+            if (exitedUsers.length === 0) {
+                // 强制使用英文城市名称
+                const cities = ['Sydney, NSW', 'Melbourne, VIC'];
+                
+                exitedUsers = [
+                    {
+                        id: 1001,
+                        brand: 'ipotisedge',
+                        account: 'exited_user1',
+                        sn: 'SN2024001',
+                        address: cities[0],
+                        meter: '12345678',
+                        submitTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US'),
+                        status: 'active',
+                        remarkType: '',
+                        isExited: true,
+                        exitTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleString('en-US')
+                    },
+                    {
+                        id: 1002,
+                        brand: 'FOX ESS',
+                        account: 'exited_user2',
+                        sn: 'SN2024002',
+                        address: cities[1],
+                        meter: '87654321',
+                        submitTime: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toLocaleString('en-US'),
+                        status: 'active',
+                        remarkType: '',
+                        isExited: true,
+                        exitTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleString('en-US')
+                    }
+                ];
+                localStorage.setItem('exitedVPPUsers', JSON.stringify(exitedUsers));
+            }
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            // 总用户数（不包括已退出和已驳回的）
+            const totalUsers = mockData.filter(item => !item.isExited && !item.isRejected).length;
+            document.getElementById('total-users').textContent = totalUsers;
+
+            // 已授权和未授权统计（不包括已退出和已驳回的）
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected).length;
+
+            document.getElementById('total-authorized').textContent = authorizedCount;
+            document.getElementById('total-unauthorized').textContent = unauthorizedCount;
+
+            // 今日数据统计
+            const today = new Date().toDateString();
+            const todayData = mockData.filter(item => {
+                return new Date(item.submitTime).toDateString() === today && !item.isExited && !item.isRejected;
+            });
+
+            const todayAuthorized = todayData.filter(item => item.status === 'active').length;
+            const todayUnauthorized = todayData.filter(item => item.status === 'inactive').length;
+
+            document.getElementById('today-total').textContent = todayData.length;
+            document.getElementById('today-authorized').textContent = todayAuthorized;
+            document.getElementById('today-unauthorized').textContent = todayUnauthorized;
+        }
+
+        // 渲染表格
+        function renderTable() {
+            console.log('renderTable() called, currentTab:', currentTab);
+            const tbody = document.getElementById('data-table-body');
+            const emptyState = document.getElementById('empty-state');
+            console.log('Found tbody:', !!tbody, 'emptyState:', !!emptyState);
+            
+            // 应用筛选
+            filteredData = filterData();
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                updatePagination();
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            // 分页
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            tbody.innerHTML = pageData.map(item => `
+                <tr class="border-b border-border hover:bg-light/50 transition-colors cursor-pointer" onclick="viewDetail(${item.id})">
+                    <td class="px-4 py-3" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="rounded" data-id="${item.id}">
+                    </td>
+                    <td class="px-4 py-3 text-sm font-medium">${item.account}</td>
+                    <td class="px-4 py-3 text-sm">${item.sn}</td>
+                    <td class="px-4 py-3 text-sm" onclick="event.stopPropagation()">
+                        ${item.brand.toLowerCase().includes('ipo') || item.brand.toLowerCase().includes('alpha') ?
+                            `<span class="text-blue-600 hover:text-blue-800 cursor-pointer inline-flex items-center gap-1" onclick="viewBrandDetail(${item.id})">
+                                <span>${item.brand}</span>
+                                <i class="fa fa-info-circle"></i>
+                            </span>` :
+                            item.brand
+                        }
+                    </td>
+                    <td class="px-4 py-3 text-sm">${item.address}</td>
+                    <td class="px-4 py-3 text-sm">${item.meter}</td>
+                    <td class="px-4 py-3 text-sm">${item.submitTime}</td>
+                    <td class="px-4 py-3">
+                        ${currentTab === 'exited' ?
+                            `<span class="text-sm">${item.exitTime || '-'}</span>` :
+                            currentTab === 'rejected' ?
+                            `<span class="text-sm">${item.rejectedTime || '-'}</span>` :
+                            currentTab === 'dispatch-failed' ?
+                            `<span class="px-2 py-1 text-xs rounded-full bg-danger/10 text-danger">
+                                ${translations[currentLang].dispatch_failed_status || '失败'}
+                            </span>` :
+                            `<span class="px-2 py-1 text-xs rounded-full ${
+                                item.status === 'active'
+                                    ? 'bg-success/10 text-success'
+                                    : 'bg-warning/10 text-warning'
+                            }">
+                                ${item.status === 'active' ? translations[currentLang].authorized : translations[currentLang].unauthorized}
+                            </span>`
+                        }
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        ${currentTab === 'rejected' ?
+                            (item.rejectionReason ? `<span class="text-sm">${item.rejectionReason}</span>` : '-') :
+                            currentTab === 'unauthorized' && !item.hasDetected ?
+                            '-' :
+                            item.status === 'inactive' && item.remarkType && item.hasDetected ?
+                            `<span class="text-danger">${translations[currentLang][item.remarkType]}</span>` :
+                            '-'}
+                    </td>
+                    ${currentTab === 'unauthorized' || currentTab === 'dispatch-failed' ? `
+                    <td class="px-4 py-3 text-sm" onclick="event.stopPropagation()">
+                        ${item.brand === 'ipotisedge' ?
+                            `<button onclick="showGuidanceModal()" class="text-blue-600 hover:text-blue-800 underline">
+                                ${translations[currentLang].view_guidance}
+                            </button>` :
+                            '-'}
+                    </td>
+                    ` : ''}
+                    <td class="px-4 py-3" onclick="event.stopPropagation()">
+                        <div class="flex gap-2 items-center">
+                            ${currentTab !== 'exited' && currentTab !== 'rejected' ? `
+                            <button onclick="showDetailsDrawer(${item.id})" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            ` : ''}
+                            ${currentTab !== 'exited' ? `
+                            <button onclick="viewDetail(${item.id})" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium bg-gray-600 text-white rounded-lg shadow-sm hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition-all duration-200">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                            ` : ''}
+                            ${currentTab === 'rejected' ?
+                                `<button onclick="restoreToUnauthorized(${item.id})" class="px-3 py-1.5 text-xs bg-warning text-white rounded-lg hover:bg-warning/90 transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-undo mr-1"></i>' : ''}
+                                    ${translations[currentLang].restore_to_unauthorized || '恢复到未授权'}
+                                </button>
+                                <button onclick="showDeleteModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-trash mr-1"></i>' : ''}
+                                    ${translations[currentLang].delete || '删除'}
+                                </button>` :
+                                currentTab === 'exited' ?
+                                `<button onclick="showRestoreModal(${item.id})" class="px-3 py-1 text-xs bg-success text-white rounded-lg hover:bg-success/90 transition-colors">
+                                    <i class="fa fa-undo mr-1"></i>
+                                    ${translations[currentLang].restore || '恢复'}
+                                </button>` :
+                                currentTab === 'dispatch-failed' ?
+                                `<button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-check mr-1"></i>' : ''}
+                                    ${translations[currentLang].detect || '检测'}
+                                </button>` :
+                                currentTab === 'unauthorized' ?
+                                `<button onclick="performDetection(${item.id})" class="px-3 py-1.5 text-xs bg-black text-white rounded-lg hover:bg-black/90 transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-check mr-1"></i>' : ''}
+                                    ${translations[currentLang].detect || '检测'}
+                                </button>
+                                <button onclick="showRejectModal(${item.id})" class="px-3 py-1 text-xs text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-all duration-200">
+                                    ${currentLang === 'zh' ? '<i class="fa fa-times mr-1"></i>' : ''}
+                                    ${translations[currentLang].reject || '驳回'}
+                                </button>` :
+                                `<button onclick="showExitVPPModal(${item.id})" class="px-3 py-1 text-xs bg-danger text-white rounded-lg hover:bg-danger/90 transition-colors">
+                                    <i class="fa fa-sign-out mr-1"></i>
+                                    ${translations[currentLang].exit_vpp}
+                                </button>`
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updatePagination();
+        }
+
+        // 筛选数据
+        function filterData() {
+            // 根据Tab筛选数据
+            let data;
+
+            if (currentTab === 'authorized') {
+                data = [...mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed && !item.isRejected)];
+            } else if (currentTab === 'unauthorized') {
+                data = [...mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed && !item.isRejected)];
+            } else if (currentTab === 'dispatch-failed') {
+                data = [...mockData.filter(item => item.dispatchFailed && !item.isExited && !item.isRejected)];
+            } else if (currentTab === 'rejected') {
+                data = [...rejectedUsers];
+            } else if (currentTab === 'exited') {
+                data = [...exitedUsers];
+            } else {
+                data = [...mockData.filter(item => !item.isExited && !item.isRejected)];
+            }
+            
+            
+            // 账号筛选
+            const accountInputElement = document.getElementById('account-input');
+            const accountTerm = accountInputElement ? accountInputElement.value.toLowerCase() : '';
+            if (accountTerm) {
+                data = data.filter(item => 
+                    item.account.toLowerCase().includes(accountTerm)
+                );
+            }
+            
+            // 设备SN筛选
+            const snTerm = document.getElementById('sn-input').value.toLowerCase();
+            if (snTerm) {
+                data = data.filter(item => 
+                    item.sn.toLowerCase().includes(snTerm)
+                );
+            }
+            
+            // 品牌筛选
+            const brandFilterElement = document.getElementById('brand-filter');
+            const brandFilter = brandFilterElement ? brandFilterElement.value : '';
+            if (brandFilter) {
+                data = data.filter(item => item.brand === brandFilter);
+            }
+            
+            // 电表号筛选
+            const meterInputElement = document.getElementById('meter-input');
+            const meterTerm = meterInputElement ? meterInputElement.value.toLowerCase() : '';
+            if (meterTerm) {
+                data = data.filter(item => 
+                    item.meter.toLowerCase().includes(meterTerm)
+                );
+            }
+            
+            // 时间筛选（日期选择器）
+            const dateFilter = document.getElementById('date-filter');
+            const selectedDate = dateFilter ? dateFilter.value : '';
+
+            if (selectedDate) {
+                data = data.filter(item => {
+                    const itemDate = new Date(item.submitTime);
+                    const selectedDateObj = new Date(selectedDate);
+
+                    // 比较年月日
+                    return itemDate.getFullYear() === selectedDateObj.getFullYear() &&
+                           itemDate.getMonth() === selectedDateObj.getMonth() &&
+                           itemDate.getDate() === selectedDateObj.getDate();
+                });
+            }
+
+            return data;
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const startIndex = (currentPage - 1) * pageSize + 1;
+            const endIndex = Math.min(currentPage * pageSize, filteredData.length);
+            
+            document.getElementById('showing-range').textContent = 
+                filteredData.length > 0 ? `${startIndex}-${endIndex}` : '0-0';
+            document.getElementById('total-records').textContent = filteredData.length;
+            document.getElementById('page-info').textContent = `${currentPage} / ${totalPages || 1}`;
+            
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage >= totalPages;
+        }
+
+        // 辅助函数：根据当前tab从正确的数组中查找数据
+        function findItemById(id) {
+            if (currentTab === 'rejected') {
+                return rejectedUsers.find(d => d.id === id);
+            } else if (currentTab === 'exited') {
+                return exitedUsers.find(d => d.id === id);
+            } else {
+                return mockData.find(d => d.id === id);
+            }
+        }
+
+        // 查看详情
+        window.viewDetail = function(id) {
+            const item = findItemById(id);
+            if (!item) return;
+
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('detail-content');
+
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <!-- 客户信息 -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '客户信息' : 'Customer Information'}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '客户姓名' : 'Customer Name'}</label>
+                                <p class="font-medium">${item.account}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '手机号码' : 'Phone Number'}</label>
+                                <p class="font-medium">+61 480629013</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '邮箱地址' : 'Email Address'}</label>
+                                <p class="font-medium">${item.account}@example.com</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电表号 (NMI)' : 'NMI'}</label>
+                                <p class="font-medium">${item.meter}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '供电地址' : 'Power Supply Address'}</label>
+                                <p class="font-medium">${item.address}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">&nbsp;</label>
+                                <p class="font-medium text-gray-400">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 设备信息 -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '设备信息' : 'Device Information'}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '品牌' : 'Brand'}</label>
+                                <p class="font-medium">${item.brand}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '逆变器SN' : 'Inverter SN'}</label>
+                                <p class="font-medium">${item.sn}</p>
+                            </div>
+                            ${item.brand === 'Alpha' ? `
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '校验码' : 'Check Code'}</label>
+                                <p class="font-medium">${item.checkCode || '-'}</p>
+                            </div>
+                            ` : `
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '用户名' : 'User Name'}</label>
+                                <p class="font-medium">${item.account}</p>
+                            </div>
+                            `}
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电池容量 (kWh)' : 'Battery Capacity (kWh)'}</label>
+                                <p class="font-medium">280</p>
+                            </div>
+                            ${item.brand === 'FOX ESS' ? `
+                            <div class="md:col-span-2">
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? 'API密钥' : 'API Key'}</label>
+                                <p class="font-medium break-all">${item.apiKey || '-'}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        // 查看Brand详情
+        window.viewBrandDetail = function(id) {
+            const item = mockData.find(d => d.id === id);
+            if (!item) return;
+
+            const modal = document.getElementById('brand-detail-modal');
+            const content = document.getElementById('brand-detail-content');
+
+            // 根据品牌显示不同内容
+            let contentHtml = '';
+
+            if (item.brand.toLowerCase().includes('ipo')) {
+                // ipotisedge品牌
+                contentHtml = `
+                    <div class="space-y-6">
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-base">1. <span data-i18n="guidance_step1">Open Solar Touch(System) and log in</span></h4>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <p class="text-sm">
+                                    <a href="https://service.cloudinverter.net/#/user/login" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                        https://service.cloudinverter.net/#/user/login
+                                    </a>
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Account:</span>
+                                        <span class="font-medium ml-2">VPPAdmin</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Password:</span>
+                                        <span class="font-medium ml-2">VPPAdmin</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.brand.toLowerCase().includes('alpha')) {
+                // Alpha品牌
+                contentHtml = `
+                    <div class="space-y-6">
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-base">1. Open Alpha ESS and log in</h4>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                                <p class="text-sm">
+                                    <a href="https://apicloud.alphaess.com" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                        https://apicloud.alphaess.com
+                                    </a>
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Account:</span>
+                                        <span class="font-medium ml-2">ems@unitedenergyhub.com.au</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Password:</span>
+                                        <span class="font-medium ml-2">123456789</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = contentHtml;
+            modal.classList.remove('hidden');
+        }
+
+        // 显示退出VPP模态框
+        window.showExitVPPModal = function(id) {
+            document.getElementById('exit-vpp-device-id').value = id;
+            document.getElementById('exit-vpp-modal').classList.remove('hidden');
+        }
+        
+        // 关闭退出VPP模态框
+        window.closeExitVPPModal = function() {
+            document.getElementById('exit-vpp-modal').classList.add('hidden');
+            document.getElementById('exit-vpp-device-id').value = '';
+        }
+
+        // 显示驳回模态框
+        window.showRejectModal = function(id) {
+            document.getElementById('reject-device-id').value = id;
+            document.getElementById('reject-modal').classList.remove('hidden');
+        }
+
+        // 关闭驳回模态框
+        window.closeRejectModal = function() {
+            document.getElementById('reject-modal').classList.add('hidden');
+            document.getElementById('reject-device-id').value = '';
+            document.getElementById('reject-reason').value = '';
+        }
+
+        // 确认驳回
+        window.confirmReject = function() {
+            const deviceId = parseInt(document.getElementById('reject-device-id').value);
+            const reason = document.getElementById('reject-reason').value.trim();
+
+            if (!deviceId) return;
+
+            // 查找要驳回的设备
+            const deviceIndex = mockData.findIndex(d => d.id === deviceId);
+            if (deviceIndex !== -1) {
+                const rejectedDevice = {...mockData[deviceIndex]};
+                rejectedDevice.rejectedTime = new Date().toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+                rejectedDevice.rejectionReason = reason;
+                rejectedDevice.isRejected = true;
+
+                // 添加到驳回用户列表
+                rejectedUsers.push(rejectedDevice);
+                localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                // 标记为已驳回
+                mockData[deviceIndex].isRejected = true;
+
+                showSuccessToast(translations[currentLang].reject_success || '已成功驳回', 'error');
+            }
+
+            closeRejectModal();
+            renderTable();
+            updateStats();
+        }
+
+        // 显示恢复模态框
+        window.showRestoreModal = function(id) {
+            document.getElementById('restore-vpp-device-id').value = id;
+            document.getElementById('restore-vpp-modal').classList.remove('hidden');
+        }
+        
+        // 关闭恢复模态框
+        window.closeRestoreModal = function() {
+            document.getElementById('restore-vpp-modal').classList.add('hidden');
+            document.getElementById('restore-vpp-device-id').value = '';
+        }
+        
+        // 确认恢复
+        window.confirmRestore = function() {
+            const deviceId = document.getElementById('restore-vpp-device-id').value;
+            if (!deviceId) return;
+
+            restoreToVPP(parseInt(deviceId));
+            closeRestoreModal();
+        }
+
+        // 显示删除确认模态框
+        window.showDeleteModal = function(id) {
+            document.getElementById('delete-device-id').value = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        window.closeDeleteModal = function() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            document.getElementById('delete-device-id').value = '';
+        }
+
+        window.confirmDelete = function() {
+            const deviceId = parseInt(document.getElementById('delete-device-id').value);
+            if (!deviceId) return;
+
+            // 如果是已驳回的数据，从rejectedUsers中删除
+            if (currentTab === 'rejected') {
+                const rejectedIndex = rejectedUsers.findIndex(item => item.id === deviceId);
+                if (rejectedIndex !== -1) {
+                    rejectedUsers.splice(rejectedIndex, 1);
+                    localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                    closeDeleteModal();
+                    showSuccessToast(translations[currentLang].delete_success || '删除成功');
+                    renderTable();
+                    updateStats();
+                }
+                return;
+            }
+
+            // 从mockData中删除该记录
+            const itemIndex = mockData.findIndex(item => item.id === deviceId);
+            if (itemIndex !== -1) {
+                mockData.splice(itemIndex, 1);
+
+                // 关闭模态框
+                closeDeleteModal();
+
+                // 刷新表格
+                renderTable();
+                updateStats();
+                updateTabCounts();
+
+                // 显示成功提示
+                showSuccessToast(translations[currentLang].delete_success || '删除成功', 'success');
+            }
+        }
+
+        // 显示指引模态框
+        window.showGuidanceModal = function() {
+            document.getElementById('guidance-modal').classList.remove('hidden');
+        }
+
+        window.closeGuidanceModal = function() {
+            document.getElementById('guidance-modal').classList.add('hidden');
+        }
+
+        // 存储退出的用户
+        let exitedUsers = JSON.parse(localStorage.getItem('exitedVPPUsers') || '[]');
+        // 存储驳回的用户
+        let rejectedUsers = JSON.parse(localStorage.getItem('rejectedUsers') || '[]');
+
+        // 初始化2条驳回测试数据（如果还没有数据）
+        if (rejectedUsers.length === 0) {
+            const now = new Date();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            rejectedUsers = [
+                {
+                    id: 2001,
+                    brand: 'Sungrow',
+                    account: 'rejected_user1@example.com',
+                    sn: 'SG-REJ-001',
+                    address: '123 Rejected St, Sydney, NSW',
+                    meter: 'NMI-REJ-001',
+                    submitTime: yesterday.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    status: 'inactive',
+                    isRejected: true,
+                    rejectedTime: yesterday.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    rejectionReason: '账号信息不完整，无法验证'
+                },
+                {
+                    id: 2002,
+                    brand: 'Growatt',
+                    account: 'rejected_user2@example.com',
+                    sn: 'GW-REJ-002',
+                    address: '456 Rejected Ave, Melbourne, VIC',
+                    meter: 'NMI-REJ-002',
+                    submitTime: now.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    status: 'inactive',
+                    isRejected: true,
+                    rejectedTime: now.toLocaleString(currentLang === 'zh' ? 'zh-CN' : 'en-US'),
+                    rejectionReason: '设备序列号与注册信息不匹配'
+                }
+            ];
+            localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+        }
+
+        // 确认退出VPP
+        window.confirmExitVPP = function() {
+            const deviceId = document.getElementById('exit-vpp-device-id').value;
+            if (!deviceId) return;
+            
+            // 查找要退出的设备
+            const deviceIndex = mockData.findIndex(d => d.id == deviceId);
+            if (deviceIndex !== -1) {
+                const exitedDevice = mockData[deviceIndex];
+                exitedDevice.exitTime = new Date().toLocaleString('en-US');
+                
+                // 添加到退出用户列表
+                exitedUsers.push(exitedDevice);
+                localStorage.setItem('exitedVPPUsers', JSON.stringify(exitedUsers));
+                
+                // 不删除数据，只标记为已退出
+                mockData[deviceIndex].isExited = true;
+                
+                // 显示成功消息（不使用alert）
+                showSuccessToast(currentLang === 'zh' ? '已成功退出VPP计划' : 'Successfully exited VPP plan');
+            }
+            
+            // 关闭模态框
+            closeExitVPPModal();
+            
+            // 更新统计和刷新表格
+            updateStats();
+            renderTable();
+            if (typeof updateTabCounts === 'function') {
+                updateTabCounts();
+            }
+        }
+        
+        // 显示成功提示
+        function showSuccessToast(message, type = 'success') {
+            // 创建toast元素
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : type === 'black' ? 'bg-black' : 'bg-primary';
+            const iconClass = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'black' ? 'fa-info-circle' : 'fa-info-circle';
+            
+            toast.className = `fixed top-20 right-6 ${bgClass} text-white px-5 py-3 rounded-lg shadow-apple z-50 flex items-center gap-2`;
+            toast.innerHTML = `
+                <i class="fa ${iconClass}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 反地理编码函数 - 将GPS坐标转换为地址
+        async function reverseGeocode(lat, lon) {
+            try {
+                // 首先尝试使用 Nominatim API 获取详细地址
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=${currentLang === 'zh' ? 'zh' : 'en'}`,
+                    {
+                        headers: {
+                            'User-Agent': 'CovaU VPP Address Lookup'
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.address) {
+                        const addr = data.address;
+                        let addressParts = [];
+
+                        if (addr.house_number && addr.road) {
+                            addressParts.push(`${addr.house_number} ${addr.road}`);
+                        } else if (addr.road) {
+                            addressParts.push(addr.road);
+                        }
+
+                        if (addr.suburb) {
+                            addressParts.push(addr.suburb);
+                        } else if (addr.neighbourhood) {
+                            addressParts.push(addr.neighbourhood);
+                        }
+
+                        if (addr.city) {
+                            addressParts.push(addr.city);
+                        } else if (addr.town) {
+                            addressParts.push(addr.town);
+                        } else if (addr.village) {
+                            addressParts.push(addr.village);
+                        }
+
+                        if (addr.state) {
+                            addressParts.push(addr.state);
+                        }
+
+                        if (addr.country) {
+                            addressParts.push(addr.country);
+                        }
+
+                        if (addr.postcode) {
+                            if (addressParts.length > 0 && addr.country) {
+                                addressParts.splice(-1, 0, addr.postcode);
+                            } else {
+                                addressParts.push(addr.postcode);
+                            }
+                        }
+
+                        if (addressParts.length > 0) {
+                            return addressParts.join(', ');
+                        }
+                    }
+
+                    if (data.display_name) {
+                        return data.display_name;
+                    }
+                }
+            } catch (error) {
+                console.error('Reverse geocoding error:', error);
+            }
+
+            try {
+                const altResponse = await fetch(
+                    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${currentLang === 'zh' ? 'zh' : 'en'}`
+                );
+
+                if (altResponse.ok) {
+                    const altData = await altResponse.json();
+
+                    if (altData.locality || altData.city) {
+                        let altAddressParts = [];
+
+                        if (altData.streetName) {
+                            if (altData.streetNumber) {
+                                altAddressParts.push(`${altData.streetNumber} ${altData.streetName}`);
+                            } else {
+                                altAddressParts.push(altData.streetName);
+                            }
+                        }
+
+                        if (altData.locality && altData.locality !== altData.city) {
+                            altAddressParts.push(altData.locality);
+                        }
+
+                        if (altData.city) {
+                            altAddressParts.push(altData.city);
+                        }
+
+                        if (altData.principalSubdivision) {
+                            altAddressParts.push(altData.principalSubdivision);
+                        }
+
+                        if (altData.postcode) {
+                            altAddressParts.push(altData.postcode);
+                        }
+
+                        if (altData.countryName) {
+                            altAddressParts.push(altData.countryName);
+                        }
+
+                        if (altAddressParts.length > 0) {
+                            return altAddressParts.join(', ');
+                        }
+                    }
+                }
+            } catch (altError) {
+                console.error('Alternative geocoding error:', altError);
+            }
+
+            const locationName = currentLang === 'zh' ? '当前位置' : 'Current Location';
+            return `${locationName} (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+        }
+
+        // 地址选择模态窗口函数
+        window.openDrawerAddressModal = function() {
+            const modal = document.getElementById('drawer-address-modal');
+            const modalContent = document.getElementById('drawer-address-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        window.closeDrawerAddressModal = function() {
+            const modal = document.getElementById('drawer-address-modal');
+            const modalContent = document.getElementById('drawer-address-modal-content');
+            modalContent.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function initDrawerAddressModal() {
+            const closeBtn = document.getElementById('close-drawer-address-btn');
+            const modal = document.getElementById('drawer-address-modal');
+            const locationBtn = document.getElementById('drawer-modal-location-btn');
+            const currentLocationText = document.getElementById('drawer-current-location-text');
+            const addressSearch = document.getElementById('drawer-address-search');
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeAddressModal);
+            }
+
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeAddressModal();
+                    }
+                });
+            }
+
+            document.querySelectorAll('.drawer-address-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const address = this.dataset.address;
+                    selectAddress(address);
+                });
+            });
+
+            if (addressSearch) {
+                addressSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    document.querySelectorAll('.drawer-address-item').forEach(item => {
+                        const address = item.dataset.address.toLowerCase();
+                        if (address.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        }
+
+        // 废弃的函数 - 保留以防其他地方引用
+        function closeDrawerAddressModal() {
+            closeAddressModal();
+        }
+
+        // 旧版本兼容
+        function oldCompatibilityFunction() {
+            const manualInput = document.getElementById('drawer-manual-address-input');
+            const confirmManualBtn = document.getElementById('drawer-confirm-manual-address');
+
+            if (confirmManualBtn) {
+                confirmManualBtn.addEventListener('click', function() {
+                    const manualAddress = manualInput ? manualInput.value.trim() : '';
+                    const addressInput = document.getElementById('edit-address');
+                    if (manualAddress && addressInput) {
+                        addressInput.value = manualAddress;
+                        closeAddressModal();
+                        showSuccessToast(
+                        currentLang === 'zh' ? '地址已手动输入' : 'Address entered manually',
+                        'success'
+                    );
+                } else {
+                    showSuccessToast(
+                        currentLang === 'zh' ? '请输入地址' : 'Please enter an address',
+                        'error'
+                    );
+                }
+            });
+            }
+
+            if (manualInput) {
+                manualInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && confirmManualBtn) {
+                        confirmManualBtn.click();
+                    }
+                });
+            }
+
+            if (locationBtn) {
+                locationBtn.addEventListener('click', async function() {
+                if (!navigator.geolocation) {
+                    showSuccessToast(
+                        currentLang === 'zh' ? '此浏览器不支持地理定位' : 'Geolocation is not supported by this browser',
+                        'error'
+                    );
+                    return;
+                }
+
+                currentLocationText.textContent = currentLang === 'zh' ? '🔍 正在搜索您的位置...' : '🔍 Searching for your location...';
+                locationBtn.disabled = true;
+                locationBtn.style.opacity = '0.6';
+
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        });
+                    });
+
+                    const { latitude, longitude } = position.coords;
+                    currentLocationText.textContent = currentLang === 'zh' ? '📍 已获取坐标，正在查询地址...' : '📍 Found coordinates, looking up address...';
+
+                    const locationAddress = await reverseGeocode(latitude, longitude);
+                    currentLocationText.textContent = currentLang === 'zh' ? '✅ 地址查询成功！' : '✅ Address found!';
+
+                    const addressInput = document.getElementById('drawer-edit-address');
+                    if (addressInput) {
+                        addressInput.value = locationAddress;
+                    }
+
+                    const shortAddress = locationAddress.length > 50 ?
+                        locationAddress.substring(0, 50) + '...' : locationAddress;
+                    showSuccessToast(
+                        currentLang === 'zh' ?
+                            `地址已自动填入: ${shortAddress}` :
+                            `Address populated: ${shortAddress}`,
+                        'success'
+                    );
+
+                    setTimeout(() => {
+                        closeDrawerAddressModal();
+                    }, 1000);
+
+                    setTimeout(() => {
+                        currentLocationText.textContent = currentLang === 'zh' ? '点击获取当前位置' : 'Click to get current location';
+                    }, 3000);
+
+                } catch (error) {
+                    console.error('Location error:', error);
+
+                    let errorMessageZh = '❌ 位置获取失败';
+                    let errorMessage = '❌ Failed to get location';
+
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessageZh = '❌ 位置权限被拒绝';
+                            errorMessage = '❌ Location permission denied';
+                            showSuccessToast(
+                                currentLang === 'zh' ? '请在浏览器设置中允许位置访问' : 'Please allow location access in browser settings',
+                                'error'
+                            );
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessageZh = '❌ 位置信息不可用';
+                            errorMessage = '❌ Location information unavailable';
+                            showSuccessToast(
+                                currentLang === 'zh' ? '无法获取位置信息，请检查GPS设置' : 'Location unavailable, please check GPS settings',
+                                'error'
+                            );
+                            break;
+                        case error.TIMEOUT:
+                            errorMessageZh = '❌ 位置请求超时';
+                            errorMessage = '❌ Location request timeout';
+                            showSuccessToast(
+                                currentLang === 'zh' ? '位置获取超时，请重试' : 'Location request timed out, please try again',
+                                'error'
+                            );
+                            break;
+                        default:
+                            showSuccessToast(
+                                currentLang === 'zh' ? '位置获取失败' : 'Failed to get location',
+                                'error'
+                            );
+                    }
+
+                    currentLocationText.textContent = currentLang === 'zh' ? errorMessageZh : errorMessage;
+
+                    setTimeout(() => {
+                        currentLocationText.textContent = currentLang === 'zh' ? '点击获取当前位置' : 'Click to get current location';
+                    }, 4000);
+                } finally {
+                    locationBtn.disabled = false;
+                    locationBtn.style.opacity = '1';
+                }
+            });
+            }
+        }
+
+        // 语言切换
+        function changeLanguage(lang, saveToStorage = true) {
+            currentLang = lang;
+            if (saveToStorage) {
+                localStorage.setItem('language', lang); // 保存到localStorage
+            }
+
+            // 设置HTML lang属性，影响浏览器原生控件（如日期选择器）的语言
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // 更新placeholder
+            document.getElementById('account-input').placeholder = lang === 'zh' ? '输入账号' : 'Enter account';
+            document.getElementById('sn-input').placeholder = lang === 'zh' ? '输入设备SN' : 'Enter device SN';
+            document.getElementById('meter-input').placeholder = lang === 'zh' ? '输入电表号' : 'Enter NMI';
+            document.getElementById('current-lang').textContent = lang === 'zh' ? '中文' : 'English';
+
+            // 日期选择器不需要更新选项（已改为input type="date"）
+
+            // 重新生成数据和渲染
+            generateMockData();
+            updateStats();
+            renderTable();
+        }
+
+        // 初始化事件监听
+        function initEventListeners() {
+            // 语言切换
+            const langToggleBtn = document.getElementById('lang-toggle-btn');
+            const langDropdown = document.getElementById('lang-dropdown');
+            
+            langToggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                langDropdown.classList.toggle('show');
+            });
+            
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                    langDropdown.classList.remove('show');
+                });
+            });
+            
+            document.addEventListener('click', function() {
+                langDropdown.classList.remove('show');
+            });
+            
+            // 查询按钮
+            document.getElementById('search-btn').addEventListener('click', function() {
+                currentPage = 1;
+                renderTable();
+            });
+            
+            // 重置按钮
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                document.getElementById('account-input').value = '';
+                document.getElementById('sn-input').value = '';
+                document.getElementById('meter-input').value = '';
+                document.getElementById('brand-filter').value = '';
+                const dateFilterElement = document.getElementById('date-filter');
+                if (dateFilterElement) {
+                    dateFilterElement.value = '';
+                    dateFilterElement.classList.remove('has-value');
+                }
+                currentPage = 1;
+                renderTable();
+            });
+            
+            // 实时筛选（可选）
+            
+            document.getElementById('account-input').addEventListener('input', function() {
+                currentPage = 1;
+                renderTable();
+            });
+            
+            document.getElementById('sn-input').addEventListener('input', function() {
+                currentPage = 1;
+                renderTable();
+            });
+            
+            document.getElementById('meter-input').addEventListener('input', function() {
+                currentPage = 1;
+                renderTable();
+            });
+            
+            document.getElementById('brand-filter').addEventListener('change', function() {
+                currentPage = 1;
+                renderTable();
+            });
+            
+            // 日期筛选器事件监听
+            const dateFilterListener = document.getElementById('date-filter');
+            if (dateFilterListener) {
+                // 更新日期输入框的状态类
+                const updateDateState = () => {
+                    if (dateFilterListener.value) {
+                        dateFilterListener.classList.add('has-value');
+                    } else {
+                        dateFilterListener.classList.remove('has-value');
+                    }
+                };
+
+                dateFilterListener.addEventListener('change', function() {
+                    currentPage = 1;
+                    updateDateState();
+                    renderTable();
+                });
+
+                dateFilterListener.addEventListener('input', updateDateState);
+
+                // 初始化状态
+                updateDateState();
+            }
+            
+            // 分页
+            document.getElementById('prev-page').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                }
+            });
+            
+            document.getElementById('next-page').addEventListener('click', function() {
+                const totalPages = Math.ceil(filteredData.length / pageSize);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                }
+            });
+            
+            // 全选
+            document.getElementById('select-all').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('#data-table-body input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+            });
+            
+            // 批量检测按钮 - 已移除
+            // document.getElementById('batch-detect-btn').addEventListener('click', performBatchDetection);
+            
+            // 表格导出按钮
+            document.getElementById('table-export-btn').addEventListener('click', function() {
+                alert(currentLang === 'zh' ? '导出功能开发中...' : 'Export feature in development...');
+            });
+            
+            // 关闭详情模态框
+            document.getElementById('close-detail-btn').addEventListener('click', function() {
+                document.getElementById('detail-modal').classList.add('hidden');
+            });
+
+            document.getElementById('detail-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+
+            // 关闭Brand详情模态框
+            document.getElementById('close-brand-detail-btn').addEventListener('click', function() {
+                document.getElementById('brand-detail-modal').classList.add('hidden');
+            });
+
+            document.getElementById('brand-detail-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+
+            // 退出VPP模态框点击外部关闭
+            document.getElementById('exit-vpp-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeExitVPPModal();
+                }
+            });
+            
+            // 恢复VPP模态框点击外部关闭
+            document.getElementById('restore-vpp-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRestoreModal();
+                }
+            });
+
+            // 删除模态框点击外部关闭
+            document.getElementById('delete-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteModal();
+                }
+            });
+
+            // 驳回模态框点击外部关闭
+            document.getElementById('reject-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRejectModal();
+                }
+            });
+
+            // 指引模态框点击外部关闭
+            document.getElementById('guidance-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeGuidanceModal();
+                }
+            });
+        }
+
+        // 切换Tab
+        function switchTab(tab) {
+            currentTab = tab;
+            currentPage = 1;
+            
+            // 批量检测按钮显示 - 已移除
+            // const batchDetectBtn = document.getElementById('batch-detect-btn');
+            // if (batchDetectBtn) {
+            //     if (tab === 'unauthorized' || tab === 'authorized') {
+            //         batchDetectBtn.classList.remove('hidden');
+            //     } else {
+            //         batchDetectBtn.classList.add('hidden');
+            //     }
+            // }
+            
+            // 更新Tab样式
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-black', 'text-white', 'font-medium');
+                btn.classList.add('text-tertiary');
+                // 更新计数透明度
+                const countSpan = btn.querySelector('[id$="-count"]');
+                if (countSpan) {
+                    countSpan.classList.remove('opacity-80');
+                    countSpan.classList.add('opacity-60');
+                }
+            });
+            
+            const activeTab = document.getElementById(`tab-${tab}`);
+            if (activeTab) {
+                activeTab.classList.remove('text-tertiary');
+                activeTab.classList.add('bg-black', 'text-white', 'font-medium');
+                // 更新激活Tab计数透明度
+                const countSpan = activeTab.querySelector('[id$="-count"]');
+                if (countSpan) {
+                    countSpan.classList.remove('opacity-60');
+                    countSpan.classList.add('opacity-80');
+                }
+            }
+            
+            // 更新表头
+            updateTableHeader();
+            
+            // 重新渲染表格
+            renderTable();
+        }
+        
+        // 更新表头
+        function updateTableHeader() {
+            const statusHeader = document.getElementById('status-header');
+            if (statusHeader) {
+                if (currentTab === 'exited') {
+                    statusHeader.textContent = translations[currentLang].exit_time || '退出时间';
+                } else if (currentTab === 'rejected') {
+                    statusHeader.textContent = translations[currentLang].rejected_time || '驳回时间';
+                } else if (currentTab === 'dispatch-failed') {
+                    statusHeader.textContent = translations[currentLang].dispatch_status || '调度状态';
+                } else {
+                    statusHeader.textContent = translations[currentLang].th_auth_status || '授权状态';
+                }
+            }
+
+            // 处理指引列
+            const tableHead = document.querySelector('thead tr');
+            const existingGuidanceHeader = document.getElementById('guidance-header');
+
+            if (currentTab === 'unauthorized' || currentTab === 'dispatch-failed') {
+                // 添加指引列（如果不存在）
+                if (!existingGuidanceHeader) {
+                    const guidanceHeader = document.createElement('th');
+                    guidanceHeader.id = 'guidance-header';
+                    guidanceHeader.className = 'px-4 py-3 text-left text-sm font-medium text-tertiary';
+                    guidanceHeader.setAttribute('data-i18n', 'guidance');
+                    guidanceHeader.textContent = translations[currentLang].guidance;
+                    // 插入到操作列之前
+                    const operationsHeader = tableHead.lastElementChild;
+                    tableHead.insertBefore(guidanceHeader, operationsHeader);
+                }
+            } else {
+                // 删除指引列（如果存在）
+                if (existingGuidanceHeader) {
+                    existingGuidanceHeader.remove();
+                }
+            }
+        }
+        
+        // 更新Tab计数
+        function updateTabCounts() {
+            const authorizedCount = mockData.filter(item => item.status === 'active' && !item.isExited && !item.dispatchFailed && !item.isRejected).length;
+            const unauthorizedCount = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.dispatchFailed && !item.isRejected).length;
+            const dispatchFailedCount = mockData.filter(item => item.dispatchFailed && !item.isExited && !item.isRejected).length;
+            const rejectedCount = rejectedUsers.length;
+            const exitedCount = exitedUsers.length;
+
+            if (document.getElementById('authorized-count')) {
+                document.getElementById('authorized-count').textContent = `(${authorizedCount})`;
+            }
+            if (document.getElementById('unauthorized-count')) {
+                document.getElementById('unauthorized-count').textContent = `(${unauthorizedCount})`;
+            }
+            if (document.getElementById('dispatch-failed-count')) {
+                document.getElementById('dispatch-failed-count').textContent = `(${dispatchFailedCount})`;
+            }
+            if (document.getElementById('rejected-count')) {
+                document.getElementById('rejected-count').textContent = `(${rejectedCount})`;
+            }
+            if (document.getElementById('exited-count')) {
+                document.getElementById('exited-count').textContent = `(${exitedCount})`;
+            }
+        }
+        
+        // 恢复到VPP
+        function restoreToVPP(userId) {
+            // 从退出用户列表中找到用户
+            const userIndex = exitedUsers.findIndex(u => u.id === userId);
+            if (userIndex !== -1) {
+                const user = exitedUsers[userIndex];
+                
+                // 从退出列表移除
+                exitedUsers.splice(userIndex, 1);
+                localStorage.setItem('exitedVPPUsers', JSON.stringify(exitedUsers));
+                
+                // 在mockData中找到并更新状态
+                const mockIndex = mockData.findIndex(d => d.id === userId);
+                if (mockIndex !== -1) {
+                    mockData[mockIndex].isExited = false;
+                    delete mockData[mockIndex].exitTime;
+                }
+                
+                showSuccessToast(currentLang === 'zh' ? '成功恢复到VPP计划' : 'Successfully restored to VPP plan');
+                renderTable();
+                updateTabCounts();
+                updateStats();
+            }
+        }
+        
+        // 执行检测
+        window.performDetection = function(id, isFromBatch = false) {
+            // 如果不是批量检测，显示单个检测提示
+            if (!isFromBatch) {
+                showSuccessToast(currentLang === 'zh' ? '正在检测中...' : 'Detecting...', 'black');
+            }
+
+            setTimeout(() => {
+                // 如果是已驳回的数据，从rejectedUsers中查找
+                if (currentTab === 'rejected') {
+                    const rejectedIndex = rejectedUsers.findIndex(d => d.id === id);
+                    if (rejectedIndex !== -1) {
+                        // 从已驳回列表移除
+                        const restoredItem = rejectedUsers.splice(rejectedIndex, 1)[0];
+                        // 恢复到mockData，并更新为已授权状态
+                        restoredItem.status = 'active';
+                        restoredItem.isRejected = false;
+                        delete restoredItem.rejectedTime;
+                        delete restoredItem.rejectionReason;
+                        mockData.push(restoredItem);
+                        // 更新localStorage
+                        localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                        if (!isFromBatch) {
+                            showSuccessToast(translations[currentLang].detect_success || '检测成功，已授权');
+                            updateStats();
+                            renderTable();
+                        }
+                    }
+                    return;
+                }
+
+                // 查找设备
+                const deviceIndex = mockData.findIndex(d => d.id === id);
+                if (deviceIndex !== -1) {
+                    // 标记为已检测，保持未授权状态但显示原因
+                    mockData[deviceIndex].hasDetected = true;
+                    
+                    // 根据remarkType判断是否可以授权
+                    if (!mockData[deviceIndex].remarkType) {
+                        // 如果没有问题，更新为已授权
+                        mockData[deviceIndex].status = 'active';
+                        if (!isFromBatch) {
+                            showSuccessToast(translations[currentLang].detect_success || '检测成功，已授权');
+                        }
+                    } else {
+                        // 如果有问题，保持未授权状态，但显示原因
+                        if (!isFromBatch) {
+                            showSuccessToast(
+                                currentLang === 'zh' ? 
+                                `检测完成：${translations[currentLang][mockData[deviceIndex].remarkType]}` : 
+                                `Detection completed: ${translations[currentLang][mockData[deviceIndex].remarkType]}`,
+                                'error'
+                            );
+                        }
+                    }
+                    
+                    if (!isFromBatch) {
+                        updateStats();
+                        renderTable();
+                        updateTabCounts();
+                    }
+                }
+            }, isFromBatch ? 500 : 1500); // 批量检测时更快
+        }
+
+        // 恢复到未授权
+        window.restoreToUnauthorized = function(id) {
+            showSuccessToast(currentLang === 'zh' ? '正在恢复...' : 'Restoring...', 'black');
+
+            setTimeout(() => {
+                const rejectedIndex = rejectedUsers.findIndex(d => d.id === id);
+                if (rejectedIndex !== -1) {
+                    // 从已驳回列表移除
+                    const restoredItem = rejectedUsers.splice(rejectedIndex, 1)[0];
+                    // 恢复到mockData，并更新为未授权状态
+                    restoredItem.status = 'inactive';
+                    restoredItem.isRejected = false;
+                    delete restoredItem.rejectedTime;
+                    delete restoredItem.rejectionReason;
+                    mockData.push(restoredItem);
+                    // 更新localStorage
+                    localStorage.setItem('rejectedUsers', JSON.stringify(rejectedUsers));
+
+                    showSuccessToast(translations[currentLang].restore_to_unauthorized_success || '已成功恢复到未授权');
+                    updateStats();
+                    renderTable();
+                    updateTabCounts();
+                }
+            }, 1000);
+        }
+
+        // 批量检测 - 已移除
+        // window.performBatchDetection = function() {
+        //     // 根据当前tab选择不同的项目
+        //     let itemsToDetect;
+        //     if (currentTab === 'unauthorized') {
+        //         itemsToDetect = mockData.filter(item => item.status === 'inactive' && !item.isExited && !item.isRejected);
+        //     } else if (currentTab === 'authorized') {
+        //         itemsToDetect = mockData.filter(item => item.status === 'active' && !item.isExited && !item.isRejected);
+        //     } else {
+        //         return;
+        //     }
+        //     
+        //     const unauthorizedItems = itemsToDetect;
+        //     
+        //     if (unauthorizedItems.length === 0) {
+        //         showSuccessToast(currentLang === 'zh' ? '没有需要检测的项目' : 'No items to detect', 'black');
+        //         return;
+        //     }
+        //     
+        //     showSuccessToast(currentLang === 'zh' ? `正在批量检测 ${unauthorizedItems.length} 个项目...` : `Detecting ${unauthorizedItems.length} items...`, 'black');
+        //     
+        //     let processed = 0;
+        //     let authorizedCount = 0;
+        //     let failedCount = 0;
+        //     
+        //     unauthorizedItems.forEach((item, index) => {
+        //         setTimeout(() => {
+        //             const deviceIndex = mockData.findIndex(d => d.id === item.id);
+        //             if (deviceIndex !== -1) {
+        //                 mockData[deviceIndex].hasDetected = true;
+        //                 
+        //                 if (!mockData[deviceIndex].remarkType) {
+        //                     mockData[deviceIndex].status = 'active';
+        //                     authorizedCount++;
+        //                 } else {
+        //                     failedCount++;
+        //                 }
+        //             }
+        //             
+        //             processed++;
+        //             
+        //             if (processed === unauthorizedItems.length) {
+        //                 // 全部完成
+        //                 setTimeout(() => {
+        //                     if (currentTab === 'authorized') {
+        //                         // 已授权tab的检测结果
+        //                         showSuccessToast(
+        //                             currentLang === 'zh' ? 
+        //                             `检测完成，${unauthorizedItems.length} 个项目状态正常` : 
+        //                             `Detection completed, ${unauthorizedItems.length} items status normal`,
+        //                             'success'
+        //                         );
+        //                     } else if (failedCount > 0) {
+        //                         showSuccessToast(
+        //                             currentLang === 'zh' ? 
+        //                             `批量检测完成：${authorizedCount} 个已授权，${failedCount} 个检测失败` : 
+        //                             `Batch detection completed: ${authorizedCount} authorized, ${failedCount} failed`,
+        //                             'black'
+        //                         );
+        //                     } else {
+        //                         showSuccessToast(
+        //                             currentLang === 'zh' ? 
+        //                             `批量检测完成，${authorizedCount} 个项目已授权` : 
+        //                             `Batch detection completed, ${authorizedCount} items authorized`,
+        //                             'success'
+        //                         );
+        //                     }
+        //                     updateStats();
+        //                     renderTable();
+        //                     updateTabCounts();
+        //                 }, 600);
+        //             }
+        //         }, index * 200); // 每个间隔200ms
+        //     });
+        // }
+        
+        // 存储当前编辑的item ID
+        let currentEditingId = null;
+
+        // 显示详情抽屉
+        window.showDetailsDrawer = function(id) {
+            const item = findItemById(id);
+            if (!item) return;
+
+            // 保存当前编辑的ID
+            currentEditingId = id;
+
+            const drawer = document.getElementById('details-drawer');
+            const drawerContent = document.getElementById('drawer-content');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            const formContent = document.getElementById('drawer-form-content');
+
+            // 禁用页面滚动
+            document.body.classList.add('drawer-open');
+
+            // 生成详情内容
+            formContent.innerHTML = generateDetailsContent(item);
+
+            // 显示抽屉容器
+            drawer.classList.remove('hidden');
+
+            // 强制重排，然后开始动画
+            drawer.offsetHeight;
+
+            // 同时显示遮罩和滑入抽屉
+            drawerOverlay.classList.add('opacity-100');
+            drawerOverlay.classList.remove('opacity-0');
+            drawerContent.classList.remove('translate-x-full');
+        }
+        
+        // 关闭详情抽屉
+        window.closeDetailsDrawer = function() {
+            const drawer = document.getElementById('details-drawer');
+            const drawerContent = document.getElementById('drawer-content');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            
+            // 恢复页面滚动
+            document.body.classList.remove('drawer-open');
+            
+            // 同时隐藏遮罩和滑出抽屉
+            drawerOverlay.classList.add('opacity-0');
+            drawerOverlay.classList.remove('opacity-100');
+            drawerContent.classList.add('translate-x-full');
+            
+            // 等待动画完成后隐藏整个容器
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 生成详情内容
+        function generateDetailsContent(item) {
+            // 判断是否为已授权状态
+            const isAuthorized = item.status === 'active';
+            // 已授权时，设备信息字段（除电池容量外）为只读
+            const deviceFieldReadonly = isAuthorized ? 'readonly' : '';
+            const deviceFieldClass = isAuthorized ? 'bg-gray-100 cursor-not-allowed' : '';
+
+            return `
+                <div class="space-y-6">
+                    <!-- 客户信息 -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '客户信息' : 'Customer Information'}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '客户姓名' : 'Customer Name'}</label>
+                                <input type="text" id="edit-customer-name" value="${item.account}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '手机号码' : 'Phone Number'}</label>
+                                <input type="text" id="edit-phone" value="+61 480629013" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '邮箱地址' : 'Email Address'}</label>
+                                <input type="email" id="edit-email" value="${item.account}@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电表号 (NMI)' : 'NMI'}</label>
+                                <input type="text" id="edit-meter" value="${item.meter}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '供电地址' : 'Power Supply Address'}</label>
+                                <input type="text" id="edit-address" value="${item.address}" readonly onclick="openAddressModal()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black cursor-pointer bg-white" placeholder="Click to select address">
+                            </div>
+                            <div>
+                                <input type="text" id="edit-additional-address" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black mt-6">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 设备信息 -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-4">${currentLang === 'zh' ? '设备信息' : 'Device Information'}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '品牌' : 'Brand'}</label>
+                                ${isAuthorized ?
+                                    `<input type="text" id="edit-brand" value="${item.brand}" readonly class="w-full px-3 py-2 border border-gray-300 rounded-lg ${deviceFieldClass}">` :
+                                    `<select id="edit-brand" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black" onchange="handleBrandChange()">
+                                        <option value="ipotisedge" ${item.brand === 'ipotisedge' ? 'selected' : ''}>ipotisedge</option>
+                                        <option value="FOX ESS" ${item.brand === 'FOX ESS' ? 'selected' : ''}>FOX ESS</option>
+                                        <option value="Alpha" ${item.brand === 'Alpha' ? 'selected' : ''}>Alpha</option>
+                                    </select>`
+                                }
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '逆变器SN' : 'Inverter SN'}</label>
+                                <input type="text" id="edit-sn" value="${item.sn}" ${deviceFieldReadonly} class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black ${deviceFieldClass}">
+                            </div>
+                            <div id="edit-account-field" style="display: ${item.brand === 'Alpha' ? 'none' : 'block'}">
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '用户名' : 'User Name'}</label>
+                                <input type="text" id="edit-account" value="${item.account}" ${deviceFieldReadonly} class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black ${deviceFieldClass}">
+                            </div>
+                            <div id="edit-checkcode-field" style="display: ${item.brand === 'Alpha' ? 'block' : 'none'}">
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '校验码' : 'Check Code'}</label>
+                                <input type="text" id="edit-checkcode" value="${item.checkCode || ''}" ${deviceFieldReadonly} class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black ${deviceFieldClass}">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? '电池容量 (kWh)' : 'Battery Capacity (kWh)'}</label>
+                                <input type="text" id="edit-capacity" value="280" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+                            </div>
+                            <div id="edit-apikey-field" class="md:col-span-2" style="display: ${item.brand === 'FOX ESS' ? 'block' : 'none'}">
+                                <label class="text-sm text-gray-600 mb-1 block">${currentLang === 'zh' ? 'API密钥' : 'API Key'}</label>
+                                <input type="text" id="edit-apikey" value="${item.apiKey || ''}" ${deviceFieldReadonly} class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black ${deviceFieldClass}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 处理品牌切换
+        window.handleBrandChange = function() {
+            const brand = document.getElementById('edit-brand').value;
+            const accountField = document.getElementById('edit-account-field');
+            const checkcodeField = document.getElementById('edit-checkcode-field');
+            const apikeyField = document.getElementById('edit-apikey-field');
+
+            if (brand === 'Alpha') {
+                accountField.style.display = 'none';
+                checkcodeField.style.display = 'block';
+            } else {
+                accountField.style.display = 'block';
+                checkcodeField.style.display = 'none';
+            }
+
+            if (brand === 'FOX ESS') {
+                apikeyField.style.display = 'block';
+            } else {
+                apikeyField.style.display = 'none';
+            }
+        }
+
+        // 打开地址选择模态框
+        window.openAddressModal = function() {
+            const modal = document.getElementById('drawer-address-modal');
+            const modalContent = document.getElementById('drawer-address-modal-content');
+            if (modal && modalContent) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.style.transform = 'translateY(0)';
+                }, 10);
+            }
+        }
+
+        // 关闭地址选择模态框
+        window.closeAddressModal = function() {
+            const modal = document.getElementById('drawer-address-modal');
+            const modalContent = document.getElementById('drawer-address-modal-content');
+            if (modal && modalContent) {
+                modalContent.style.transform = 'translateY(100%)';
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // 选择地址
+        window.selectAddress = function(address) {
+            const addressInput = document.getElementById('edit-address');
+            if (addressInput) {
+                addressInput.value = address;
+            }
+            closeAddressModal();
+        }
+
+        // 保存修改
+        window.saveDrawerChanges = function() {
+            if (!currentEditingId) return;
+
+            const itemIndex = mockData.findIndex(d => d.id === currentEditingId);
+            if (itemIndex === -1) return;
+
+            // 获取表单数据
+            mockData[itemIndex].account = document.getElementById('edit-customer-name').value;
+            mockData[itemIndex].meter = document.getElementById('edit-meter').value;
+            mockData[itemIndex].address = document.getElementById('edit-address').value;
+            mockData[itemIndex].brand = document.getElementById('edit-brand').value;
+            mockData[itemIndex].sn = document.getElementById('edit-sn').value;
+
+            if (mockData[itemIndex].brand === 'Alpha') {
+                mockData[itemIndex].checkCode = document.getElementById('edit-checkcode').value;
+            } else {
+                mockData[itemIndex].account = document.getElementById('edit-account').value;
+            }
+
+            if (mockData[itemIndex].brand === 'FOX ESS') {
+                mockData[itemIndex].apiKey = document.getElementById('edit-apikey').value;
+            }
+
+            // 关闭抽屉
+            closeDetailsDrawer();
+
+            // 刷新表格
+            renderTable();
+            updateStats();
+            updateTabCounts();
+
+            // 显示成功提示
+            showSuccessToast(currentLang === 'zh' ? '保存成功' : 'Saved successfully');
+        }
+
+        // 导出函数到全局
+        window.switchTab = switchTab;
+        window.restoreToVPP = restoreToVPP;
+
+        // ==================== 组织管理模块 ====================
+
+        // 用户数据存储
+        let userData = JSON.parse(localStorage.getItem('orgUsers') || '[]');
+        let userCurrentPage = 1;
+        const userPageSize = 10;
+        let filteredUserData = [];
+
+        // 初始化默认管理员用户（如果没有数据）
+        if (userData.length === 0) {
+            userData = [
+                {
+                    id: 1,
+                    nickname: 'Admin',
+                    account: 'admin',
+                    password: 'admin123',
+                    status: 'enabled',
+                    remarks: '系统管理员',
+                    createTime: new Date().toLocaleString()
+                }
+            ];
+            localStorage.setItem('orgUsers', JSON.stringify(userData));
+        }
+
+        // 页面切换函数
+        function showAuthManagement(event) {
+            if (event) event.preventDefault();
+            document.getElementById('auth-page').classList.remove('hidden');
+            document.getElementById('org-page').classList.add('hidden');
+
+            // 更新导航栏样式
+            document.getElementById('auth-management-link').classList.add('bg-black', 'text-white');
+            document.getElementById('auth-management-link').classList.remove('text-gray-600', 'hover:bg-gray-100');
+            document.getElementById('org-management-link').classList.remove('bg-black', 'text-white');
+            document.getElementById('org-management-link').classList.add('text-gray-600', 'hover:bg-gray-100');
+        }
+
+        function showOrgManagement(event) {
+            if (event) event.preventDefault();
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('org-page').classList.remove('hidden');
+
+            // 更新导航栏样式
+            document.getElementById('org-management-link').classList.add('bg-black', 'text-white');
+            document.getElementById('org-management-link').classList.remove('text-gray-600', 'hover:bg-gray-100');
+            document.getElementById('auth-management-link').classList.remove('bg-black', 'text-white');
+            document.getElementById('auth-management-link').classList.add('text-gray-600', 'hover:bg-gray-100');
+
+            // 渲染用户表格
+            renderUserTable();
+        }
+
+        // 渲染用户表格
+        function renderUserTable() {
+            const tbody = document.getElementById('user-table-body');
+            const emptyState = document.getElementById('user-empty-state');
+
+            // 应用搜索过滤
+            filteredUserData = userData.filter(user => {
+                const nicknameSearch = document.getElementById('user-nickname-search').value.toLowerCase();
+                const accountSearch = document.getElementById('user-account-search').value.toLowerCase();
+                const statusSearch = document.getElementById('user-status-search').value;
+
+                const matchNickname = !nicknameSearch || user.nickname.toLowerCase().includes(nicknameSearch);
+                const matchAccount = !accountSearch || user.account.toLowerCase().includes(accountSearch);
+                const matchStatus = !statusSearch || user.status === statusSearch;
+
+                return matchNickname && matchAccount && matchStatus;
+            });
+
+            // 更新统计
+            document.getElementById('user-total-count').textContent = filteredUserData.length;
+            document.getElementById('user-total-records').textContent = filteredUserData.length;
+
+            // 分页计算
+            const totalPages = Math.ceil(filteredUserData.length / userPageSize) || 1;
+            if (userCurrentPage > totalPages) userCurrentPage = totalPages;
+
+            const startIndex = (userCurrentPage - 1) * userPageSize;
+            const endIndex = Math.min(startIndex + userPageSize, filteredUserData.length);
+            const pageData = filteredUserData.slice(startIndex, endIndex);
+
+            // 更新分页信息
+            document.getElementById('user-showing-range').textContent = filteredUserData.length > 0
+                ? `${startIndex + 1}-${endIndex}`
+                : '0-0';
+            document.getElementById('user-page-info').textContent = `${userCurrentPage} / ${totalPages}`;
+
+            // 更新分页按钮状态
+            document.getElementById('user-prev-page').disabled = userCurrentPage <= 1;
+            document.getElementById('user-next-page').disabled = userCurrentPage >= totalPages;
+
+            if (filteredUserData.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            tbody.innerHTML = pageData.map(user => `
+                <tr class="border-b border-border hover:bg-light/50 transition-colors">
+                    <td class="px-4 py-3 text-sm">${escapeHtml(user.nickname)}</td>
+                    <td class="px-4 py-3 text-sm font-medium">${escapeHtml(user.account)}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                            user.status === 'enabled'
+                                ? 'bg-success/10 text-success'
+                                : 'bg-danger/10 text-danger'
+                        }">
+                            ${user.status === 'enabled'
+                                ? (currentLang === 'zh' ? '启用' : 'Enabled')
+                                : (currentLang === 'zh' ? '禁用' : 'Disabled')}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-tertiary">${user.createTime}</td>
+                    <td class="px-4 py-3 text-sm text-tertiary">${escapeHtml(user.remarks || '-')}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex gap-2">
+                            <button onclick="editUser(${user.id})" class="text-primary hover:text-primary/80 text-sm">
+                                <i class="fa fa-edit mr-1"></i>${currentLang === 'zh' ? '编辑' : 'Edit'}
+                            </button>
+                            <button onclick="showDeleteUserModal(${user.id})" class="text-danger hover:text-danger/80 text-sm">
+                                <i class="fa fa-trash mr-1"></i>${currentLang === 'zh' ? '删除' : 'Delete'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 搜索用户
+        function searchUsers() {
+            userCurrentPage = 1;
+            renderUserTable();
+        }
+
+        // 重置搜索
+        function resetUserSearch() {
+            document.getElementById('user-nickname-search').value = '';
+            document.getElementById('user-account-search').value = '';
+            document.getElementById('user-status-search').value = '';
+            userCurrentPage = 1;
+            renderUserTable();
+        }
+
+        // 分页函数
+        function prevUserPage() {
+            if (userCurrentPage > 1) {
+                userCurrentPage--;
+                renderUserTable();
+            }
+        }
+
+        function nextUserPage() {
+            const totalPages = Math.ceil(filteredUserData.length / userPageSize) || 1;
+            if (userCurrentPage < totalPages) {
+                userCurrentPage++;
+                renderUserTable();
+            }
+        }
+
+        // 显示添加用户模态框
+        function showAddUserModal() {
+            document.getElementById('edit-user-id').value = '';
+            document.getElementById('user-nickname').value = '';
+            document.getElementById('user-account').value = '';
+            document.getElementById('user-password').value = '';
+            document.getElementById('user-remarks').value = '';
+            document.querySelector('input[name="user-status"][value="enabled"]').checked = true;
+
+            // 添加模式：账号可编辑
+            const accountInput = document.getElementById('user-account');
+            accountInput.readOnly = false;
+            accountInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'text-gray-500');
+
+            document.getElementById('user-modal-title').textContent = currentLang === 'zh' ? '添加用户' : 'Add User';
+            document.getElementById('password-hint').classList.add('hidden');
+            document.getElementById('user-modal').classList.remove('hidden');
+        }
+
+        // 编辑用户
+        function editUser(id) {
+            const user = userData.find(u => u.id === id);
+            if (!user) return;
+
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('user-nickname').value = user.nickname;
+            document.getElementById('user-account').value = user.account;
+            document.getElementById('user-password').value = '';
+            document.getElementById('user-remarks').value = user.remarks || '';
+            document.querySelector(`input[name="user-status"][value="${user.status}"]`).checked = true;
+
+            // 编辑模式：账号不可修改
+            const accountInput = document.getElementById('user-account');
+            accountInput.readOnly = true;
+            accountInput.classList.add('bg-gray-100', 'cursor-not-allowed', 'text-gray-500');
+
+            document.getElementById('user-modal-title').textContent = currentLang === 'zh' ? '编辑用户' : 'Edit User';
+            document.getElementById('password-hint').classList.remove('hidden');
+            document.getElementById('user-modal').classList.remove('hidden');
+        }
+
+        // 关闭用户模态框
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.add('hidden');
+        }
+
+        // 保存用户
+        function saveUser() {
+            const id = document.getElementById('edit-user-id').value;
+            const nickname = document.getElementById('user-nickname').value.trim();
+            const account = document.getElementById('user-account').value.trim();
+            const password = document.getElementById('user-password').value;
+            const remarks = document.getElementById('user-remarks').value.trim();
+            const status = document.querySelector('input[name="user-status"]:checked').value;
+
+            // 验证
+            if (!nickname) {
+                showSuccessToast(currentLang === 'zh' ? '请输入昵称' : 'Please enter nickname', 'error');
+                return;
+            }
+            if (!account) {
+                showSuccessToast(currentLang === 'zh' ? '请输入账号' : 'Please enter account', 'error');
+                return;
+            }
+
+            if (id) {
+                // 编辑模式
+                const index = userData.findIndex(u => u.id === parseInt(id));
+                if (index !== -1) {
+                    // 检查账号是否重复（排除自身）
+                    const duplicate = userData.find(u => u.account === account && u.id !== parseInt(id));
+                    if (duplicate) {
+                        showSuccessToast(currentLang === 'zh' ? '账号已存在' : 'Account already exists', 'error');
+                        return;
+                    }
+
+                    userData[index].nickname = nickname;
+                    userData[index].account = account;
+                    if (password) userData[index].password = password;
+                    userData[index].remarks = remarks;
+                    userData[index].status = status;
+                }
+            } else {
+                // 新增模式
+                if (!password) {
+                    showSuccessToast(currentLang === 'zh' ? '请输入密码' : 'Please enter password', 'error');
+                    return;
+                }
+
+                // 检查账号是否重复
+                const duplicate = userData.find(u => u.account === account);
+                if (duplicate) {
+                    showSuccessToast(currentLang === 'zh' ? '账号已存在' : 'Account already exists', 'error');
+                    return;
+                }
+
+                const newUser = {
+                    id: userData.length > 0 ? Math.max(...userData.map(u => u.id)) + 1 : 1,
+                    nickname,
+                    account,
+                    password,
+                    status,
+                    remarks,
+                    createTime: new Date().toLocaleString()
+                };
+                userData.push(newUser);
+            }
+
+            // 保存到 localStorage
+            localStorage.setItem('orgUsers', JSON.stringify(userData));
+
+            closeUserModal();
+            renderUserTable();
+            showSuccessToast(currentLang === 'zh' ? '保存成功' : 'Saved successfully');
+        }
+
+        // 显示删除用户确认模态框
+        function showDeleteUserModal(id) {
+            document.getElementById('delete-user-id').value = id;
+            document.getElementById('delete-user-modal').classList.remove('hidden');
+        }
+
+        // 关闭删除用户模态框
+        function closeDeleteUserModal() {
+            document.getElementById('delete-user-modal').classList.add('hidden');
+        }
+
+        // 确认删除用户
+        function confirmDeleteUser() {
+            const id = parseInt(document.getElementById('delete-user-id').value);
+            const index = userData.findIndex(u => u.id === id);
+
+            if (index !== -1) {
+                userData.splice(index, 1);
+                localStorage.setItem('orgUsers', JSON.stringify(userData));
+                closeDeleteUserModal();
+                renderUserTable();
+                showSuccessToast(currentLang === 'zh' ? '删除成功' : 'Deleted successfully');
+            }
+        }
+
+        // 切换密码显示
+        function toggleUserPassword() {
+            const passwordInput = document.getElementById('user-password');
+            const icon = document.getElementById('password-toggle-icon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // 导出组织管理函数到全局
+        window.showAuthManagement = showAuthManagement;
+        window.showOrgManagement = showOrgManagement;
+        window.showAddUserModal = showAddUserModal;
+        window.editUser = editUser;
+        window.closeUserModal = closeUserModal;
+        window.saveUser = saveUser;
+        window.showDeleteUserModal = showDeleteUserModal;
+        window.closeDeleteUserModal = closeDeleteUserModal;
+        window.confirmDeleteUser = confirmDeleteUser;
+        window.searchUsers = searchUsers;
+        window.resetUserSearch = resetUserSearch;
+        window.prevUserPage = prevUserPage;
+        window.nextUserPage = nextUserPage;
+        window.toggleUserPassword = toggleUserPassword;
+
+        // ==================== 组织管理模块结束 ====================
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+    <!-- 详情抽屉 -->
+    <div id="details-drawer" class="fixed inset-0 z-50 hidden">
+        <!-- 背景遮罩 -->
+        <div class="fixed inset-0 bg-black/50 transition-opacity opacity-0" id="drawer-overlay" onclick="closeDetailsDrawer()"></div>
+
+        <!-- 抽屉内容 -->
+        <div class="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out translate-x-full flex flex-col" id="drawer-content">
+            <!-- 抽屉头部 -->
+            <div class="flex items-center justify-between p-6 border-b border-border bg-white flex-shrink-0">
+                <h2 class="text-xl font-semibold" data-i18n="details_title">Details</h2>
+                <button onclick="closeDetailsDrawer()" class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200 focus:ring-2 focus:ring-gray-300 focus:ring-offset-1">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- 抽屉内容区 -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="p-6" id="drawer-form-content">
+                    <!-- 详情内容将通过JavaScript动态添加 -->
+                </div>
+            </div>
+
+            <!-- 抽屉底部按钮 -->
+            <div class="flex items-center justify-end gap-3 p-6 border-t border-border bg-white flex-shrink-0">
+                <button onclick="closeDetailsDrawer()" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="saveDrawerChanges()" class="px-6 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-black/90 transition-colors">
+                    <span data-i18n="save">保存</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Selection Modal -->
+    <div id="drawer-address-modal" class="fixed inset-0 bg-black/70 z-50 flex items-end md:items-center justify-center hidden">
+        <div class="bg-white rounded-t-2xl md:rounded-2xl w-full md:max-w-lg max-h-[80vh] overflow-hidden transform transition-transform duration-300" id="drawer-address-modal-content" style="transform: translateY(100%);">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white border-b border-gray-300 z-10">
+                <div class="p-4 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold" data-i18n="select_address">Select Address</h3>
+                    <button id="close-drawer-address-btn" class="text-gray-500 hover:text-gray-700 transition-colors p-1">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <!-- Current Location Button -->
+                <div class="px-4 pb-3">
+                    <button id="drawer-modal-location-btn"
+                            class="w-full flex items-center gap-3 p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        <i class="fa fa-location-arrow text-black"></i>
+                        <div class="flex-1 text-left">
+                            <p class="font-medium text-gray-800" data-i18n="current_location">Current Location</p>
+                            <p class="text-sm text-gray-500" id="drawer-current-location-text" data-i18n="click_to_get_location">Click to get current location</p>
+                        </div>
+                        <i class="fa fa-chevron-right text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Address List -->
+            <div class="overflow-y-auto" style="max-height: calc(80vh - 180px);">
+                <!-- Search Box -->
+                <div class="p-4 border-b border-gray-200">
+                    <div class="relative">
+                        <input type="text" id="drawer-address-search"
+                               placeholder="Search address"
+                               data-i18n-placeholder="search_address"
+                               class="w-full px-10 py-2.5 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                        <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Popular Addresses -->
+                <div class="p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-3" data-i18n="popular_addresses">Popular Addresses</p>
+                    <div class="space-y-2" id="drawer-address-list-container">
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Sydney, NSW, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Sydney</p>
+                                    <p class="text-sm text-gray-500">New South Wales, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Melbourne, VIC, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Melbourne</p>
+                                    <p class="text-sm text-gray-500">Victoria, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Brisbane, QLD, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Brisbane</p>
+                                    <p class="text-sm text-gray-500">Queensland, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Perth, WA, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Perth</p>
+                                    <p class="text-sm text-gray-500">Western Australia, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Adelaide, SA, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Adelaide</p>
+                                    <p class="text-sm text-gray-500">South Australia, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Canberra, ACT, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Canberra</p>
+                                    <p class="text-sm text-gray-500">Australian Capital Territory, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Gold Coast, QLD, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Gold Coast</p>
+                                    <p class="text-sm text-gray-500">Queensland, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                        <button class="drawer-address-item w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+                                data-address="Darwin, NT, Australia">
+                            <div class="flex items-start gap-3">
+                                <i class="fa fa-map-marker text-gray-400 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-800">Darwin</p>
+                                    <p class="text-sm text-gray-500">Northern Territory, Australia</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manual Input -->
+                <div class="p-4 border-t border-gray-200">
+                    <p class="text-sm font-medium text-gray-500 mb-3" data-i18n="enter_manually">Enter address manually</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="drawer-manual-address-input"
+                               placeholder="Enter detailed address"
+                               data-i18n-placeholder="enter_detailed_address"
+                               class="flex-1 px-4 py-2.5 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                        <button id="drawer-confirm-manual-address" class="px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
+                            <span data-i18n="confirm">Confirm</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
